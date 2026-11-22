@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B.A.D CARDS 2400 — Interactive 3D Mythic Collector Vault &amp; Duel Arena</title>
+  <meta name="description" content="Official Build a Dream (B.A.D) Cards 2400 interactive 3D holographic NFL collector vault, 4-card squad deck builder, pack ripper, and tactical Hype Energy duel arena." />
+  <meta name="theme-color" content="#07090f" />
+
+  <!-- OpenGraph & Social Preview Metadata (Flagship Pro Share Cards) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://iksterbo-design.github.io/bad-cards-2400/" />
+  <meta property="og:title" content="B.A.D CARDS 2400 — Interactive 3D Mythic Collector Vault" />
+  <meta property="og:description" content="Flip all 5 live-animated 99 OVR 1st-Edition holographic collector cards, rip a Mythic God Pack, build your 4-card squad, and battle friends in the Tactical Duel Arena." />
+  <meta property="og:image" content="https://iksterbo-design.github.io/bad-cards-2400/assets/card-tavaris-too-too.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="B.A.D CARDS 2400 — Interactive 3D Mythic Collector Vault" />
+  <meta name="twitter:description" content="5 live-animated 99 OVR Mythic 1/1 cards • Pack Ripper • 4-Card Squad Builder • Tactical Hype-Energy Duel Arena." />
+  <meta name="twitter:image" content="https://iksterbo-design.github.io/bad-cards-2400/assets/card-tavaris-too-too.jpg" />
+
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23f5b942'/><text x='32' y='40' font-family='Arial Black' font-size='20' font-weight='900' fill='%23070b14' text-anchor='middle'>B.A.D</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body data-foil="native">
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+  <canvas id="fireworks-canvas" aria-hidden="true"></canvas>
+
+  <div class="app-shell">
+    <!-- TOP UTILITY BAR -->
+    <div class="top-strip">
+      <div class="top-strip-inner">
+        <div class="top-strip-group">
+          <span class="live-pill"><span class="live-dot" aria-hidden="true"></span> LIVE &bull; SEASON 2400 &bull; 1ST EDITION</span>
+          <span class="grade-crest">★ GRADE: DIVINITY (5/5)</span>
+        </div>
+        <div class="top-strip-group">
+          <span>Build a Dream (B.A.D) Studio &bull; Moline, IL</span>
+          <button id="copy-share-btn" class="strip-link-btn" type="button">🔗 Copy Live Link</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- STICKY HEADER -->
+    <header class="hud-nav">
+      <div class="hud-nav-inner">
+        <a href="#top" class="brand-lockup">
+          <span class="brand-seal">B.A.D</span>
+          <div>
+            <div class="brand-title">B.A.D CARDS 2400</div>
+            <div class="brand-sub">Flagship 1st-Edition Vault</div>
+          </div>
+        </a>
+
+        <nav class="nav-links" aria-label="Primary navigation">
+          <a href="#vault">Card Vault</a>
+          <a href="#battle">Duel Arena</a>
+          <a href="#request-desk">Get Your Card</a>
+          <a href="#hype-wall">Crew Wall</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button id="open-squad-btn" class="btn btn-cyan btn-sm" type="button">🃏 My Squad (<span id="squad-count">3</span>/4)</button>
+          <button id="mute-btn" class="btn btn-ghost btn-sm" type="button">🔊 Sound</button>
+          <button id="nav-pack-btn" class="btn btn-gold btn-sm" type="button">🎁 Rip Pack</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section id="top" class="hero">
+      <div class="hero-content">
+        <div class="hero-pill">✨ FLAGSHIP EDITION &bull; CORNER HOLOGRAPHIC SEAL SERIES</div>
+        <h1 class="hero-title">
+          <span class="gold">B.A.D CARDS</span> 2400<br />
+          MYTHIC CREW VAULT
+        </h1>
+        <p class="hero-sub">
+          Collect, evolve, build your 4-card squad, and out-bluff your friends with Hype Energy &amp; Instant Traps — featuring pure team-native 3D holographic cards stamped with the subtle <strong>B.A.D</strong> corner authentication seal.
+        </p>
+
+        <div class="clan-strip" aria-label="Active team clans">
+          <span class="clan-badge">⚡ VALHALLA SQUAD &bull; 3</span>
+          <span class="clan-badge">🐻 MIDWAY MONSTERS &bull; 1</span>
+          <span class="clan-badge">⭐ LONE STAR EMPIRE &bull; 1</span>
+        </div>
+
+        <div class="hero-cta-row">
+          <button id="hero-pack-btn" class="btn btn-gold" type="button">🎁 Rip 5-Card Mythic Pack</button>
+          <a href="#vault" class="btn btn-cyan">🃏 Open Card Binder</a>
+          <a href="#battle" class="btn btn-ghost">⚔️ Play 4-Round Duel</a>
+          <a href="#request-desk" class="btn btn-ghost">🎨 Request Your Card</a>
+        </div>
+
+        <div class="hero-stats">
+          <div class="stat-pill-box">
+            <div class="stat-pill-val">5 / 5</div>
+            <div class="stat-pill-lbl">1st-Ed Mythic 1/1</div>
+          </div>
+          <div class="stat-pill-box">
+            <div class="stat-pill-val">5 FOILS</div>
+            <div class="stat-pill-lbl">Prism • Gold • Ghost • Ice</div>
+          </div>
+          <div class="stat-pill-box">
+            <div class="stat-pill-val">12 NRG</div>
+            <div class="stat-pill-lbl">Tactical Bluff Duels</div>
+          </div>
+          <div class="stat-pill-box">
+            <div class="stat-pill-val">B.A.D 10</div>
+            <div class="stat-pill-lbl">Corner Holo Sealed</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: DIGITAL BINDER & LIVE 3D CARD VAULT -->
+    <section id="vault" class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">DIGITAL BINDER &bull; FOIL LAB</div>
+          <h2 class="section-title">Live 3D Holographic Card Vault</h2>
+        </div>
+        <p class="section-desc">
+          Tilt for real 3D foil glare, <strong>click any card to flip 180°</strong>, inspect <strong>1★→5★ Evolution stages</strong>, add cards to your <strong>4-Card Squad</strong>, or download crisp Front &amp; Back PNGs with the corner <strong>B.A.D</strong> foil seal.
+        </p>
+      </div>
+
+      <div class="vault-toolbar">
+        <div class="toolbar-row">
+          <div class="toolbar-group" role="group" aria-label="Filter by team clan">
+            <span class="toolbar-label">CLAN / TEAM:</span>
+            <button class="chip active" data-team-filter="all" type="button">All 5</button>
+            <button class="chip" data-team-filter="vikings" type="button">⚡ Vikings (3)</button>
+            <button class="chip" data-team-filter="bears" type="button">🐻 Bears (1)</button>
+            <button class="chip" data-team-filter="cowboys" type="button">⭐ Cowboys (1)</button>
+          </div>
+          <div class="toolbar-group">
+            <input id="vault-search" class="search-input" type="search" placeholder="Search player, #number, keyword..." aria-label="Search cards" />
+          </div>
+        </div>
+
+        <div class="toolbar-row">
+          <div class="toolbar-group" role="group" aria-label="Collector foil finish">
+            <span class="toolbar-label">FOIL FINISH:</span>
+            <button class="chip active" data-foil-btn="native" type="button">✨ Team Native</button>
+            <button class="chip" data-foil-btn="prism" type="button">🌈 Secret Prism</button>
+            <button class="chip" data-foil-btn="gold" type="button">🏆 Golden Aura</button>
+            <button class="chip" data-foil-btn="ghost" type="button">👻 Ghost Platinum</button>
+            <button class="chip" data-foil-btn="ice" type="button">❄️ Sapphire Ice</button>
+          </div>
+
+          <div class="toolbar-group">
+            <button id="toggle-view-btn" class="btn btn-ghost btn-sm" type="button">🗂️ Binder View: Full</button>
+            <button id="toggle-anim-btn" class="btn btn-ghost btn-sm" type="button">⏸ Pause Live 3D</button>
+            <button id="toggle-slab-btn" class="btn btn-cyan btn-sm" type="button">💎 B.A.D 10 Slab: OFF</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="cards-grid" class="cards-grid"></div>
+    </section>
+
+    <!-- SECTION 2: TACTICAL 4-ROUND DUEL ARENA -->
+    <section id="battle" class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">TACTICAL BLUFF &amp; INSTANT COUNTERPLAY</div>
+          <h2 class="section-title">B.A.D 4-Round Duel Arena</h2>
+        </div>
+        <p class="section-desc">
+          Pick your card, stake <strong>Hype Energy (0–12)</strong> secretly to multiply <strong>Power × (1 + Energy)</strong>, arm a 1-per-match <strong>Instant or Trap</strong>, and drop your opponent’s Life to 0!
+        </p>
+      </div>
+
+      <div class="panel-surface">
+        <!-- Urban Rivals-style Top Duel HUD -->
+        <div class="duel-hud">
+          <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+            <span style="font-family:var(--font-display);font-size:0.72rem;color:var(--bad-gold-hot);" id="duel-round-label">ROUND 1 / 4</span>
+            <div class="round-dashes" id="round-dashes" aria-hidden="true">
+              <span class="round-dash active"></span>
+              <span class="round-dash"></span>
+              <span class="round-dash"></span>
+              <span class="round-dash"></span>
+            </div>
+          </div>
+
+          <div class="energy-counters">
+            <span class="energy-pill-readout">⚡ YOU: <strong id="hero-energy-val">12</strong> NRG</span>
+            <span class="energy-pill-readout" style="border-color:rgba(239,68,68,0.55);color:#fca5a5;">⚡ OPP: <strong id="opp-energy-val">12</strong> NRG</span>
+            <span style="color:var(--text-muted);" id="battle-wins-badge">WINS: 0</span>
+          </div>
+        </div>
+
+        <div class="battle-setup">
+          <div class="battle-row">
+            <span class="toolbar-label">YOUR CARD:</span>
+            <div id="fighter-picker" class="toolbar-group"></div>
+          </div>
+          <div class="battle-row">
+            <span class="toolbar-label">MODE:</span>
+            <button class="chip active" data-opp-mode="crew" type="button">⚔️ Friend vs. Friend</button>
+            <button class="chip" data-opp-mode="rivals" type="button">🏟️ NFL Rivals</button>
+            <span class="toolbar-label" style="margin-left:0.4rem;">OPPONENT:</span>
+            <div id="opponent-picker" class="toolbar-group"></div>
+          </div>
+        </div>
+
+        <div class="battle-stage">
+          <!-- HERO SIDE -->
+          <div class="fighter-card" id="hero-fighter-box">
+            <img id="battle-hero-img" class="fighter-avatar" src="assets/card-tavaris-too-too.jpg" alt="Your fighter" />
+            <div id="battle-hero-name" class="fighter-name">TAVARIS aka TOO TOO #22</div>
+            <div class="fighter-stat-badges">
+              <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">9</strong></span>
+              <span class="badge-dmg">🔥 DMG <strong id="hero-dmg-val">7</strong></span>
+            </div>
+            <div id="hero-atk-readout" class="attack-readout">27</div>
+            <div id="hero-atk-sub" class="attack-sub">Projected: 9 × (1 + 2 NRG)</div>
+            <div class="hp-wrap">
+              <div class="hp-label"><span>LIFE POINTS</span><span id="hero-hp-text">14 / 14</span></div>
+              <div class="hp-track"><div id="hero-hp-fill" class="hp-fill" style="width:100%;"></div></div>
+            </div>
+          </div>
+
+          <!-- CENTER VS + RESULT BANNER -->
+          <div class="vs-core">
+            <div class="vs-slanted">VS</div>
+            <div id="round-result-banner" class="round-banner">STAKE ENERGY &amp; CLASH</div>
+          </div>
+
+          <!-- OPPONENT SIDE -->
+          <div class="fighter-card" id="opp-fighter-box">
+            <div id="battle-opp-visual"></div>
+            <div id="battle-opp-name" class="fighter-name">TYLER DAVIS! #54</div>
+            <div class="fighter-stat-badges">
+              <span class="badge-pwr">👊 PWR <strong id="opp-pwr-val">8</strong></span>
+              <span class="badge-dmg">🔥 DMG <strong id="opp-dmg-val">7</strong></span>
+            </div>
+            <div id="opp-atk-readout" class="attack-readout">?</div>
+            <div id="opp-atk-sub" class="attack-sub">Hidden stake</div>
+            <div class="hp-wrap">
+              <div class="hp-label"><span>LIFE POINTS</span><span id="opp-hp-text">14 / 14</span></div>
+              <div class="hp-track"><div id="opp-hp-fill" class="hp-fill" style="width:100%;"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- HYPE ENERGY STAKE + INSTANT/TRAP CONTROLS -->
+        <div class="stake-controls">
+          <div>
+            <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-size:0.72rem;">
+              <span style="color:var(--bad-gold-hot);">⚡ STAKE HYPE ENERGY: <strong id="stake-val-label">2</strong></span>
+              <span style="color:var(--text-muted);" id="stake-formula-hint">Power × 3</span>
+            </div>
+            <div class="energy-pips" id="energy-pips"></div>
+            <input id="stake-slider" class="stake-slider" type="range" min="0" max="12" value="2" aria-label="Hype Energy to stake" />
+          </div>
+
+          <div class="instant-bar">
+            <div style="font-family:var(--font-display);font-size:0.68rem;color:#7dd3fc;">
+              🛡️ INSTANT / TRAP SLOT <span id="instant-status-tag" style="color:var(--bad-gold);">(1 READY)</span>
+            </div>
+            <div id="instant-picker" class="instant-grid"></div>
+            <div id="instant-desc" style="font-size:0.78rem;color:var(--text-muted);">Optional: Arm a 1-per-match Instant or Trap before playing the round.</div>
+          </div>
+        </div>
+
+        <div class="battle-cta-row">
+          <button id="play-round-btn" class="btn btn-gold" style="min-width:240px;padding:0.72rem 1.6rem;" type="button">⚡ PLAY THE ROUND</button>
+          <button id="battle-reset-btn" class="btn btn-ghost" type="button">🔄 New 4-Round Match</button>
+        </div>
+
+        <div id="battle-log" class="battle-log" aria-live="polite">
+          <div>🏟️ B.A.D 2400 Tactical Duel Arena is live! Stake your Hype Energy, arm an Instant or Trap, and hit PLAY THE ROUND!</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: CUSTOM CARD REQUEST DESK & CREW HYPE WALL -->
+    <section id="request-desk" class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-kicker">JOIN THE 1ST EDITION ROSTER</div>
+          <h2 class="section-title">Request a Custom Card &amp; Crew Wall</h2>
+        </div>
+        <p class="section-desc">
+          Want your own 99 OVR holographic <strong>B.A.D Card</strong> added to the vault? Build your player order card below or drop trash talk on the Crew Wall.
+        </p>
+      </div>
+
+      <div class="two-col-grid">
+        <!-- Custom Card Request Desk (Central Store Request Desk Tier) -->
+        <div class="panel-surface">
+          <h3 style="font-family:var(--font-display);font-size:1rem;color:var(--bad-gold-hot);margin-bottom:0.35rem;">🎨 MINT YOUR OWN B.A.D CARD</h3>
+          <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:1rem;">Fill in your details and send straight to Isaiah (Build a Dream Studio) with your selfie photo.</p>
+          <form id="request-form" class="form-stack">
+            <div class="form-row-2">
+              <div>
+                <label class="field-label" for="req-name">YOUR NAME</label>
+                <input id="req-name" class="text-input" type="text" placeholder="e.g. Marcus Johnson" required />
+              </div>
+              <div>
+                <label class="field-label" for="req-nick">NICKNAME</label>
+                <input id="req-nick" class="text-input" type="text" placeholder='e.g. "Big Play"' />
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div>
+                <label class="field-label" for="req-team">NFL TEAM</label>
+                <input id="req-team" class="text-input" type="text" placeholder="e.g. Cowboys, Bears, Vikings..." required />
+              </div>
+              <div>
+                <label class="field-label" for="req-num">JERSEY # &amp; POSITION</label>
+                <input id="req-num" class="text-input" type="text" placeholder="e.g. #88 WR" required />
+              </div>
+            </div>
+            <div>
+              <label class="field-label" for="req-move">SIGNATURE X-FACTOR / QUOTE</label>
+              <input id="req-move" class="text-input" type="text" placeholder="e.g. Fourth-Quarter Moss • Ice in My Veins" />
+            </div>
+            <div style="display:flex;gap:0.55rem;flex-wrap:wrap;margin-top:0.2rem;">
+              <button class="btn btn-gold" type="submit">📋 Copy Order Card</button>
+              <button id="req-email-btn" class="btn btn-cyan" type="button">✉️ Email to B.A.D Studio</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Crew Hype Wall -->
+        <div id="hype-wall" class="panel-surface">
+          <h3 style="font-family:var(--font-display);font-size:1rem;color:#7dd3fc;margin-bottom:0.85rem;">💬 CREW LOCKER ROOM WALL</h3>
+          <form id="wall-form" class="form-stack" style="margin-bottom:1rem;">
+            <div class="form-row-2">
+              <div>
+                <label class="field-label" for="wall-author-select">REP YOUR CARD</label>
+                <select id="wall-author-select" class="select-input">
+                  <option value="ISAIAH aka LITTLE BILL #11|VIKINGS • FOUNDER">ISAIAH aka LITTLE BILL #11</option>
+                  <option value="TAVARIS aka TOO TOO #22|COWBOYS">TAVARIS aka TOO TOO #22</option>
+                  <option value="TYLER DAVIS! #54|BEARS">TYLER DAVIS! #54</option>
+                  <option value="KARL DANGER! #99|VIKINGS">KARL DANGER! #99</option>
+                  <option value="JARED aka JROC! #28|VIKINGS">JARED aka JROC! #28</option>
+                </select>
+              </div>
+              <div style="display:flex;align-items:flex-end;">
+                <button class="btn btn-gold" style="width:100%;" type="submit">🔥 Post Hype</button>
+              </div>
+            </div>
+            <textarea id="wall-msg" class="text-input" rows="2" maxlength="220" placeholder="Call out a friend for a 4-round duel..." required></textarea>
+          </form>
+          <div id="wall-feed" class="wall-feed"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <strong>B.A.D CARDS 2400</strong> &bull; Build a Dream (B.A.D) Studio &bull; Moline, IL &bull; 1st Edition Mythic Collector Vault
+    </footer>
+  </div>
+
+  <!-- NATIVE MODAL DIALOG: RIP 5-CARD MYTHIC PACK -->
+  <dialog id="pack-dialog" closedby="any" aria-labelledby="pack-dialog-title">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <h2 id="pack-dialog-title" class="modal-title">🎁 B.A.D CARDS • 1ST EDITION MYTHIC PACK</h2>
+        <form method="dialog">
+          <button class="btn btn-ghost btn-sm" type="submit" aria-label="Close pack dialog">✕ Close</button>
+        </form>
+      </div>
+
+      <div id="pack-sealed" class="pack-stage">
+        <button id="pack-foil-bag" class="pack-foil-bag" type="button" autofocus>
+          <span class="pack-bag-logo">B.A.D</span>
+          <div style="font-family:var(--font-display);font-size:0.86rem;font-weight:900;color:#ffe28a;letter-spacing:0.12em;">1ST EDITION</div>
+          <div style="font-size:0.82rem;color:#b8cceb;">5 GUARANTEED 99 OVR<br />MYTHIC 1/1 PULLS</div>
+          <span class="btn btn-gold btn-sm">⚡ TAP TO RIP OPEN</span>
+        </button>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Click or tap the sealed foil pack to reveal all 5 1st-Edition Crew Legends.</p>
+      </div>
+
+      <div id="pack-revealed" class="pack-stage" hidden>
+        <div style="font-family:var(--font-display);font-size:0.74rem;letter-spacing:0.18em;color:#38bdf8;margin-bottom:0.25rem;">🔥 MYTHIC GOD PACK UNLOCKED 🔥</div>
+        <div style="font-family:var(--font-display);font-size:1.22rem;font-weight:900;color:#ffe28a;">ALL 5 1ST-EDITION B.A.D CARDS!</div>
+        <div id="pack-reveal-grid" class="pack-reveal-grid"></div>
+        <form method="dialog">
+          <button class="btn btn-gold" type="submit">🏟️ Enter the Vault</button>
+        </form>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- NATIVE MODAL DIALOG: EVOLUTION & CARD INSPECTOR -->
+  <dialog id="inspect-dialog" closedby="any" aria-labelledby="inspect-dialog-title">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <h2 id="inspect-dialog-title" class="modal-title">CARD INSPECTOR &amp; EVOLUTION TRACK</h2>
+        <form method="dialog">
+          <button class="btn btn-ghost btn-sm" type="submit" autofocus aria-label="Close card inspector">✕ Close</button>
+        </form>
+      </div>
+
+      <div class="inspect-layout">
+        <img id="inspect-img" class="inspect-art" src="assets/card-tavaris-too-too.jpg" alt="" />
+        <div>
+          <div id="inspect-edition" style="font-family:var(--font-display);font-size:0.68rem;letter-spacing:0.16em;color:#38bdf8;margin-bottom:0.2rem;"></div>
+          <div id="inspect-name" style="font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:#ffe28a;margin-bottom:0.16rem;"></div>
+          <div id="inspect-sub" style="color:var(--text-muted);margin-bottom:0.55rem;font-weight:600;"></div>
+
+          <!-- Star Evolution + Yu-Gi-Oh ATK/DEF + MTG Keywords -->
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.45rem;">
+            <div id="inspect-stars" class="star-row" aria-label="Evolution star rating"></div>
+            <div id="inspect-atkdef" style="font-family:var(--font-mono);font-size:0.78rem;color:#ffe28a;font-weight:700;"></div>
+          </div>
+
+          <div id="inspect-evo-bar" class="evo-bar"></div>
+          <div id="inspect-evo-note" style="font-size:0.86rem;color:#c9dcf7;background:rgba(255,255,255,0.045);border-radius:8px;padding:0.45rem 0.65rem;margin-bottom:0.7rem;"></div>
+
+          <div id="inspect-keywords" class="keyword-row"></div>
+          <blockquote id="inspect-quote" style="border-left:3px solid #f5b942;padding-left:0.75rem;font-style:italic;color:#e6f0ff;margin-bottom:0.7rem;"></blockquote>
+          <div id="inspect-chem" style="font-family:var(--font-display);font-size:0.63rem;color:#7dd3fc;background:rgba(56,189,248,0.14);border:1px solid rgba(56,189,248,0.38);border-radius:8px;padding:0.42rem 0.62rem;margin-bottom:0.75rem;"></div>
+
+          <div style="font-family:var(--font-display);font-size:0.66rem;letter-spacing:0.12em;color:#f5b942;">CAREER MILESTONES</div>
+          <ul id="inspect-milestones" class="inspect-milestones"></ul>
+
+          <div style="display:flex;align-items:center;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.95rem;">
+            <span id="inspect-set-code" class="bad-set-code" style="font-size:0.62rem;"></span>
+            <span class="bad-holo-seal" title="Authentic B.A.D Cards 1st Edition Corner Seal">B.A.D</span>
+          </div>
+          <div style="display:flex;gap:0.55rem;flex-wrap:wrap;">
+            <button id="inspect-dl-front" class="btn btn-gold btn-sm" type="button">⬇️ Front PNG</button>
+            <button id="inspect-dl-back" class="btn btn-cyan btn-sm" type="button">⬇️ Back PNG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- NATIVE SLIDE-OUT DRAWER: MY 4-CARD B.A.D SQUAD BUILDER -->
+  <dialog id="squad-dialog" class="squad-drawer" closedby="any" aria-labelledby="squad-dialog-title">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <h2 id="squad-dialog-title" class="modal-title">🃏 MY B.A.D SQUAD DECK</h2>
+        <form method="dialog">
+          <button class="btn btn-ghost btn-sm" type="submit" autofocus aria-label="Close squad drawer">✕ Close</button>
+        </form>
+      </div>
+
+      <div id="squad-synergy-box" style="background:rgba(34,197,94,0.12);border:1px solid rgba(34,197,94,0.45);border-radius:12px;padding:0.7rem 0.85rem;margin-bottom:1rem;font-size:0.86rem;color:#bbf7d0;"></div>
+      <div id="squad-slots-list"></div>
+
+      <div style="display:flex;gap:0.55rem;flex-wrap:wrap;margin-top:1.1rem;">
+        <button id="squad-launch-duel" class="btn btn-gold" style="flex:1;" type="button">⚔️ Battle With Squad</button>
+        <button id="squad-clear-btn" class="btn btn-ghost btn-sm" type="button">Clear</button>
+      </div>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="audio.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
