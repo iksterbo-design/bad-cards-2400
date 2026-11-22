@@ -13,10 +13,10 @@
   const AUDIO = window.badAudio;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const SQUAD_KEY = 'bad_cards_2400_squad_v4';
-  const WALL_KEY = 'bad_cards_2400_wall_v4';
+  const SQUAD_KEY = 'bad_cards_2400_squad_v5';
+  const WALL_KEY = 'bad_cards_2400_wall_v5';
 
-  let initialSquad = ['jerry-mack', 'shawn-elon', 'isaiah-little-bill'];
+  let initialSquad = ['david-da-boss', 'jerry-mack', 'isaiah-little-bill'];
   try {
     const saved = JSON.parse(localStorage.getItem(SQUAD_KEY) || 'null');
     if (Array.isArray(saved) && saved.length) initialSquad = saved;
@@ -33,9 +33,9 @@
     squad: initialSquad,
 
     // Tactical 4-Round Duel State
-    heroId: 'jerry-mack',
+    heroId: 'david-da-boss',
     oppMode: 'crew',
-    oppId: 'tyler-davis',
+    oppId: 'karl-danger',
     round: 1,
     maxRounds: 4,
     heroHp: 14,
@@ -863,12 +863,14 @@
     const members = state.squad.map((id) => state.cards.find((c) => c.id === id)).filter(Boolean);
     const totalStars = members.reduce((sum, c) => sum + c.stars, 0);
     const vikCount = members.filter((c) => c.teamKey === 'vikings').length;
+    const packCount = members.filter((c) => c.teamKey === 'packers').length;
     const uniqueTeams = new Set(members.map((c) => c.teamKey)).size;
 
     let synText = `Squad Power: ${members.length}/4 Cards • ${totalStars}/20 ★ Stars. `;
     if (vikCount >= 2) synText += '⚡ VALHALLA CLAN RESONANCE ACTIVE (+2 Duel Power)!';
+    else if (packCount >= 2) synText += '🧀 TITLETOWN TUNDRA RESONANCE ACTIVE (+2 Duel Power)!';
     else if (uniqueTeams >= 3) synText += '⭐ MULTI-TEAM ALLIANCE ACTIVE (+1 Bonus Clash Damage)!';
-    else synText += 'Add 2+ Vikings or 3+ Teams to activate Clan Synergy!';
+    else synText += 'Add 2+ Vikings, 2+ Packers, or 3+ Teams to activate Clan Synergy!';
     synBox.textContent = synText;
 
     if (!members.length) {
@@ -971,9 +973,13 @@
   function getSquadSynergy() {
     const members = state.squad.map((id) => state.cards.find((c) => c.id === id)).filter(Boolean);
     const vikCount = members.filter((c) => c.teamKey === 'vikings').length;
+    const packCount = members.filter((c) => c.teamKey === 'packers').length;
     const uniqueTeams = new Set(members.map((c) => c.teamKey)).size;
     if (vikCount >= 2) {
       return { bonusPwr: 2, bonusDmg: 0, label: '⚡ VALHALLA +2 PWR' };
+    }
+    if (packCount >= 2) {
+      return { bonusPwr: 2, bonusDmg: 0, label: '🧀 TITLETOWN +2 PWR' };
     }
     if (uniqueTeams >= 3) {
       return { bonusPwr: 0, bonusDmg: 1, label: '⭐ ALLIANCE +1 DMG' };

@@ -1,14 +1,15 @@
 # B.A.D CARDS 2400 — Interactive 3D Mythic Collector Vault
 
-Official **Build a Dream (B.A.D) Studio** Flagship Pro trading card vault & tactical battle arena featuring all 7 custom 1st-Edition 99 OVR holographic collector cards:
+Official **Build a Dream (B.A.D) Studio** Flagship Pro trading card vault & tactical battle arena featuring all 8 custom 1st-Edition 99 OVR holographic collector cards:
 
-- **KARL DANGER! #99** — Minnesota Vikings (`BAD-2400 • 001/007 ★`)
-- **JARED aka JROC! #28** — Minnesota Vikings (`BAD-2400 • 002/007 ★`)
-- **ISAIAH aka LITTLE BILL #11** — Minnesota Vikings • Founder 1/1 (`BAD-2400 • 003/007 ★`)
-- **TYLER DAVIS! #54** — Chicago Bears (`BAD-2400 • 004/007 ★`)
-- **TAVARIS aka TOO TOO #22** (*Tavaris Welch*) — Dallas Cowboys (`BAD-2400 • 005/007 ★`)
-- **SHAWN aka ELON! #12** (*Shawn Clark*) — New England Patriots (`BAD-2400 • 006/007 ★`)
-- **JERRY aka MACK #4** (*Jerry Jernigan*) — Green Bay Packers • QB (`BAD-2400 • 007/007 ★`)
+- **KARL DANGER! #99** — Minnesota Vikings (`BAD-2400 • 001/008 ★`)
+- **JARED aka JROC! #28** — Minnesota Vikings (`BAD-2400 • 002/008 ★`)
+- **ISAIAH aka LITTLE BILL #11** — Minnesota Vikings • Founder 1/1 (`BAD-2400 • 003/008 ★`)
+- **TYLER DAVIS! #54** — Chicago Bears (`BAD-2400 • 004/008 ★`)
+- **TAVARIS aka TOO TOO #22** (*Tavaris Welch*) — Dallas Cowboys (`BAD-2400 • 005/008 ★`)
+- **SHAWN aka ELON! #12** (*Shawn Clark*) — New England Patriots (`BAD-2400 • 006/008 ★`)
+- **JERRY aka MACK #4** (*Jerry Jernigan*) — Green Bay Packers • QB (`BAD-2400 • 007/008 ★`)
+- **DAVID aka DA BOSS #92** (*David Burke*) — Green Bay Packers • DE / OLB (`BAD-2400 • 008/008 ★`)
 
 ## Live URL
 - [https://iksterbo-design.github.io/bad-cards-2400/](https://iksterbo-design.github.io/bad-cards-2400/)
@@ -19,4 +20,4 @@ Official **Build a Dream (B.A.D) Studio** Flagship Pro trading card vault & tact
 - **Card Evolution Inspector (`1★ → 3★ → 5★`)** — inspect lore quotes, MTG-inspired keywords, Yu-Gi-Oh!-inspired ATK/DEF ratings, career milestones, and download high-res Front & Back PNGs with the corner seal baked in.
 - **4-Card Squad Builder Drawer** — build a 4-card team deck with live Star Cap & Clan Synergy bonuses.
 - **Tactical Hype-Energy Duel Arena** — bluff with 12 Hype Energy (`Power × (1 + Energy)`), fire Instant/Trap counterplays, and run Friend vs. Friend or NFL Rival matches.
-- **Rip 7-Card Mythic Pack + Custom Card Request Desk** — friends can rip a sealed holographic pack and request their own custom B.A.D Card directly.
+- **Rip 8-Card Mythic Pack + Custom Card Request Desk** — friends can rip a sealed holographic pack and request their own custom B.A.D Card directly.

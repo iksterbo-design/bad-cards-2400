@@ -19,7 +19,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-9901',
       serial: '#001 / 001 • VIK-2400-KD',
-      setCode: 'BAD-2400 • 001/007 ★',
+      setCode: 'BAD-2400 • 001/008 ★',
       number: '99',
       position: 'OLB',
       ovr: 99,
@@ -87,7 +87,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-2801',
       serial: '#001 / 001 • VIK-2400-JR',
-      setCode: 'BAD-2400 • 002/007 ★',
+      setCode: 'BAD-2400 • 002/008 ★',
       number: '28',
       position: 'WR / RB',
       ovr: 99,
@@ -155,7 +155,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-1101',
       serial: '#001 / 001 • VIK-2400-LB',
-      setCode: 'BAD-2400 • 003/007 ★',
+      setCode: 'BAD-2400 • 003/008 ★',
       number: '11',
       position: 'QB / HC',
       ovr: 99,
@@ -224,7 +224,7 @@ window.BAD_CARDS_DATA = {
       grade: 'BEAR 10 GEM MINT',
       cert: 'CERT #2400-5401',
       serial: '#001 / 001 • CHI-2400-TD',
-      setCode: 'BAD-2400 • 004/007 ★',
+      setCode: 'BAD-2400 • 004/008 ★',
       number: '54',
       position: 'MLB',
       ovr: 99,
@@ -292,7 +292,7 @@ window.BAD_CARDS_DATA = {
       grade: 'STAR 10 GEM MINT',
       cert: 'CERT #2400-2201',
       serial: '#001 / 001 • DAL-2400-TW',
-      setCode: 'BAD-2400 • 005/007 ★',
+      setCode: 'BAD-2400 • 005/008 ★',
       number: '22',
       position: 'RB',
       ovr: 99,
@@ -360,7 +360,7 @@ window.BAD_CARDS_DATA = {
       grade: 'PAT 10 GEM MINT',
       cert: 'CERT #2400-1201',
       serial: '#001 / 001 • NEP-2400-EL',
-      setCode: 'BAD-2400 • 006/007 ★',
+      setCode: 'BAD-2400 • 006/008 ★',
       number: '12',
       position: 'QB / WR',
       ovr: 99,
@@ -428,7 +428,7 @@ window.BAD_CARDS_DATA = {
       grade: 'PACK 10 GEM MINT',
       cert: 'CERT #2400-0401',
       serial: '#001 / 001 • GBP-2400-JM',
-      setCode: 'BAD-2400 • 007/007 ★',
+      setCode: 'BAD-2400 • 007/008 ★',
       number: '4',
       position: 'QB',
       ovr: 99,
@@ -439,7 +439,7 @@ window.BAD_CARDS_DATA = {
       duelDamage: 7,
       keywords: ['Gunslinger', 'Ice Veins', 'Hail Mary'],
       clan: 'Titletown Tundra',
-      clanBonus: '+2 Duel Power on 4th-quarter & blizzard clash turns',
+      clanBonus: '+2 Duel Power when paired with another Packers card',
       team: 'GREEN BAY PACKERS',
       teamKey: 'packers',
       theme: 'packers',
@@ -448,7 +448,7 @@ window.BAD_CARDS_DATA = {
       objectPos: 'center 10%',
       accent: '#ffb612',
       quote: '“Frozen Tundra under the lights — MACK drops dimes in any blizzard.”',
-      chemistry: '🧀 SYNERGY: +20 NFC NORTH RIVALRY vs KARL, JROC!, LITTLE BILL & TYLER',
+      chemistry: '🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with DAVID aka DA BOSS #92',
       signatureAbility: '🧀 TUNDRA HAIL MARY (X-FACTOR)',
       miniStats: [
         { k: 'ARM', v: 99 },
@@ -484,6 +484,74 @@ window.BAD_CARDS_DATA = {
         'Undefeated Sub-Zero Titletown Gunslinger — Zero 4th-Quarter Picks',
         'Certified 1st-Edition B.A.D Cards Green Bay Packers Legend'
       ]
+    },
+    {
+      id: 'david-da-boss',
+      name: 'DAVID aka DA BOSS',
+      shortName: 'DA BOSS #92',
+      subtitle: 'David Burke • Titletown Edge Enforcer',
+      edition: '2400 TITLETOWN MYTHIC',
+      rarity: '🧀 MYTHIC 1/1',
+      rarityTier: 'mythic',
+      grade: 'PACK 10 GEM MINT',
+      cert: 'CERT #2400-9201',
+      serial: '#001 / 001 • GBP-2400-DB',
+      setCode: 'BAD-2400 • 008/008 ★',
+      number: '92',
+      position: 'DE / OLB',
+      ovr: 99,
+      stars: 5,
+      atk: 3170,
+      def: 3280,
+      duelPower: 9,
+      duelDamage: 7,
+      keywords: ['Boss Mode', 'Blitz', 'Intimidate'],
+      clan: 'Titletown Tundra',
+      clanBonus: '+2 Duel Power when paired with another Packers card',
+      team: 'GREEN BAY PACKERS',
+      teamKey: 'packers',
+      theme: 'packers',
+      fxTheme: 'packers',
+      image: 'assets/card-david-da-boss.jpg',
+      objectPos: 'center 10%',
+      accent: '#ffb612',
+      quote: '“Lambeau runs through Da Boss — QBs don’t survive the Frozen Tundra.”',
+      chemistry: '🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with JERRY aka MACK #4',
+      signatureAbility: '🧀 BOSS MODE SACK (X-FACTOR)',
+      miniStats: [
+        { k: 'PWR', v: 100, hot: true },
+        { k: 'HIT', v: 99 },
+        { k: 'PACK', v: 100, hot: true },
+        { k: 'IQ', v: 99 }
+      ],
+      evolutions: [
+        { stars: 1, stage: 'Tundra Edge Rusher', ovr: 84, power: 6, dmg: 4, note: 'Relentless off-the-edge powerhouse built for freezing Green Bay nights.' },
+        { stars: 3, stage: 'Lambeau Defensive Boss', ovr: 94, power: 8, dmg: 6, note: 'Unlocks Boss Mode Sack & shuts down every NFC North pocket.' },
+        { stars: 5, stage: '2400 Mythic 1/1', ovr: 99, power: 9, dmg: 7, note: 'Max Titletown evolution — anchors the Frozen Tundra with Jerry aka MACK #4.' }
+      ],
+      bio: 'The undisputed defensive general of Lambeau Field 2400. David Burke — known across Green Bay as "Da Boss" — wears the legendary #92 with ice-cold intensity, bulldozing offensive tackles and pairing with QB Jerry aka MACK #4 to form the unstoppable Titletown Tundra duo.',
+      detailedStats: [
+        { label: 'Boss Rush Pwr', val: 100 },
+        { label: 'Strip Sack IQ', val: 99 },
+        { label: 'Tundra Grit', val: 100 },
+        { label: 'Hit Stick', val: 99 },
+        { label: '4th Qtr Stop', val: 100 },
+        { label: 'Titletown Aura', val: 100 }
+      ],
+      moves: [
+        { title: '🧀 BOSS MODE SACK', desc: 'Shatters double-team protection in sub-zero snow for an instant strip-sack.', power: 9, dmg: 7, crit: 0.43 },
+        { title: '⚡ FROZEN TUNDRA LOCKDOWN', desc: 'Green Bay defensive takeover — shuts down opposing momentum with Titletown lightning.', power: 8, dmg: 7, crit: 0.42 }
+      ],
+      combine: [
+        { k: '40-YD DASH', v: '4.36s' },
+        { k: 'BENCH REPS', v: '46' },
+        { k: 'BOSS LEVEL', v: 'MAX' }
+      ],
+      milestones: [
+        '2400 Titletown Tundra Defensive MVP — Iconic Green Bay #92',
+        'Co-Captain of the Packers Duo alongside QB Jerry aka MACK #4',
+        'Certified 1st-Edition B.A.D Cards Green Bay Packers Legend'
+      ]
     }
   ],
 
@@ -505,7 +573,13 @@ window.BAD_CARDS_DATA = {
       author: 'ISAIAH aka LITTLE BILL #11',
       badge: 'VIKINGS • FOUNDER',
       time: 'B.A.D HQ',
-      text: 'Welcome to the official B.A.D Cards 2400 Flagship Vault! All 7 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡'
+      text: 'Welcome to the official B.A.D Cards 2400 Flagship Vault! All 8 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡'
+    },
+    {
+      author: 'DAVID aka DA BOSS #92',
+      badge: 'PACKERS',
+      time: 'LAMBEAU 2400',
+      text: 'DA BOSS IS IN THE BUILDING!! #92 locked in next to MACK #4 — Titletown Tundra defense is officially open for business! Go Pack Go! 🧀⚡'
     },
     {
       author: 'JERRY aka MACK #4',
