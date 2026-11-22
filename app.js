@@ -249,7 +249,9 @@
     const vals = state.cards.map((c) => getCardLevel(c));
     const allSame = vals.every((v) => v === vals[0]) ? vals[0] : null;
     document.querySelectorAll('[data-all-level]').forEach((b) => {
-      b.classList.toggle('active', allSame !== null && Number(b.dataset.allLevel) === allSame);
+      const active = allSame !== null && Number(b.dataset.allLevel) === allSame;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-pressed', String(active));
     });
   }
 
@@ -335,12 +337,12 @@
             <span class="slab-grade-badge">${card.grade}</span>
           </div>
 
-          <div class="holo-card-scene ${state.liveAnim ? 'is-live-anim' : ''}" data-card-id="${card.id}" data-card-idx="${idx}" tabindex="0" role="button" aria-label="Flip ${card.name} number ${card.number} card">
+          <div class="holo-card-scene ${state.liveAnim ? 'is-live-anim' : ''}" data-card-id="${card.id}" data-card-idx="${idx}" tabindex="0" role="button" aria-pressed="false" aria-label="Flip ${card.name} number ${card.number} card">
             <div class="holo-card-inner">
               <!-- FRONT -->
               <div class="holo-face holo-front">
                 <div class="card-art-wrap">
-                  <img class="card-art-img" src="${card.image}" alt="${card.name} #${card.number} ${card.team}" style="object-position:${card.objectPos || 'center 10%'};" />
+                  <img class="card-art-img" src="${card.image}" alt="${card.name} #${card.number} ${card.team}" decoding="async" style="object-position:${card.objectPos || 'center 10%'};" />
                   <canvas class="card-fx-canvas" data-fx-theme="${card.fxTheme}" aria-hidden="true"></canvas>
                   <div class="chrome-sweep" style="--sweep-delay:${(idx * 0.95).toFixed(2)}s;" aria-hidden="true"></div>
                   <div class="card-art-vignette"></div>
@@ -471,12 +473,24 @@
         inner.style.setProperty('--fy', '0px');
         inner.style.setProperty('--rx', '0deg');
         inner.style.setProperty('--ry', '0deg');
-        scene.classList.toggle('is-flipped');
+        const flipped = scene.classList.toggle('is-flipped');
+        scene.setAttribute('aria-pressed', String(flipped));
         AUDIO.playCardFlip();
       };
 
+      const resetTilt = () => {
+        scene.classList.remove('is-tilting');
+        inner.style.setProperty('--px', '0px');
+        inner.style.setProperty('--py', '0px');
+        if (!state.liveAnim) {
+          inner.style.setProperty('--rx', '0deg');
+          inner.style.setProperty('--ry', '0deg');
+          inner.style.setProperty('--glare-op', '0.32');
+        }
+      };
+
       scene.addEventListener('pointermove', (e) => {
-        if (scene.classList.contains('is-flipped')) return;
+        if (e.pointerType === 'touch' || scene.classList.contains('is-flipped')) return;
         const rect = scene.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
         const y = (e.clientY - rect.top) / rect.height;
@@ -491,21 +505,20 @@
         inner.style.setProperty('--glare-op', '0.56');
       });
 
-      scene.addEventListener('pointerleave', () => {
-        scene.classList.remove('is-tilting');
-        inner.style.setProperty('--px', '0px');
-        inner.style.setProperty('--py', '0px');
-        if (!state.liveAnim) {
-          inner.style.setProperty('--rx', '0deg');
-          inner.style.setProperty('--ry', '0deg');
-          inner.style.setProperty('--glare-op', '0.32');
-        }
-      });
+      scene.addEventListener('pointerleave', resetTilt);
+      scene.addEventListener('pointercancel', resetTilt);
 
       scene.addEventListener('click', toggleFlip);
       scene.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+        if (e.key === 'Enter') {
           e.preventDefault();
+          toggleFlip();
+        } else if (e.key === ' ') {
+          e.preventDefault();
+        }
+      });
+      scene.addEventListener('keyup', (e) => {
+        if (e.key === ' ') {
           toggleFlip();
         }
       });
@@ -992,7 +1005,7 @@
         const evo = getCardEvo(c);
         return `
         <div class="squad-slot">
-          <img src="${c.image}" alt="${c.name}" style="object-position:${c.objectPos || 'center 10%'};" />
+          <img src="${c.image}" alt="${c.name}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
           <div style="flex:1;">
             <div style="font-family:var(--font-display);font-size:0.78rem;color:var(--bad-gold-hot);font-weight:800;">${c.name} #${c.number} • LVL ${lvl}</div>
             <div style="font-size:0.74rem;color:var(--text-muted);">${evo.stage} • PWR ${evo.power} / DMG ${evo.dmg} • ${'★'.repeat(evo.stars)}</div>
@@ -1032,7 +1045,7 @@
       revealGrid.innerHTML = state.cards
         .map((c) => `
           <div class="pack-reveal-card">
-            <img src="${c.image}" alt="${c.name}" style="object-position:${c.objectPos || 'center 10%'};" />
+            <img src="${c.image}" alt="${c.name}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
             <div class="pack-reveal-meta">
               <div style="font-size:0.6rem;color:#7dd3fc;font-family:var(--font-display);">${c.rarity} • ${c.ovr} OVR</div>
               <div style="font-size:0.82rem;color:#ffe28a;font-weight:900;font-family:var(--font-display);margin-top:2px;">${c.name} #${c.number}</div>
@@ -1170,9 +1183,12 @@
       const pip = document.createElement('button');
       pip.type = 'button';
       const available = i <= state.heroEnergy;
-      pip.className = `energy-pip ${!available ? 'spent' : (i <= state.stake ? 'active' : '')}`;
+      const isSelected = available && i <= state.stake;
+      pip.className = `energy-pip ${!available ? 'spent' : (isSelected ? 'active' : '')}`;
       pip.disabled = !available || state.duelOver;
+      pip.setAttribute('aria-pressed', String(isSelected));
       pip.setAttribute('aria-label', `Stake ${i} Hype Energy`);
+      pip.title = `Stake ${i} NRG`;
       pip.addEventListener('click', () => {
         state.stake = (state.stake === i) ? i - 1 : i;
         renderEnergyControls();
@@ -1185,7 +1201,7 @@
     if (statusTag) statusTag.textContent = state.instantUsed ? '(USED THIS MATCH)' : '(1 READY)';
     const insWrap = document.getElementById('instant-picker');
     insWrap.innerHTML = DATA.instants
-      .map((ins) => `<button class="chip ${state.armedInstantId === ins.id ? 'active' : ''}" data-ins-id="${ins.id}" type="button" ${state.instantUsed ? 'disabled style="opacity:0.45;"' : ''}>${ins.name}</button>`)
+      .map((ins) => `<button class="chip ${state.armedInstantId === ins.id ? 'active' : ''}" data-ins-id="${ins.id}" type="button" aria-pressed="${state.armedInstantId === ins.id}" ${state.instantUsed ? 'disabled style="opacity:0.45;"' : ''}>${ins.name}</button>`)
       .join('');
     insWrap.querySelectorAll('[data-ins-id]').forEach((b) => {
       b.addEventListener('click', () => {
@@ -1462,8 +1478,12 @@
     document.querySelectorAll('[data-team-filter]').forEach((btn) => {
       btn.addEventListener('click', () => {
         state.teamFilter = btn.dataset.teamFilter;
-        document.querySelectorAll('[data-team-filter]').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('[data-team-filter]').forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
         renderCards();
       });
     });
@@ -1482,8 +1502,12 @@
     document.querySelectorAll('[data-foil-btn]').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.body.setAttribute('data-foil', btn.dataset.foilBtn);
-        document.querySelectorAll('[data-foil-btn]').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('[data-foil-btn]').forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
         AUDIO.playCardFlip();
       });
     });
@@ -1491,12 +1515,16 @@
     document.getElementById('toggle-view-btn')?.addEventListener('click', (e) => {
       state.compactBinder = !state.compactBinder;
       e.currentTarget.textContent = state.compactBinder ? '🗂️ Binder View: Compact' : '🗂️ Binder View: Full';
+      e.currentTarget.setAttribute('aria-pressed', String(state.compactBinder));
       renderCards();
     });
 
     const animBtn = document.getElementById('toggle-anim-btn');
     const syncAnimBtn = () => {
-      if (animBtn) animBtn.textContent = state.liveAnim ? '⏸ Pause Live 3D' : '▶ Play Live 3D';
+      if (animBtn) {
+        animBtn.textContent = state.liveAnim ? '⏸ Pause Live 3D' : '▶ Play Live 3D';
+        animBtn.setAttribute('aria-pressed', String(state.liveAnim));
+      }
     };
     syncAnimBtn();
     animBtn?.addEventListener('click', () => {
@@ -1517,19 +1545,25 @@
     document.getElementById('toggle-slab-btn')?.addEventListener('click', (e) => {
       const on = document.body.classList.toggle('slab-mode');
       e.currentTarget.textContent = on ? '💎 B.A.D 10 Slab: ON' : '💎 B.A.D 10 Slab: OFF';
+      e.currentTarget.setAttribute('aria-pressed', String(on));
       AUDIO.playCardFlip();
     });
 
     document.getElementById('mute-btn')?.addEventListener('click', (e) => {
       const muted = AUDIO.toggleMute();
       e.currentTarget.textContent = muted ? '🔇 Muted' : '🔊 Sound';
+      e.currentTarget.setAttribute('aria-pressed', String(muted));
     });
 
     document.querySelectorAll('[data-opp-mode]').forEach((btn) => {
       btn.addEventListener('click', () => {
         state.oppMode = btn.dataset.oppMode;
-        document.querySelectorAll('[data-opp-mode]').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('[data-opp-mode]').forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
         resetDuelMatch();
       });
     });
