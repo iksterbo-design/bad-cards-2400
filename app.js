@@ -15,11 +15,24 @@
 
   const SQUAD_KEY = 'bad_cards_2400_squad_v5';
   const WALL_KEY = 'bad_cards_2400_wall_v5';
+  const LEVELS_KEY = 'bad_cards_2400_levels_v1';
 
   let initialSquad = ['david-da-boss', 'jerry-mack', 'isaiah-little-bill'];
   try {
     const saved = JSON.parse(localStorage.getItem(SQUAD_KEY) || 'null');
     if (Array.isArray(saved) && saved.length) initialSquad = saved;
+  } catch (_) {}
+
+  let initialLevels = {};
+  DATA.cards.forEach((c) => { initialLevels[c.id] = 3; });
+  try {
+    const savedLvls = JSON.parse(localStorage.getItem(LEVELS_KEY) || 'null');
+    if (savedLvls && typeof savedLvls === 'object') {
+      Object.keys(savedLvls).forEach((k) => {
+        const v = Number(savedLvls[k]);
+        if (v >= 1 && v <= 3) initialLevels[k] = v;
+      });
+    }
   } catch (_) {}
 
   const state = {
@@ -31,6 +44,7 @@
     inspectCardId: null,
     inspectEvoIdx: 2,
     squad: initialSquad,
+    cardLevels: initialLevels,
 
     // Tactical 4-Round Duel State
     heroId: 'david-da-boss',
@@ -217,6 +231,67 @@
     renderDuelArena();
   }
 
+  function getCardLevel(card) {
+    const lvl = Number(state.cardLevels[card.id] || 3);
+    return Math.min(3, Math.max(1, lvl));
+  }
+
+  function getCardEvo(card) {
+    const lvl = getCardLevel(card);
+    return card.evolutions[lvl - 1] || card.evolutions[card.evolutions.length - 1];
+  }
+
+  function saveCardLevels() {
+    try { localStorage.setItem(LEVELS_KEY, JSON.stringify(state.cardLevels)); } catch (_) {}
+  }
+
+  function syncToolbarLevelChips() {
+    const vals = state.cards.map((c) => getCardLevel(c));
+    const allSame = vals.every((v) => v === vals[0]) ? vals[0] : null;
+    document.querySelectorAll('[data-all-level]').forEach((b) => {
+      b.classList.toggle('active', allSame !== null && Number(b.dataset.allLevel) === allSame);
+    });
+  }
+
+  function setCardLevel(cardId, lvl) {
+    const card = state.cards.find((c) => c.id === cardId);
+    if (!card) return;
+    const clamped = Math.min(3, Math.max(1, Number(lvl)));
+    state.cardLevels[cardId] = clamped;
+    saveCardLevels();
+    const evo = getCardEvo(card);
+    renderCards();
+    renderSquadDrawer();
+    renderDuelArena();
+    syncToolbarLevelChips();
+    if (clamped === 3) {
+      AUDIO.playMythicFanfare();
+      launchFireworks(4);
+      showToast(`⚡ ${card.shortName} MAXED TO LVL 3: ${evo.stage.toUpperCase()}!`);
+    } else {
+      AUDIO.playCardFlip();
+      showToast(`${card.shortName} set to LVL ${clamped} (${evo.stage})`);
+    }
+  }
+
+  function setAllCardsLevel(lvl) {
+    const clamped = Math.min(3, Math.max(1, Number(lvl)));
+    state.cards.forEach((c) => { state.cardLevels[c.id] = clamped; });
+    saveCardLevels();
+    renderCards();
+    renderSquadDrawer();
+    renderDuelArena();
+    syncToolbarLevelChips();
+    if (clamped === 3) {
+      AUDIO.playMythicFanfare();
+      launchFireworks(6);
+      showToast('⚡ ALL 8 CARDS MAXED TO LEVEL 3 MASCOT ASCENSION!');
+    } else {
+      AUDIO.playCardFlip();
+      showToast(`All 8 cards set to Level ${clamped}`);
+    }
+  }
+
   function renderCards() {
     const grid = document.getElementById('cards-grid');
     if (!grid) return;
@@ -228,7 +303,8 @@
     const visible = state.cards.filter((c) => {
       if (state.teamFilter !== 'all' && c.teamKey !== state.teamFilter) return false;
       if (!q) return true;
-      const hay = `${c.name} ${c.subtitle} ${c.team} #${c.number} ${c.position} ${c.keywords.join(' ')} ${c.clan}`.toLowerCase();
+      const evoNames = c.evolutions.map((e) => `${e.stage} ${e.mascotBadge || ''}`).join(' ');
+      const hay = `${c.name} ${c.subtitle} ${c.team} #${c.number} ${c.position} ${c.keywords.join(' ')} ${c.clan} ${c.mascot || ''} ${evoNames}`.toLowerCase();
       return hay.includes(q);
     });
 
@@ -239,14 +315,22 @@
 
     visible.forEach((card, idx) => {
       const inSquad = state.squad.includes(card.id);
+      const lvl = getCardLevel(card);
+      const evo = getCardEvo(card);
+      const statDelta = typeof evo.statDelta === 'number' ? evo.statDelta : 0;
+      const atkMult = typeof evo.atkMult === 'number' ? evo.atkMult : 1;
+      const liveAtk = Math.round(card.atk * atkMult);
+      const liveDef = Math.round(card.def * atkMult);
+      const starsStr = '★'.repeat(evo.stars);
       const article = document.createElement('article');
       article.className = `card-column theme-${card.theme}`;
+      article.dataset.level = String(lvl);
       article.innerHTML = `
         <div class="card-slab-wrap">
           <div class="slab-label">
             <div class="slab-meta">
               <div style="color:var(--back-accent);font-weight:900;">${card.name} #${card.number}</div>
-              <div>${card.cert} &bull; ${card.edition}</div>
+              <div>${card.cert} &bull; LVL ${lvl} ${evo.stage}</div>
             </div>
             <span class="slab-grade-badge">${card.grade}</span>
           </div>
@@ -262,26 +346,33 @@
                   <div class="card-art-vignette"></div>
                   <div class="card-top-bar">
                     <div class="ovr-shield">
-                      <div class="ovr-num">${card.ovr}</div>
+                      <div class="ovr-num">${evo.ovr}</div>
                       <div class="ovr-pos">${card.position}</div>
                     </div>
                     <div class="card-rarity-stack">
-                      <span class="rarity-pill">${card.rarity}</span>
+                      <span class="rarity-pill">${lvl === 3 ? card.rarity : `LVL ${lvl} • ${evo.stage.split(' ')[0]}`}</span>
                       <span class="jersey-pill">#${card.number}</span>
                     </div>
                   </div>
+                  <div class="mascot-crest-banner" title="${evo.mascotTrait || evo.note}">
+                    <span>${evo.mascotBadge || `LVL ${lvl} • ${evo.stage}`}</span>
+                    <span class="mascot-crest-stars">${starsStr}</span>
+                  </div>
                 </div>
                 <div class="card-front-footer">
-                  <div class="card-edition-tag">${card.edition}</div>
+                  <div class="card-edition-tag">${lvl === 3 ? `${card.edition} • MAX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`}</div>
                   <div class="card-player-name">${card.name}</div>
-                  <div class="card-player-sub">${card.subtitle}</div>
+                  <div class="card-player-sub">${lvl === 3 ? `${evo.stage} • ${card.mascot || card.team}` : card.subtitle}</div>
                   <div class="card-mini-stats">
                     ${card.miniStats
-                      .map((s) => `
-                        <div class="mini-stat ${s.hot ? 'hot' : ''}">
-                          <div class="mini-stat-v">${s.v}</div>
+                      .map((s) => {
+                        const val = Math.max(70, Math.min(100, s.v + statDelta));
+                        return `
+                        <div class="mini-stat ${s.hot && lvl === 3 ? 'hot' : ''}">
+                          <div class="mini-stat-v">${val}</div>
                           <div class="mini-stat-k">${s.k}</div>
-                        </div>`)
+                        </div>`;
+                      })
                       .join('')}
                   </div>
                   <div class="card-sig-ability">
@@ -302,21 +393,24 @@
                 <div class="back-header">
                   <div>
                     <div class="back-name">${card.name} #${card.number}</div>
-                    <div class="back-sub">${card.team} &bull; ${card.position} &bull; ATK ${card.atk} / DEF ${card.def}</div>
+                    <div class="back-sub">${card.team} &bull; LVL ${lvl} &bull; ATK ${liveAtk} / DEF ${liveDef}</div>
                   </div>
-                  <span class="back-serial">${card.rarity}</span>
+                  <span class="back-serial">${lvl === 3 ? 'LVL 3 MAX' : `LVL ${lvl}/3`}</span>
                 </div>
 
-                <div class="back-bio">${card.bio}</div>
+                <div class="back-bio"><strong>${evo.mascotBadge}:</strong> ${evo.mascotTrait || card.bio}</div>
 
                 <div class="back-stat-bars">
                   ${card.detailedStats
-                    .map((st) => `
+                    .map((st) => {
+                      const val = Math.max(70, Math.min(100, st.val + statDelta));
+                      return `
                       <div class="stat-row">
                         <span class="stat-label">${st.label}</span>
-                        <div class="stat-track"><div class="stat-fill" style="width:${Math.min(100, st.val)}%"></div></div>
-                        <span class="stat-val">${st.val}</span>
-                      </div>`)
+                        <div class="stat-track"><div class="stat-fill" style="width:${val}%"></div></div>
+                        <span class="stat-val">${val}</span>
+                      </div>`;
+                    })
                     .join('')}
                 </div>
 
@@ -352,9 +446,15 @@
           </div>
         </div>
 
+        <div class="card-level-bar" role="group" aria-label="Upgrade ${card.name} level">
+          <button class="lvl-pill ${lvl === 1 ? 'active' : ''}" data-set-lvl="1" data-card-id="${card.id}" type="button">★ LVL 1</button>
+          <button class="lvl-pill ${lvl === 2 ? 'active' : ''}" data-set-lvl="2" data-card-id="${card.id}" type="button">★★★ LVL 2</button>
+          <button class="lvl-pill is-max ${lvl === 3 ? 'active' : ''}" data-set-lvl="3" data-card-id="${card.id}" type="button">⚡ LVL 3 MAX</button>
+        </div>
+
         <div class="card-action-bar">
           <button class="card-mini-btn" data-action="flip" data-card-id="${card.id}" type="button">🔄 Flip</button>
-          <button class="card-mini-btn" data-action="inspect" data-card-id="${card.id}" type="button">★ Evolve</button>
+          <button class="card-mini-btn" data-action="inspect" data-card-id="${card.id}" type="button">★ Mascot</button>
           <button class="card-mini-btn ${inSquad ? 'in-squad' : ''}" data-action="squad" data-card-id="${card.id}" type="button">${inSquad ? '✓ In Squad' : '+ Squad'}</button>
           <button class="card-mini-btn" data-action="dl-front" data-card-id="${card.id}" type="button">⬇️ PNG</button>
         </div>
@@ -410,6 +510,10 @@
         }
       });
 
+      article.querySelectorAll('[data-set-lvl]').forEach((btn) => {
+        btn.addEventListener('click', () => setCardLevel(card.id, Number(btn.dataset.setLvl)));
+      });
+
       article.querySelectorAll('[data-action]').forEach((btn) => {
         btn.addEventListener('click', () => {
           const act = btn.dataset.action;
@@ -420,12 +524,12 @@
         });
       });
 
-      fxEngines.push(createCardFxEngine(fxCanvas, scene, card.fxTheme, idx));
+      fxEngines.push(createCardFxEngine(fxCanvas, scene, card.fxTheme, idx, lvl));
     });
   }
 
   /* ---------- PER-TEAM 60FPS CARD FX ENGINE ---------- */
-  function createCardFxEngine(canvas, scene, fxTheme, idx) {
+  function createCardFxEngine(canvas, scene, fxTheme, idx, level = 3) {
     const ctx = canvas.getContext('2d');
     let cw = 340, ch = 360;
     const resize = () => {
@@ -448,16 +552,18 @@
       bears: { p1: '#ff7b29', p2: '#38bdf8', glow1: 'rgba(255,130,50,', glow2: 'rgba(56,189,248,', stars: false },
       cowboys: { p1: '#ffd166', p2: '#38bdf8', glow1: 'rgba(255,206,92,', glow2: 'rgba(56,189,248,', stars: true },
       patriots: { p1: '#e31837', p2: '#e2e8f0', glow1: 'rgba(227,24,55,', glow2: 'rgba(203,213,225,', stars: true },
-      packers: { p1: '#ffb612', p2: '#22c55e', glow1: 'rgba(255,182,18,', glow2: 'rgba(34,197,94,', stars: true }
+      packers: { p1: '#ffb612', p2: '#22c55e', glow1: 'rgba(255,182,18,', glow2: 'rgba(34,197,94,', stars: true },
+      'packers-boss': { p1: '#ffe066', p2: '#34d399', glow1: 'rgba(255,224,102,', glow2: 'rgba(52,211,153,', stars: true }
     }[fxTheme] || { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false };
 
-    const sparks = Array.from({ length: 28 }, () => ({
+    const sparkCount = level === 3 ? 40 : (level === 2 ? 26 : 14);
+    const sparks = Array.from({ length: sparkCount }, () => ({
       x: Math.random() * cw, y: Math.random() * ch,
-      r: 1.0 + Math.random() * 2.0,
-      vx: (Math.random() - 0.5) * 0.52,
-      vy: 0.4 + Math.random() * 0.88,
+      r: (level === 3 ? 1.25 : 0.95) + Math.random() * 2.1,
+      vx: (Math.random() - 0.5) * 0.56,
+      vy: (level === 3 ? 0.56 : 0.36) + Math.random() * 0.92,
       alt: Math.random() > 0.5,
-      star: palette.stars && Math.random() > 0.68,
+      star: (palette.stars || level === 3) && Math.random() > 0.65,
       life: Math.random()
     }));
     const arcs = [];
@@ -597,6 +703,7 @@
     if (card.theme === 'cowboys') return { bgDark: '#041026', footer: '#051430', primary: '#7dd3fc', hot: '#ffffff', sub: '#b7cae6', box: 'rgba(11,42,91,0.74)', pill: '#0d3270', bar1: '#1d63ed', ovrText: '#070b14' };
     if (card.theme === 'patriots') return { bgDark: '#020b1c', footer: '#021430', primary: '#e31837', hot: '#ffffff', sub: '#b5c7e0', box: 'rgba(0,30,66,0.82)', pill: '#c8102e', bar1: '#1d4ed8', ovrText: '#ffffff' };
     if (card.theme === 'packers') return { bgDark: '#04140d', footer: '#061f14', primary: '#ffb612', hot: '#fff3c4', sub: '#b5dec9', box: 'rgba(20,59,42,0.82)', pill: '#183b2c', bar1: '#22c55e', ovrText: '#061b11' };
+    if (card.theme === 'packers-boss') return { bgDark: '#030d09', footer: '#051a12', primary: '#ffe066', hot: '#fef9c3', sub: '#a7f3d0', box: 'rgba(10,36,24,0.86)', pill: '#0d2b1f', bar1: '#10b981', ovrText: '#04140d' };
     return { bgDark: '#0e0522', footer: '#110628', primary: '#ffc62f', hot: '#ffe58f', sub: '#c8b8eb', box: 'rgba(79,38,131,0.58)', pill: '#4f2683', bar1: '#7c3aed', ovrText: '#070b14' };
   }
 
@@ -817,19 +924,20 @@
   function renderInspectorEvo(card) {
     const evo = card.evolutions[state.inspectEvoIdx] || card.evolutions[card.evolutions.length - 1];
     const starsHtml = Array.from({ length: 5 }, (_, i) => (i < evo.stars ? '★' : '<span class="star-dim">★</span>')).join('');
+    const mult = typeof evo.atkMult === 'number' ? evo.atkMult : (evo.ovr / 99);
     document.getElementById('inspect-stars').innerHTML = starsHtml;
-    document.getElementById('inspect-atkdef').textContent = `ATK ${Math.round(card.atk * (evo.ovr / 99))} / DEF ${Math.round(card.def * (evo.ovr / 99))} • PWR ${evo.power} / DMG ${evo.dmg}`;
-    document.getElementById('inspect-evo-note').textContent = `${evo.stage} (${evo.ovr} OVR) — ${evo.note}`;
+    document.getElementById('inspect-atkdef').textContent = `ATK ${Math.round(card.atk * mult)} / DEF ${Math.round(card.def * mult)} • PWR ${evo.power} / DMG ${evo.dmg}`;
+    document.getElementById('inspect-evo-note').textContent = `${evo.mascotBadge || `LVL ${evo.level}`} (${evo.ovr} OVR) — ${evo.mascotTrait || evo.note}`;
 
     const evoBar = document.getElementById('inspect-evo-bar');
     evoBar.innerHTML = card.evolutions
-      .map((e, i) => `<button class="chip ${i === state.inspectEvoIdx ? 'active' : ''}" data-evo-idx="${i}" type="button">${'★'.repeat(e.stars)} ${e.stage}</button>`)
+      .map((e, i) => `<button class="chip ${i === state.inspectEvoIdx ? 'active' : ''}" data-evo-idx="${i}" type="button">${i === 2 ? '⚡ ' : ''}${'★'.repeat(e.stars)} LVL ${i + 1}: ${e.stage}</button>`)
       .join('');
     evoBar.querySelectorAll('[data-evo-idx]').forEach((b) => {
       b.addEventListener('click', () => {
         state.inspectEvoIdx = Number(b.dataset.evoIdx);
+        setCardLevel(card.id, state.inspectEvoIdx + 1);
         renderInspectorEvo(card);
-        AUDIO.playCardFlip();
       });
     });
   }
@@ -839,10 +947,10 @@
     const dialog = document.getElementById('inspect-dialog');
     if (!card || !dialog) return;
     state.inspectCardId = cardId;
-    state.inspectEvoIdx = card.evolutions.length - 1;
+    state.inspectEvoIdx = getCardLevel(card) - 1;
     document.getElementById('inspect-img').src = card.image;
     document.getElementById('inspect-img').alt = `${card.name} #${card.number}`;
-    document.getElementById('inspect-edition').textContent = `${card.edition} • ${card.clan.toUpperCase()} • ${card.grade}`;
+    document.getElementById('inspect-edition').textContent = `${card.edition} • ${card.clan.toUpperCase()} • MASCOT: ${(card.mascot || card.team).toUpperCase()}`;
     document.getElementById('inspect-name').textContent = `${card.name} #${card.number}`;
     document.getElementById('inspect-sub').textContent = `${card.team} • ${card.subtitle}`;
     document.getElementById('inspect-keywords').innerHTML = card.keywords.map((k) => `<span class="keyword-pill">${k}</span>`).join('');
@@ -861,7 +969,7 @@
     if (!list || !synBox) return;
 
     const members = state.squad.map((id) => state.cards.find((c) => c.id === id)).filter(Boolean);
-    const totalStars = members.reduce((sum, c) => sum + c.stars, 0);
+    const totalStars = members.reduce((sum, c) => sum + getCardEvo(c).stars, 0);
     const vikCount = members.filter((c) => c.teamKey === 'vikings').length;
     const packCount = members.filter((c) => c.teamKey === 'packers').length;
     const uniqueTeams = new Set(members.map((c) => c.teamKey)).size;
@@ -879,15 +987,19 @@
     }
 
     list.innerHTML = members
-      .map((c) => `
+      .map((c) => {
+        const lvl = getCardLevel(c);
+        const evo = getCardEvo(c);
+        return `
         <div class="squad-slot">
           <img src="${c.image}" alt="${c.name}" style="object-position:${c.objectPos || 'center 10%'};" />
           <div style="flex:1;">
-            <div style="font-family:var(--font-display);font-size:0.78rem;color:var(--bad-gold-hot);font-weight:800;">${c.name} #${c.number}</div>
-            <div style="font-size:0.74rem;color:var(--text-muted);">${c.team} • PWR ${c.duelPower} / DMG ${c.duelDamage} • ${'★'.repeat(c.stars)}</div>
+            <div style="font-family:var(--font-display);font-size:0.78rem;color:var(--bad-gold-hot);font-weight:800;">${c.name} #${c.number} • LVL ${lvl}</div>
+            <div style="font-size:0.74rem;color:var(--text-muted);">${evo.stage} • PWR ${evo.power} / DMG ${evo.dmg} • ${'★'.repeat(evo.stars)}</div>
           </div>
           <button class="btn btn-ghost btn-sm" data-remove-squad="${c.id}" type="button">✕</button>
-        </div>`)
+        </div>`;
+      })
       .join('');
 
     list.querySelectorAll('[data-remove-squad]').forEach((b) => {
@@ -997,7 +1109,8 @@
       const opp = state.cards.find((c) => c.id === state.oppId && c.id !== state.heroId)
         || state.cards.find((c) => c.id !== state.heroId);
       state.oppId = opp.id;
-      return { type: 'crew', name: `${opp.name} #${opp.number}`, image: opp.image, objectPos: opp.objectPos, pwr: opp.duelPower, dmg: opp.duelDamage, maxHp: 14 };
+      const oppEvo = getCardEvo(opp);
+      return { type: 'crew', name: `${opp.name} #${opp.number}`, image: opp.image, objectPos: opp.objectPos, pwr: oppEvo.power, dmg: oppEvo.dmg, maxHp: 14, mascotBadge: oppEvo.mascotBadge };
     }
     const r = DATA.rivals.find((rv) => rv.id === state.oppId) || DATA.rivals[0];
     state.oppId = r.id;
@@ -1034,8 +1147,9 @@
 
   function renderEnergyControls() {
     const hero = getHeroCard();
+    const heroEvo = getCardEvo(hero);
     const syn = getSquadSynergy();
-    const effPwr = hero.duelPower + syn.bonusPwr;
+    const effPwr = heroEvo.power + syn.bonusPwr;
     const slider = document.getElementById('stake-slider');
     if (state.stake > state.heroEnergy) state.stake = state.heroEnergy;
     slider.max = String(state.heroEnergy);
@@ -1088,6 +1202,7 @@
 
   function renderDuelArena() {
     const hero = getHeroCard();
+    const heroEvo = getCardEvo(hero);
     const opp = getOpponent();
 
     document.getElementById('duel-round-label').textContent = state.duelOver ? 'MATCH COMPLETE' : `ROUND ${state.round} / ${state.maxRounds}`;
@@ -1104,7 +1219,7 @@
     // Pickers
     const fPicker = document.getElementById('fighter-picker');
     fPicker.innerHTML = state.cards
-      .map((c) => `<button class="chip ${c.id === state.heroId ? 'active' : ''}" data-pick-hero="${c.id}" type="button">${c.shortName}</button>`)
+      .map((c) => `<button class="chip ${c.id === state.heroId ? 'active' : ''}" data-pick-hero="${c.id}" type="button">${c.shortName} (L${getCardLevel(c)})</button>`)
       .join('');
     fPicker.querySelectorAll('[data-pick-hero]').forEach((b) => {
       b.addEventListener('click', () => { state.heroId = b.dataset.pickHero; resetDuelMatch(); });
@@ -1114,7 +1229,7 @@
     if (state.oppMode === 'crew') {
       oPicker.innerHTML = state.cards
         .filter((c) => c.id !== state.heroId)
-        .map((c) => `<button class="chip ${c.id === state.oppId ? 'active' : ''}" data-pick-opp="${c.id}" type="button">${c.shortName}</button>`)
+        .map((c) => `<button class="chip ${c.id === state.oppId ? 'active' : ''}" data-pick-opp="${c.id}" type="button">${c.shortName} (L${getCardLevel(c)})</button>`)
         .join('');
     } else {
       oPicker.innerHTML = DATA.rivals
@@ -1131,8 +1246,10 @@
     document.getElementById('battle-hero-img').src = hero.image;
     document.getElementById('battle-hero-img').style.objectPosition = hero.objectPos || 'center 10%';
     document.getElementById('battle-hero-name').textContent = `${hero.name} #${hero.number}`;
-    document.getElementById('hero-pwr-val').textContent = String(hero.duelPower + syn.bonusPwr);
-    document.getElementById('hero-dmg-val').textContent = String(hero.duelDamage + syn.bonusDmg);
+    const mascotTag = document.getElementById('battle-hero-mascot');
+    if (mascotTag) mascotTag.textContent = heroEvo.mascotBadge || `LVL ${getCardLevel(hero)} • ${heroEvo.stage}`;
+    document.getElementById('hero-pwr-val').textContent = String(heroEvo.power + syn.bonusPwr);
+    document.getElementById('hero-dmg-val').textContent = String(heroEvo.dmg + syn.bonusDmg);
 
     const oppVis = document.getElementById('battle-opp-visual');
     oppVis.innerHTML = opp.type === 'crew'
@@ -1162,6 +1279,7 @@
   function playDuelRound() {
     if (state.duelOver) { resetDuelMatch(); return; }
     const hero = getHeroCard();
+    const heroEvo = getCardEvo(hero);
     const opp = getOpponent();
 
     // Opponent AI bluffing stake across remaining rounds
@@ -1180,7 +1298,7 @@
     state.oppEnergy = Math.max(0, state.oppEnergy - oppStake);
 
     const syn = getSquadSynergy();
-    const heroAtk = (hero.duelPower + syn.bonusPwr) * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0);
+    const heroAtk = (heroEvo.power + syn.bonusPwr) * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0);
     const oppAtk = opp.pwr * (1 + oppStake);
 
     if (usedInstant) {
@@ -1197,7 +1315,7 @@
     document.getElementById('opp-atk-sub').textContent = `Staked ${oppStake} NRG (${opp.pwr} × ${1 + oppStake})`;
 
     if (heroAtk >= oppAtk) {
-      const dealt = hero.duelDamage + syn.bonusDmg;
+      const dealt = heroEvo.dmg + syn.bonusDmg;
       state.oppHp = Math.max(0, state.oppHp - dealt);
       heroBox.classList.add('round-win'); heroBox.classList.remove('round-loss');
       oppBox.classList.add('round-loss'); oppBox.classList.remove('round-win');
@@ -1206,7 +1324,7 @@
       banner.textContent = `ROUND WON! ${heroAtk} > ${oppAtk} (-${dealt} LIFE)`;
       banner.className = 'round-banner win';
       AUDIO.playImpact(true);
-      appendDuelLog(`⚡ R${state.round}: ${hero.shortName} (${heroAtk} ATK, ${state.stake} NRG${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK, ${oppStake} NRG) for -${dealt} Life!`);
+      appendDuelLog(`⚡ R${state.round}: ${hero.shortName} [${heroEvo.stage}] (${heroAtk} ATK, ${state.stake} NRG${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK, ${oppStake} NRG) for -${dealt} Life!`);
     } else {
       const blocked = usedInstant ? usedInstant.blockDmg : 0;
       const taken = Math.max(1, opp.dmg - blocked);
@@ -1355,6 +1473,12 @@
       renderCards();
     });
 
+    document.querySelectorAll('[data-all-level]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        setAllCardsLevel(Number(btn.dataset.allLevel));
+      });
+    });
+
     document.querySelectorAll('[data-foil-btn]').forEach((btn) => {
       btn.addEventListener('click', () => {
         document.body.setAttribute('data-foil', btn.dataset.foilBtn);
@@ -1429,6 +1553,7 @@
   initFireworks();
   initControls();
   initDialogs();
+  syncToolbarLevelChips();
   renderCards();
   resetDuelMatch();
   initRequestDesk();

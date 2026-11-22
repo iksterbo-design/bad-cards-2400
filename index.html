@@ -125,7 +125,7 @@
           <h2 class="section-title">Live 3D Holographic Card Vault</h2>
         </div>
         <p class="section-desc">
-          Tilt for real 3D foil glare, <strong>click any card to flip 180°</strong>, inspect <strong>1★→5★ Evolution stages</strong>, add cards to your <strong>4-Card Squad</strong>, or download crisp Front &amp; Back PNGs with the corner <strong>B.A.D</strong> foil seal.
+          Tilt for real 3D foil glare, <strong>click any card to flip 180°</strong>, power up every card through <strong>3 Team Mascot Upgrade Levels (L1 → L2 → L3 MAX)</strong>, build your <strong>4-Card Squad</strong>, or download crisp Front &amp; Back PNGs with the corner <strong>B.A.D</strong> seal.
         </p>
       </div>
 
@@ -141,18 +141,25 @@
             <button class="chip" data-team-filter="patriots" type="button">🚀 Patriots (1)</button>
           </div>
           <div class="toolbar-group">
-            <input id="vault-search" class="search-input" type="search" placeholder="Search player, #number, keyword..." aria-label="Search cards" />
+            <input id="vault-search" class="search-input" type="search" placeholder="Search player, #number, mascot..." aria-label="Search cards" />
           </div>
         </div>
 
         <div class="toolbar-row">
+          <div class="toolbar-group" role="group" aria-label="Set all cards upgrade level">
+            <span class="toolbar-label">MASCOT LEVEL:</span>
+            <button class="chip" data-all-level="1" type="button">★ Lvl 1 Rookie</button>
+            <button class="chip" data-all-level="2" type="button">★★★ Lvl 2 Awakened</button>
+            <button class="chip active" data-all-level="3" type="button">⚡ Lvl 3 MAX Mascot</button>
+          </div>
+
           <div class="toolbar-group" role="group" aria-label="Collector foil finish">
-            <span class="toolbar-label">FOIL FINISH:</span>
-            <button class="chip active" data-foil-btn="native" type="button">✨ Team Native</button>
-            <button class="chip" data-foil-btn="prism" type="button">🌈 Secret Prism</button>
-            <button class="chip" data-foil-btn="gold" type="button">🏆 Golden Aura</button>
-            <button class="chip" data-foil-btn="ghost" type="button">👻 Ghost Platinum</button>
-            <button class="chip" data-foil-btn="ice" type="button">❄️ Sapphire Ice</button>
+            <span class="toolbar-label">FOIL:</span>
+            <button class="chip active" data-foil-btn="native" type="button">✨ Native</button>
+            <button class="chip" data-foil-btn="prism" type="button">🌈 Prism</button>
+            <button class="chip" data-foil-btn="gold" type="button">🏆 Gold</button>
+            <button class="chip" data-foil-btn="ghost" type="button">👻 Ghost</button>
+            <button class="chip" data-foil-btn="ice" type="button">❄️ Ice</button>
           </div>
 
           <div class="toolbar-group">
@@ -218,9 +225,10 @@
           <div class="fighter-card" id="hero-fighter-box">
             <img id="battle-hero-img" class="fighter-avatar" src="assets/card-david-da-boss.jpg" alt="Your fighter" />
             <div id="battle-hero-name" class="fighter-name">DAVID aka DA BOSS #92</div>
+            <div id="battle-hero-mascot" class="duel-mascot-tag">LVL 3 MAX • 🧀❄️ TUNDRA TITAN</div>
             <div class="fighter-stat-badges">
-              <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">9</strong></span>
-              <span class="badge-dmg">🔥 DMG <strong id="hero-dmg-val">7</strong></span>
+              <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">11</strong></span>
+              <span class="badge-dmg">🔥 DMG <strong id="hero-dmg-val">9</strong></span>
             </div>
             <div id="hero-atk-readout" class="attack-readout">27</div>
             <div id="hero-atk-sub" class="attack-sub">Projected: 9 × (1 + 2 NRG)</div>
