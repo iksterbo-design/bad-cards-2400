@@ -78,20 +78,43 @@ try {
   await send('Page.navigate', { url: `http://127.0.0.1:${port}/` });
   await new Promise((r) => setTimeout(r, 1400));
 
+  // Scroll through vault so lazy images load cleanly
+  await send('Runtime.evaluate', { expression: `window.scrollTo(0, document.body.scrollHeight * 0.5);` });
+  await new Promise((r) => setTimeout(r, 700));
+  await send('Runtime.evaluate', { expression: `window.scrollTo(0, 0);` });
+  await new Promise((r) => setTimeout(r, 300));
+
   const desktopStats = await send('Runtime.evaluate', {
     returnByValue: true,
-    expression: `({
-      cards: document.querySelectorAll('.holo-card-scene').length,
-      seals: document.querySelectorAll('.bad-holo-seal').length,
-      brokenImgs: [...document.querySelectorAll('img')].filter(i => i.complete && i.naturalWidth === 0).length,
-      synergy: document.getElementById('duel-synergy-pill')?.textContent || '',
-      overflowX: document.documentElement.scrollWidth > window.innerWidth
-    })`
+    expression: `(() => {
+      const l3Banner = document.querySelector('.card-column[data-level="3"] .mascot-crest-banner');
+      const l3Bg = l3Banner ? getComputedStyle(l3Banner).backgroundImage : 'none';
+      const imgs = [...document.querySelectorAll('.card-art-img, .fighter-avatar')];
+      return {
+        cards: document.querySelectorAll('.holo-card-scene').length,
+        seals: document.querySelectorAll('.bad-holo-seal').length,
+        brokenImgs: imgs.filter(i => !i.complete || i.naturalWidth === 0).length,
+        l3BannerHasGradient: l3Bg !== 'none',
+        synergy: document.getElementById('duel-synergy-pill')?.textContent || '',
+        oppMascot: document.getElementById('battle-opp-mascot')?.textContent || '',
+        overflowX: document.documentElement.scrollWidth > window.innerWidth
+      };
+    })()`
   });
 
-  // Trigger a live duel round & inspect modal
-  await send('Runtime.evaluate', { expression: `document.getElementById('play-round-btn').click();` });
-  await new Promise((r) => setTimeout(r, 200));
+  // Trigger a live duel round, mascot level change, and search XSS check
+  await send('Runtime.evaluate', {
+    expression: `(() => {
+      document.getElementById('play-round-btn').click();
+      document.querySelector('[data-all-level="1"]').click();
+      document.querySelector('[data-all-level="3"]').click();
+      const s = document.getElementById('vault-search');
+      s.value = '<img src=x onerror=throw(1)>';
+      s.dispatchEvent(new Event('input'));
+      document.querySelector('#cards-grid button')?.click();
+    })()`
+  });
+  await new Promise((r) => setTimeout(r, 300));
 
   // Mobile viewport audit (390x844)
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
@@ -107,7 +130,15 @@ try {
     jsErrors: errs,
     http404s
   }));
-  if (errs.length || http404s.length || desktopStats.result.value.brokenImgs > 0) {
+  if (
+    errs.length ||
+    http404s.length ||
+    desktopStats.result.value.cards !== 8 ||
+    desktopStats.result.value.brokenImgs > 0 ||
+    !desktopStats.result.value.l3BannerHasGradient ||
+    desktopStats.result.value.overflowX ||
+    mobileOverflow.result.value
+  ) {
     process.exitCode = 1;
   }
 } finally {

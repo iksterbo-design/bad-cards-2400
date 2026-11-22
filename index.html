@@ -55,7 +55,7 @@
           </div>
         </a>
 
-        <nav class="nav-links" aria-label="Primary navigation">
+        <nav class="nav-links" aria-label="Primary">
           <a href="#vault">Card Vault</a>
           <a href="#battle">Duel Arena</a>
           <a href="#request-desk">Get Your Card</a>
@@ -63,19 +63,19 @@
         </nav>
 
         <div class="nav-actions">
-          <button id="open-squad-btn" class="btn btn-cyan btn-sm" type="button">🃏 My Squad (<span id="squad-count">3</span>/4)</button>
-          <button id="mute-btn" class="btn btn-ghost btn-sm" type="button" aria-pressed="false">🔊 Sound</button>
+          <button id="open-squad-btn" class="btn btn-cyan btn-sm" type="button">🃏 <span>My Squad (<span id="squad-count">3</span>/4)</span></button>
+          <button id="mute-btn" class="btn btn-ghost btn-sm" type="button">🔊 Sound</button>
           <button id="nav-pack-btn" class="btn btn-gold btn-sm" type="button">🎁 Rip Pack</button>
         </div>
       </div>
     </header>
 
-    <main id="main-content" tabindex="-1">
+    <main>
     <!-- HERO -->
     <section id="top" class="hero">
       <div class="hero-content">
         <div class="hero-pill">✨ FLAGSHIP EDITION &bull; CORNER HOLOGRAPHIC SEAL SERIES</div>
-        <h1 class="hero-title">
+        <h1 id="main-content" class="hero-title" tabindex="-1">
           <span class="gold">B.A.D CARDS</span> 2400<br />
           MYTHIC CREW VAULT
         </h1>
@@ -83,13 +83,13 @@
           Collect, evolve, build your 4-card squad, and out-bluff your friends with Hype Energy &amp; Instant Traps — featuring pure team-native 3D holographic cards stamped with the subtle <strong>B.A.D</strong> corner authentication seal.
         </p>
 
-        <div class="clan-strip" aria-label="Active team clans">
-          <span class="clan-badge">⚡ VALHALLA SQUAD &bull; 3</span>
-          <span class="clan-badge">🧀 TITLETOWN TUNDRA &bull; 2</span>
-          <span class="clan-badge">🐻 MIDWAY MONSTERS &bull; 1</span>
-          <span class="clan-badge">⭐ LONE STAR EMPIRE &bull; 1</span>
-          <span class="clan-badge">🚀 FOXBOROUGH ROCKET LABS &bull; 1</span>
-        </div>
+        <ul class="clan-strip" role="list" aria-label="Active team clans">
+          <li class="clan-badge">⚡ VALHALLA SQUAD &bull; 3</li>
+          <li class="clan-badge">🧀 TITLETOWN TUNDRA &bull; 2</li>
+          <li class="clan-badge">🐻 MIDWAY MONSTERS &bull; 1</li>
+          <li class="clan-badge">⭐ LONE STAR EMPIRE &bull; 1</li>
+          <li class="clan-badge">🚀 FOXBOROUGH ROCKET LABS &bull; 1</li>
+        </ul>
 
         <div class="hero-cta-row">
           <button id="hero-pack-btn" class="btn btn-gold" type="button">🎁 Rip 8-Card Mythic Pack</button>
@@ -143,7 +143,7 @@
             <button class="chip" data-team-filter="patriots" type="button" aria-pressed="false">🚀 Patriots (1)</button>
           </div>
           <div class="toolbar-group">
-            <input id="vault-search" class="search-input" type="search" placeholder="Search player, #number, mascot..." aria-label="Search cards" />
+            <input id="vault-search" class="search-input" type="search" placeholder="Search player, #, mascot..." aria-label="Search cards" />
           </div>
         </div>
 
@@ -166,7 +166,7 @@
 
           <div class="toolbar-group">
             <button id="toggle-view-btn" class="btn btn-ghost btn-sm" type="button" aria-pressed="false">🗂️ Binder View: Full</button>
-            <button id="toggle-anim-btn" class="btn btn-ghost btn-sm" type="button" aria-pressed="true">⏸ Pause Live 3D</button>
+            <button id="toggle-anim-btn" class="btn btn-ghost btn-sm" type="button">⏸ Pause Live 3D</button>
             <button id="toggle-slab-btn" class="btn btn-cyan btn-sm" type="button" aria-pressed="false">💎 B.A.D 10 Slab: OFF</button>
           </div>
         </div>
@@ -229,11 +229,11 @@
             <div id="battle-hero-name" class="fighter-name">DAVID aka DA BOSS #92</div>
             <div id="battle-hero-mascot" class="duel-mascot-tag">LVL 3 MAX • 🧀❄️ TUNDRA TITAN</div>
             <div class="fighter-stat-badges">
-              <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">11</strong></span>
+              <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">13</strong></span>
               <span class="badge-dmg">🔥 DMG <strong id="hero-dmg-val">9</strong></span>
             </div>
-            <div id="hero-atk-readout" class="attack-readout">27</div>
-            <div id="hero-atk-sub" class="attack-sub">Projected: 9 × (1 + 2 NRG)</div>
+            <div id="hero-atk-readout" class="attack-readout">39</div>
+            <div id="hero-atk-sub" class="attack-sub">Projected: 13 × (1 + 2 NRG)</div>
             <div class="hp-wrap">
               <div class="hp-label"><span>LIFE POINTS</span><span id="hero-hp-text">14 / 14</span></div>
               <div class="hp-track"><div id="hero-hp-fill" class="hp-fill" style="width:100%;"></div></div>
@@ -250,9 +250,10 @@
           <div class="fighter-card" id="opp-fighter-box">
             <div id="battle-opp-visual"></div>
             <div id="battle-opp-name" class="fighter-name">KARL DANGER! #99</div>
+            <div id="battle-opp-mascot" class="duel-mascot-tag opp-tag">LVL 3 MAX • 🪓 VIKTOR BERSERKER</div>
             <div class="fighter-stat-badges">
-              <span class="badge-pwr">👊 PWR <strong id="opp-pwr-val">8</strong></span>
-              <span class="badge-dmg">🔥 DMG <strong id="opp-dmg-val">6</strong></span>
+              <span class="badge-pwr">👊 PWR <strong id="opp-pwr-val">10</strong></span>
+              <span class="badge-dmg">🔥 DMG <strong id="opp-dmg-val">8</strong></span>
             </div>
             <div id="opp-atk-readout" class="attack-readout">?</div>
             <div id="opp-atk-sub" class="attack-sub">Hidden stake</div>
@@ -315,11 +316,11 @@
             <div class="form-row-2">
               <div>
                 <label class="field-label" for="req-name">YOUR NAME</label>
-                <input id="req-name" class="text-input" type="text" placeholder="e.g. Marcus Johnson" required />
+                <input id="req-name" class="text-input" type="text" autocomplete="name" placeholder="e.g. Marcus Johnson" required />
               </div>
               <div>
                 <label class="field-label" for="req-nick">NICKNAME</label>
-                <input id="req-nick" class="text-input" type="text" placeholder='e.g. "Big Play"' />
+                <input id="req-nick" class="text-input" type="text" autocomplete="nickname" placeholder='e.g. "Big Play"' />
               </div>
             </div>
             <div class="form-row-2">
@@ -365,7 +366,10 @@
                 <button class="btn btn-gold" style="width:100%;" type="submit">🔥 Post Hype</button>
               </div>
             </div>
-            <textarea id="wall-msg" class="text-input" rows="2" maxlength="220" placeholder="Call out a friend for a 4-round duel..." required></textarea>
+            <div>
+              <label class="field-label" for="wall-msg">LOCKER ROOM MESSAGE</label>
+              <textarea id="wall-msg" class="text-input" rows="2" maxlength="220" placeholder="Call out a friend for a 4-round duel..." required></textarea>
+            </div>
           </form>
           <div id="wall-feed" class="wall-feed"></div>
         </div>
@@ -420,7 +424,7 @@
       </div>
 
       <div class="inspect-layout">
-        <img id="inspect-img" class="inspect-art" src="assets/card-tavaris-too-too.jpg" alt="" decoding="async" />
+        <img id="inspect-img" class="inspect-art" src="assets/card-david-da-boss.jpg" alt="" decoding="async" loading="lazy" fetchpriority="low" />
         <div>
           <div id="inspect-edition" style="font-family:var(--font-display);font-size:0.68rem;letter-spacing:0.16em;color:#38bdf8;margin-bottom:0.2rem;"></div>
           <div id="inspect-name" style="font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:#ffe28a;margin-bottom:0.16rem;"></div>
@@ -428,7 +432,7 @@
 
           <!-- Star Evolution + Yu-Gi-Oh ATK/DEF + MTG Keywords -->
           <div style="display:flex;align-items:center;justify-content:space-between;gap:0.6rem;flex-wrap:wrap;margin-bottom:0.45rem;">
-            <div id="inspect-stars" class="star-row" aria-label="Evolution star rating"></div>
+            <div id="inspect-stars" class="star-row" role="img" aria-label="5 out of 5 stars"></div>
             <div id="inspect-atkdef" style="font-family:var(--font-mono);font-size:0.78rem;color:#ffe28a;font-weight:700;"></div>
           </div>
 

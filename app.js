@@ -20,7 +20,10 @@
   let initialSquad = ['david-da-boss', 'jerry-mack', 'isaiah-little-bill'];
   try {
     const saved = JSON.parse(localStorage.getItem(SQUAD_KEY) || 'null');
-    if (Array.isArray(saved) && saved.length) initialSquad = saved;
+    if (Array.isArray(saved)) {
+      const valid = saved.filter((id) => DATA.cards.some((c) => c.id === id)).slice(0, 4);
+      if (valid.length) initialSquad = valid;
+    }
   } catch (_) {}
 
   let initialLevels = {};
@@ -120,22 +123,25 @@
       h = canvas.height = window.innerHeight;
     });
     function loop() {
-      ctx.clearRect(0, 0, w, h);
-      for (let i = fireworks.length - 1; i >= 0; i--) {
-        const p = fireworks[i];
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.08;
-        p.vx *= 0.985;
-        p.life -= 0.017;
-        if (p.life <= 0) { fireworks.splice(i, 1); continue; }
-        ctx.globalAlpha = Math.max(0, p.life);
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = p.color;
-        ctx.fill();
+      if (!document.hidden && fireworks.length) {
+        ctx.clearRect(0, 0, w, h);
+        for (let i = fireworks.length - 1; i >= 0; i--) {
+          const p = fireworks[i];
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vy += 0.08;
+          p.vx *= 0.985;
+          p.life -= 0.017;
+          if (p.life <= 0) { fireworks.splice(i, 1); continue; }
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        if (!fireworks.length) ctx.clearRect(0, 0, w, h);
       }
-      ctx.globalAlpha = 1;
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
@@ -183,25 +189,27 @@
       a: 0.20 + Math.random() * 0.45
     }));
     function loop() {
-      ctx.clearRect(0, 0, w, h);
-      for (const m of motes) {
-        m.x += m.vx;
-        m.y += m.gold ? -m.vy : m.vy * 0.7;
-        if (m.y > h + 8) { m.y = -8; m.x = Math.random() * w; }
-        if (m.y < -8) { m.y = h + 8; m.x = Math.random() * w; }
-        if (m.x > w + 8) m.x = -8;
-        if (m.x < -8) m.x = w + 8;
-        ctx.beginPath();
-        ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
-        ctx.fillStyle = m.gold ? `rgba(245, 185, 66, ${m.a})` : `rgba(125, 211, 252, ${m.a * 0.85})`;
-        ctx.fill();
+      if (!document.hidden) {
+        ctx.clearRect(0, 0, w, h);
+        for (const m of motes) {
+          m.x += m.vx;
+          m.y += m.gold ? -m.vy : m.vy * 0.7;
+          if (m.y > h + 8) { m.y = -8; m.x = Math.random() * w; }
+          if (m.y < -8) { m.y = h + 8; m.x = Math.random() * w; }
+          if (m.x > w + 8) m.x = -8;
+          if (m.x < -8) m.x = w + 8;
+          ctx.beginPath();
+          ctx.arc(m.x, m.y, m.r, 0, Math.PI * 2);
+          ctx.fillStyle = m.gold ? `rgba(245, 185, 66, ${m.a})` : `rgba(125, 211, 252, ${m.a * 0.85})`;
+          ctx.fill();
+        }
       }
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
   }
 
-  /* ---------- RENDER 5-CARD VAULT ---------- */
+  /* ---------- RENDER 8-CARD VAULT ---------- */
   const fxEngines = [];
 
   function saveSquad() {
@@ -311,7 +319,28 @@
     });
 
     if (!visible.length) {
-      grid.innerHTML = `<div style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-family:var(--font-display);font-size:0.86rem;">No cards matched "${q}". Clear the search or team filter to view all ${state.cards.length} Mythics.</div>`;
+      const empty = document.createElement('div');
+      empty.style.cssText = 'text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-family:var(--font-display);font-size:0.86rem;display:flex;flex-direction:column;align-items:center;gap:0.85rem;';
+      const msg = document.createElement('p');
+      msg.textContent = `No cards matched "${state.searchQuery.trim()}". Clear the search or team filter to view all ${state.cards.length} Mythics.`;
+      const resetBtn = document.createElement('button');
+      resetBtn.type = 'button';
+      resetBtn.className = 'btn btn-gold btn-sm';
+      resetBtn.textContent = 'Reset Vault Filters';
+      resetBtn.addEventListener('click', () => {
+        state.teamFilter = 'all';
+        state.searchQuery = '';
+        const searchEl = document.getElementById('vault-search');
+        if (searchEl) searchEl.value = '';
+        document.querySelectorAll('[data-team-filter]').forEach((b) => {
+          const isAll = b.dataset.teamFilter === 'all';
+          b.classList.toggle('active', isAll);
+          b.setAttribute('aria-pressed', String(isAll));
+        });
+        renderCards();
+      });
+      empty.append(msg, resetBtn);
+      grid.appendChild(empty);
       return;
     }
 
@@ -342,7 +371,7 @@
               <!-- FRONT -->
               <div class="holo-face holo-front">
                 <div class="card-art-wrap">
-                  <img class="card-art-img" src="${card.image}" alt="${card.name} #${card.number} ${card.team}" decoding="async" style="object-position:${card.objectPos || 'center 10%'};" />
+                  <img class="card-art-img" src="${card.image}" alt="${card.name} #${card.number} ${card.team}" decoding="async" ${idx < 2 ? 'fetchpriority="high"' : (idx >= 4 ? 'loading="lazy"' : '')} style="object-position:${card.objectPos || 'center 10%'};" />
                   <canvas class="card-fx-canvas" data-fx-theme="${card.fxTheme}" aria-hidden="true"></canvas>
                   <div class="chrome-sweep" style="--sweep-delay:${(idx * 0.95).toFixed(2)}s;" aria-hidden="true"></div>
                   <div class="card-art-vignette"></div>
@@ -449,16 +478,16 @@
         </div>
 
         <div class="card-level-bar" role="group" aria-label="Upgrade ${card.name} level">
-          <button class="lvl-pill ${lvl === 1 ? 'active' : ''}" data-set-lvl="1" data-card-id="${card.id}" type="button">★ LVL 1</button>
-          <button class="lvl-pill ${lvl === 2 ? 'active' : ''}" data-set-lvl="2" data-card-id="${card.id}" type="button">★★★ LVL 2</button>
-          <button class="lvl-pill is-max ${lvl === 3 ? 'active' : ''}" data-set-lvl="3" data-card-id="${card.id}" type="button">⚡ LVL 3 MAX</button>
+          <button class="lvl-pill ${lvl === 1 ? 'active' : ''}" data-set-lvl="1" data-card-id="${card.id}" type="button" aria-pressed="${lvl === 1}">★ LVL 1</button>
+          <button class="lvl-pill ${lvl === 2 ? 'active' : ''}" data-set-lvl="2" data-card-id="${card.id}" type="button" aria-pressed="${lvl === 2}">★★★ LVL 2</button>
+          <button class="lvl-pill is-max ${lvl === 3 ? 'active' : ''}" data-set-lvl="3" data-card-id="${card.id}" type="button" aria-pressed="${lvl === 3}">⚡ LVL 3 MAX</button>
         </div>
 
         <div class="card-action-bar">
-          <button class="card-mini-btn" data-action="flip" data-card-id="${card.id}" type="button">🔄 Flip</button>
-          <button class="card-mini-btn" data-action="inspect" data-card-id="${card.id}" type="button">★ Mascot</button>
-          <button class="card-mini-btn ${inSquad ? 'in-squad' : ''}" data-action="squad" data-card-id="${card.id}" type="button">${inSquad ? '✓ In Squad' : '+ Squad'}</button>
-          <button class="card-mini-btn" data-action="dl-front" data-card-id="${card.id}" type="button">⬇️ PNG</button>
+          <button class="card-mini-btn" data-action="flip" data-card-id="${card.id}" type="button" aria-label="Flip ${card.name}">🔄 Flip</button>
+          <button class="card-mini-btn" data-action="inspect" data-card-id="${card.id}" type="button" aria-label="Mascot details for ${card.name}">★ Mascot</button>
+          <button class="card-mini-btn ${inSquad ? 'in-squad' : ''}" data-action="squad" data-card-id="${card.id}" type="button" aria-pressed="${inSquad}" aria-label="${inSquad ? 'In Squad' : 'Squad'} — ${card.name}">${inSquad ? '✓ In Squad' : '+ Squad'}</button>
+          <button class="card-mini-btn" data-action="dl-front" data-card-id="${card.id}" type="button" aria-label="PNG export for ${card.name}">⬇️ PNG</button>
         </div>
       `;
 
@@ -658,21 +687,23 @@
 
   let masterTick = 0;
   function masterAnimLoop(ts) {
-    masterTick += 1;
-    for (const eng of fxEngines) {
-      eng.step(masterTick);
-      const sc = eng.scene;
-      if (state.liveAnim && !sc.classList.contains('is-tilting') && !sc.classList.contains('is-flipped')) {
-        const inner = sc.querySelector('.holo-card-inner');
-        if (inner) {
-          const phase = ((ts / 4400) + eng.idx * 0.19) % 1;
-          const tau = Math.PI * 2;
-          inner.style.setProperty('--fy', `${(Math.sin(phase * tau) * -4.5).toFixed(2)}px`);
-          inner.style.setProperty('--rx', `${(Math.sin(phase * tau * 2) * 3.8).toFixed(2)}deg`);
-          inner.style.setProperty('--ry', `${(Math.sin(phase * tau) * 8.5).toFixed(2)}deg`);
-          inner.style.setProperty('--mx', `${(50 + Math.sin(phase * tau) * 28).toFixed(1)}%`);
-          inner.style.setProperty('--my', `${(42 + Math.cos(phase * tau) * 20).toFixed(1)}%`);
-          inner.style.setProperty('--glare-op', `${(0.28 + Math.abs(Math.sin(phase * tau)) * 0.2).toFixed(2)}`);
+    if (!document.hidden) {
+      masterTick += 1;
+      for (const eng of fxEngines) {
+        eng.step(masterTick);
+        const sc = eng.scene;
+        if (state.liveAnim && !sc.classList.contains('is-tilting') && !sc.classList.contains('is-flipped')) {
+          const inner = sc.querySelector('.holo-card-inner');
+          if (inner) {
+            const phase = ((ts / 4400) + eng.idx * 0.19) % 1;
+            const tau = Math.PI * 2;
+            inner.style.setProperty('--fy', `${(Math.sin(phase * tau) * -4.5).toFixed(2)}px`);
+            inner.style.setProperty('--rx', `${(Math.sin(phase * tau * 2) * 3.8).toFixed(2)}deg`);
+            inner.style.setProperty('--ry', `${(Math.sin(phase * tau) * 8.5).toFixed(2)}deg`);
+            inner.style.setProperty('--mx', `${(50 + Math.sin(phase * tau) * 28).toFixed(1)}%`);
+            inner.style.setProperty('--my', `${(42 + Math.cos(phase * tau) * 20).toFixed(1)}%`);
+            inner.style.setProperty('--glare-op', `${(0.28 + Math.abs(Math.sin(phase * tau)) * 0.2).toFixed(2)}`);
+          }
         }
       }
     }
@@ -723,6 +754,9 @@
   function exportCardFrontPNG(cardId) {
     const card = state.cards.find((c) => c.id === cardId);
     if (!card) return;
+    const lvl = getCardLevel(card);
+    const evo = getCardEvo(card);
+    const statDelta = typeof evo.statDelta === 'number' ? evo.statDelta : 0;
     const canvas = document.createElement('canvas');
     const W = 750, H = 1120;
     canvas.width = W; canvas.height = H;
@@ -738,7 +772,8 @@
         const artH = 720;
         const scale = Math.max(W / img.width, artH / img.height);
         const dw = img.width * scale, dh = img.height * scale;
-        const yBias = card.theme === 'cowboys' ? 0.22 : (card.theme === 'patriots' ? 0.08 : 0.10);
+        const posMatch = String(card.objectPos || '').match(/(\d+(?:\.\d+)?)%/);
+        const yBias = posMatch ? (Number(posMatch[1]) / 100) : 0.10;
         ctx.drawImage(img, (W - dw) / 2, -(dh - artH) * yBias, dw, dh);
 
         const vig = ctx.createLinearGradient(0, 440, 0, artH);
@@ -746,6 +781,20 @@
         vig.addColorStop(1, col.footer);
         ctx.fillStyle = vig;
         ctx.fillRect(0, 440, W, artH - 440);
+
+        // Mascot Crest Banner on art bottom
+        ctx.fillStyle = 'rgba(6,12,26,0.92)';
+        ctx.fillRect(30, artH - 54, W - 60, 38);
+        ctx.strokeStyle = col.primary;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(30, artH - 54, W - 60, 38);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#fffbeb';
+        ctx.font = '800 17px Orbitron, Arial, sans-serif';
+        ctx.fillText(evo.mascotBadge || `LVL ${lvl} • ${evo.stage}`, 46, artH - 29);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fbbf24';
+        ctx.fillText('★'.repeat(evo.stars), W - 46, artH - 29);
 
         ctx.fillStyle = col.footer;
         ctx.fillRect(0, artH, W, H - artH);
@@ -757,7 +806,7 @@
         ctx.fillStyle = col.ovrText || '#070b14';
         ctx.font = '900 54px Orbitron, Arial Black, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(String(card.ovr), 87, 94);
+        ctx.fillText(String(evo.ovr), 87, 94);
         ctx.font = '800 21px Orbitron, Arial, sans-serif';
         ctx.fillText(card.position, 87, 130);
 
@@ -768,7 +817,7 @@
         ctx.strokeRect(W - 234, 30, 204, 44);
         ctx.fillStyle = col.hot;
         ctx.font = '800 19px Orbitron, Arial, sans-serif';
-        ctx.fillText(card.rarity, W - 132, 59);
+        ctx.fillText(lvl === 3 ? card.rarity : `LVL ${lvl} • ${evo.stage.split(' ')[0]}`, W - 132, 59);
 
         ctx.fillStyle = col.pill;
         ctx.fillRect(W - 120, 86, 90, 48);
@@ -779,16 +828,17 @@
         ctx.textAlign = 'left';
         ctx.fillStyle = '#38bdf8';
         ctx.font = '700 19px Orbitron, Arial, sans-serif';
-        ctx.fillText(card.edition, 34, artH + 40);
+        ctx.fillText(lvl === 3 ? `${card.edition} • MAX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`, 34, artH + 40);
         ctx.fillStyle = col.hot;
         ctx.font = '900 40px Orbitron, Arial Black, sans-serif';
         ctx.fillText(card.name, 34, artH + 92);
         ctx.fillStyle = col.sub;
         ctx.font = '600 23px Rajdhani, Arial, sans-serif';
-        ctx.fillText(card.subtitle, 34, artH + 126);
+        ctx.fillText(lvl === 3 ? `${evo.stage} • ${card.mascot || card.team}` : card.subtitle, 34, artH + 126);
 
         const boxW = (W - 68 - 36) / 4;
         card.miniStats.forEach((st, i) => {
+          const val = Math.max(70, Math.min(100, st.v + statDelta));
           const bx = 34 + i * (boxW + 12), by = artH + 148;
           ctx.fillStyle = col.box;
           ctx.fillRect(bx, by, boxW, 80);
@@ -798,7 +848,7 @@
           ctx.textAlign = 'center';
           ctx.fillStyle = col.hot;
           ctx.font = '900 32px Orbitron, Arial Black, sans-serif';
-          ctx.fillText(String(st.v), bx + boxW / 2, by + 42);
+          ctx.fillText(String(val), bx + boxW / 2, by + 42);
           ctx.fillStyle = '#e6eeff';
           ctx.font = '700 17px Orbitron, Arial, sans-serif';
           ctx.fillText(st.k, bx + boxW / 2, by + 68);
@@ -819,10 +869,10 @@
         ctx.strokeRect(7, 7, W - 14, H - 14);
 
         const a = document.createElement('a');
-        a.download = `${card.id}-front-bad-cards-2400.png`;
+        a.download = `${card.id}-lvl${lvl}-front-bad-cards-2400.png`;
         a.href = canvas.toDataURL('image/png');
         a.click();
-        showToast(`⬇️ Saved ${card.name} Front PNG with B.A.D corner seal!`);
+        showToast(`⬇️ Saved ${card.name} (LVL ${lvl}) Front PNG with B.A.D corner seal!`);
       } catch (_) {
         showToast('💡 Open via the live URL to enable one-click PNG export!');
       }
@@ -849,6 +899,12 @@
   function exportCardBackPNG(cardId) {
     const card = state.cards.find((c) => c.id === cardId);
     if (!card) return;
+    const lvl = getCardLevel(card);
+    const evo = getCardEvo(card);
+    const statDelta = typeof evo.statDelta === 'number' ? evo.statDelta : 0;
+    const atkMult = typeof evo.atkMult === 'number' ? evo.atkMult : 1;
+    const liveAtk = Math.round(card.atk * atkMult);
+    const liveDef = Math.round(card.def * atkMult);
     const canvas = document.createElement('canvas');
     const W = 750, H = 1120;
     canvas.width = W; canvas.height = H;
@@ -866,17 +922,18 @@
     ctx.font = '900 38px Orbitron, Arial Black, sans-serif';
     ctx.fillText(`${card.name} #${card.number}`, 42, 88);
     ctx.fillStyle = col.sub;
-    ctx.font = '700 19px Orbitron, Arial, sans-serif';
-    ctx.fillText(`${card.team} • ${card.position} • ATK ${card.atk} / DEF ${card.def}`, 42, 124);
+    ctx.font = '700 18px Orbitron, Arial, sans-serif';
+    ctx.fillText(`${card.team} • LVL ${lvl} (${evo.ovr} OVR) • ATK ${liveAtk} / DEF ${liveDef}`, 42, 124);
 
     ctx.fillStyle = col.primary;
     ctx.fillRect(42, 146, W - 84, 3);
     ctx.fillStyle = '#e8f0ff';
-    ctx.font = '600 24px Rajdhani, Arial, sans-serif';
-    wrapText(ctx, card.bio, 42, 192, W - 84, 32);
+    ctx.font = '600 23px Rajdhani, Arial, sans-serif';
+    wrapText(ctx, `${evo.mascotBadge}: ${evo.mascotTrait || card.bio}`, 42, 188, W - 84, 30);
 
     let y = 370;
     card.detailedStats.forEach((st) => {
+      const val = Math.max(70, Math.min(100, st.val + statDelta));
       ctx.textAlign = 'left';
       ctx.fillStyle = col.sub;
       ctx.font = '700 19px Orbitron, Arial, sans-serif';
@@ -887,10 +944,10 @@
       bg.addColorStop(0, col.bar1);
       bg.addColorStop(1, col.primary);
       ctx.fillStyle = bg;
-      ctx.fillRect(280, y - 16, (336 * Math.min(100, st.val)) / 100, 16);
+      ctx.fillRect(280, y - 16, (336 * val) / 100, 16);
       ctx.fillStyle = col.hot;
       ctx.font = '900 23px Orbitron, Arial Black, sans-serif';
-      ctx.fillText(String(st.val), 638, y);
+      ctx.fillText(String(val), 638, y);
       y += 48;
     });
 
@@ -927,24 +984,26 @@
 
     drawCornerBadSeal(ctx, W, H, card.serial);
     const a = document.createElement('a');
-    a.download = `${card.id}-back-bad-cards-2400.png`;
+    a.download = `${card.id}-lvl${lvl}-back-bad-cards-2400.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
-    showToast(`⬇️ Saved ${card.name} Back PNG with B.A.D corner seal!`);
+    showToast(`⬇️ Saved ${card.name} (LVL ${lvl}) Back PNG with B.A.D corner seal!`);
   }
 
   /* ---------- EVOLUTION INSPECTOR, PACK RIPPER & SQUAD DRAWER ---------- */
   function renderInspectorEvo(card) {
     const evo = card.evolutions[state.inspectEvoIdx] || card.evolutions[card.evolutions.length - 1];
-    const starsHtml = Array.from({ length: 5 }, (_, i) => (i < evo.stars ? '★' : '<span class="star-dim">★</span>')).join('');
+    const starsEl = document.getElementById('inspect-stars');
+    const starsHtml = Array.from({ length: 5 }, (_, i) => (i < evo.stars ? '<span aria-hidden="true">★</span>' : '<span class="star-dim" aria-hidden="true">★</span>')).join('');
     const mult = typeof evo.atkMult === 'number' ? evo.atkMult : (evo.ovr / 99);
-    document.getElementById('inspect-stars').innerHTML = starsHtml;
+    starsEl.innerHTML = starsHtml;
+    starsEl.setAttribute('aria-label', `${evo.stars} out of 5 stars`);
     document.getElementById('inspect-atkdef').textContent = `ATK ${Math.round(card.atk * mult)} / DEF ${Math.round(card.def * mult)} • PWR ${evo.power} / DMG ${evo.dmg}`;
     document.getElementById('inspect-evo-note').textContent = `${evo.mascotBadge || `LVL ${evo.level}`} (${evo.ovr} OVR) — ${evo.mascotTrait || evo.note}`;
 
     const evoBar = document.getElementById('inspect-evo-bar');
     evoBar.innerHTML = card.evolutions
-      .map((e, i) => `<button class="chip ${i === state.inspectEvoIdx ? 'active' : ''}" data-evo-idx="${i}" type="button">${i === 2 ? '⚡ ' : ''}${'★'.repeat(e.stars)} LVL ${i + 1}: ${e.stage}</button>`)
+      .map((e, i) => `<button class="chip ${i === state.inspectEvoIdx ? 'active' : ''}" data-evo-idx="${i}" type="button" aria-pressed="${i === state.inspectEvoIdx}">${i === 2 ? '⚡ ' : ''}${'★'.repeat(e.stars)} LVL ${i + 1}: ${e.stage}</button>`)
       .join('');
     evoBar.querySelectorAll('[data-evo-idx]').forEach((b) => {
       b.addEventListener('click', () => {
@@ -1010,7 +1069,7 @@
             <div style="font-family:var(--font-display);font-size:0.78rem;color:var(--bad-gold-hot);font-weight:800;">${c.name} #${c.number} • LVL ${lvl}</div>
             <div style="font-size:0.74rem;color:var(--text-muted);">${evo.stage} • PWR ${evo.power} / DMG ${evo.dmg} • ${'★'.repeat(evo.stars)}</div>
           </div>
-          <button class="btn btn-ghost btn-sm" data-remove-squad="${c.id}" type="button">✕</button>
+          <button class="btn btn-ghost btn-sm" data-remove-squad="${c.id}" type="button" aria-label="Remove ${c.name} from My Squad">✕</button>
         </div>`;
       })
       .join('');
@@ -1068,6 +1127,8 @@
       saveSquad();
       renderCards();
       renderSquadDrawer();
+      renderDuelArena();
+      showToast('Cleared My Squad');
     });
     document.getElementById('squad-launch-duel')?.addEventListener('click', () => {
       if (state.squad.length) {
@@ -1127,7 +1188,7 @@
     }
     const r = DATA.rivals.find((rv) => rv.id === state.oppId) || DATA.rivals[0];
     state.oppId = r.id;
-    return { type: 'rival', name: r.name, badge: r.badge, pwr: r.duelPower, dmg: r.duelDamage, maxHp: r.hp };
+    return { type: 'rival', name: r.name, badge: r.badge, ovr: r.ovr, pwr: r.duelPower, dmg: r.duelDamage, maxHp: r.hp, mascotBadge: `${r.badge} NFL RIVAL • ${r.ovr} OVR` };
   }
 
   function appendDuelLog(line) {
@@ -1155,6 +1216,8 @@
     document.getElementById('opp-fighter-box')?.classList.remove('round-win', 'round-loss');
     const banner = document.getElementById('round-result-banner');
     if (banner) { banner.textContent = 'STAKE ENERGY & CLASH'; banner.className = 'round-banner'; }
+    const insDesc = document.getElementById('instant-desc');
+    if (insDesc) insDesc.textContent = 'Optional: Arm a 1-per-match Instant or Trap before playing the round.';
     renderDuelArena();
   }
 
@@ -1235,7 +1298,7 @@
     // Pickers
     const fPicker = document.getElementById('fighter-picker');
     fPicker.innerHTML = state.cards
-      .map((c) => `<button class="chip ${c.id === state.heroId ? 'active' : ''}" data-pick-hero="${c.id}" type="button">${c.shortName} (L${getCardLevel(c)})</button>`)
+      .map((c) => `<button class="chip ${c.id === state.heroId ? 'active' : ''}" data-pick-hero="${c.id}" type="button" aria-pressed="${c.id === state.heroId}">${c.shortName} (L${getCardLevel(c)})</button>`)
       .join('');
     fPicker.querySelectorAll('[data-pick-hero]').forEach((b) => {
       b.addEventListener('click', () => { state.heroId = b.dataset.pickHero; resetDuelMatch(); });
@@ -1245,11 +1308,11 @@
     if (state.oppMode === 'crew') {
       oPicker.innerHTML = state.cards
         .filter((c) => c.id !== state.heroId)
-        .map((c) => `<button class="chip ${c.id === state.oppId ? 'active' : ''}" data-pick-opp="${c.id}" type="button">${c.shortName} (L${getCardLevel(c)})</button>`)
+        .map((c) => `<button class="chip ${c.id === state.oppId ? 'active' : ''}" data-pick-opp="${c.id}" type="button" aria-pressed="${c.id === state.oppId}">${c.shortName} (L${getCardLevel(c)})</button>`)
         .join('');
     } else {
       oPicker.innerHTML = DATA.rivals
-        .map((r) => `<button class="chip ${r.id === state.oppId ? 'active' : ''}" data-pick-opp="${r.id}" type="button">${r.badge} ${r.name.split(' ')[0]}</button>`)
+        .map((r) => `<button class="chip ${r.id === state.oppId ? 'active' : ''}" data-pick-opp="${r.id}" type="button" aria-pressed="${r.id === state.oppId}">${r.badge} ${r.name.split(' ')[0]}</button>`)
         .join('');
     }
     oPicker.querySelectorAll('[data-pick-opp]').forEach((b) => {
@@ -1269,9 +1332,11 @@
 
     const oppVis = document.getElementById('battle-opp-visual');
     oppVis.innerHTML = opp.type === 'crew'
-      ? `<img class="fighter-avatar" src="${opp.image}" alt="${opp.name}" style="object-position:${opp.objectPos || 'center 10%'};border-color:#ef4444;" />`
+      ? `<img class="fighter-avatar" src="${opp.image}" alt="${opp.name}" decoding="async" style="object-position:${opp.objectPos || 'center 10%'};border-color:#ef4444;" />`
       : `<div class="rival-emblem">${opp.badge}</div>`;
     document.getElementById('battle-opp-name').textContent = opp.name;
+    const oppMascotTag = document.getElementById('battle-opp-mascot');
+    if (oppMascotTag) oppMascotTag.textContent = opp.mascotBadge || '';
     document.getElementById('opp-pwr-val').textContent = String(opp.pwr);
     document.getElementById('opp-dmg-val').textContent = String(opp.dmg);
 
@@ -1337,7 +1402,8 @@
       oppBox.classList.add('round-loss'); oppBox.classList.remove('round-win');
       document.getElementById('hero-atk-readout').classList.add('gold');
       document.getElementById('opp-atk-readout').classList.remove('gold');
-      banner.textContent = `ROUND WON! ${heroAtk} > ${oppAtk} (-${dealt} LIFE)`;
+      const isTie = heroAtk === oppAtk;
+      banner.textContent = `${isTie ? 'TIEBREAKER WON!' : 'ROUND WON!'} ${heroAtk} ${isTie ? '=' : '>'} ${oppAtk} (-${dealt} LIFE)`;
       banner.className = 'round-banner win';
       AUDIO.playImpact(true);
       appendDuelLog(`⚡ R${state.round}: ${hero.shortName} [${heroEvo.stage}] (${heroAtk} ATK, ${state.stake} NRG${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK, ${oppStake} NRG) for -${dealt} Life!`);
@@ -1371,6 +1437,10 @@
       state.stake = Math.min(state.stake, state.heroEnergy);
     }
 
+    document.querySelectorAll('#round-dashes .round-dash').forEach((d, i) => {
+      d.classList.toggle('done', i + 1 < state.round || state.duelOver);
+      d.classList.toggle('active', !state.duelOver && i + 1 === state.round);
+    });
     document.getElementById('hero-hp-text').textContent = `${state.heroHp} / ${state.heroMaxHp}`;
     document.getElementById('hero-hp-fill').style.width = `${Math.max(0, (state.heroHp / state.heroMaxHp) * 100)}%`;
     document.getElementById('opp-hp-text').textContent = `${state.oppHp} / ${state.oppMaxHp}`;
@@ -1523,7 +1593,6 @@
     const syncAnimBtn = () => {
       if (animBtn) {
         animBtn.textContent = state.liveAnim ? '⏸ Pause Live 3D' : '▶ Play Live 3D';
-        animBtn.setAttribute('aria-pressed', String(state.liveAnim));
       }
     };
     syncAnimBtn();
@@ -1552,7 +1621,6 @@
     document.getElementById('mute-btn')?.addEventListener('click', (e) => {
       const muted = AUDIO.toggleMute();
       e.currentTarget.textContent = muted ? '🔇 Muted' : '🔊 Sound';
-      e.currentTarget.setAttribute('aria-pressed', String(muted));
     });
 
     document.querySelectorAll('[data-opp-mode]').forEach((btn) => {

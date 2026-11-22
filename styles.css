@@ -409,6 +409,7 @@ body {
   gap: 0.65rem;
   flex-wrap: wrap;
   margin-bottom: 1.45rem;
+  list-style: none;
 }
 
 .clan-badge {
@@ -453,6 +454,11 @@ body {
   max-width: 1340px;
   margin: 0 auto;
   padding: 2.7rem 1.25rem;
+  scroll-margin-top: 84px;
+}
+
+#hype-wall {
+  scroll-margin-top: 84px;
 }
 
 .section-header {
@@ -527,7 +533,7 @@ body {
   font-family: var(--font-body);
   font-size: 0.92rem;
   padding: 0.42rem 0.95rem;
-  min-width: 220px;
+  min-width: 245px;
 }
 
 .search-input:focus-visible {
@@ -536,7 +542,7 @@ body {
   box-shadow: 0 0 14px rgba(168, 85, 247, 0.35);
 }
 
-/* ---------- 5-CARD RESPONSIVE VAULT GRID ---------- */
+/* ---------- 8-CARD RESPONSIVE VAULT GRID ---------- */
 .cards-grid {
   display: flex;
   flex-wrap: wrap;
@@ -905,6 +911,13 @@ body.slab-mode .slab-label { display: flex; }
   transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), filter 0.32s ease;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .card-column .holo-card-scene,
+  .pack-foil-bag {
+    transition: none;
+  }
+}
+
 .card-column[data-level="1"] .holo-card-scene {
   transform: scale(0.95);
   filter: saturate(0.88);
@@ -915,7 +928,15 @@ body.slab-mode .slab-label { display: flex; }
 }
 
 .card-column[data-level="3"] .holo-card-scene {
-  transform: scale(1.03);
+  transform: scale(1.02);
+  margin-bottom: 0.22rem;
+}
+
+body.slab-mode .card-column[data-level="1"] .holo-card-scene,
+body.slab-mode .card-column[data-level="2"] .holo-card-scene,
+body.slab-mode .card-column[data-level="3"] .holo-card-scene {
+  transform: none;
+  margin-bottom: 0;
 }
 
 .card-column[data-level="3"] .holo-face {
@@ -927,7 +948,7 @@ body.slab-mode .slab-label { display: flex; }
 }
 
 .card-column[data-level="3"] .ovr-shield {
-  transform: scale(1.08);
+  transform: scale(1.06);
   box-shadow: 0 0 22px var(--card-glow-1), 0 6px 18px rgba(0, 0, 0, 0.78);
 }
 
@@ -948,7 +969,7 @@ body.slab-mode .slab-label { display: flex; }
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: rgba(5, 11, 24, 0.82);
+  background: rgba(5, 11, 24, 0.86);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #dbeafe;
   backdrop-filter: blur(6px);
@@ -956,16 +977,16 @@ body.slab-mode .slab-label { display: flex; }
 }
 
 .card-column[data-level="2"] .mascot-crest-banner {
-  background: linear-gradient(90deg, rgba(6, 16, 36, 0.90), rgba(18, 32, 62, 0.88));
+  background: linear-gradient(90deg, rgba(6, 16, 36, 0.92), rgba(18, 32, 62, 0.90));
   border-color: var(--pill-border);
   color: var(--pill-text);
 }
 
 .card-column[data-level="3"] .mascot-crest-banner {
-  background: linear-gradient(90deg, rgba(10, 18, 38, 0.94), var(--sig-bg), rgba(10, 18, 38, 0.94));
+  background: var(--sig-bg), linear-gradient(90deg, rgba(6, 12, 26, 0.94), rgba(6, 12, 26, 0.94));
   border: 1.5px solid var(--card-border);
   color: #fffbeb;
-  box-shadow: 0 0 18px var(--card-glow-1);
+  box-shadow: 0 0 18px var(--card-glow-1), 0 4px 12px rgba(0, 0, 0, 0.55);
 }
 
 .mascot-crest-stars {
@@ -989,6 +1010,7 @@ body.slab-mode .slab-label { display: flex; }
   color: #94a3b8;
   border-radius: 9px;
   padding: 0.34rem 0.28rem;
+  min-block-size: 28px;
   font-family: var(--font-display);
   font-size: 0.62rem;
   font-weight: 800;
@@ -1028,6 +1050,12 @@ body.slab-mode .slab-label { display: flex; }
   padding: 0.16rem 0.55rem;
   margin-bottom: 0.35rem;
   display: inline-block;
+}
+
+.duel-mascot-tag.opp-tag {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.45);
 }
 
 /* ---------- CARD ART & TOP HUD ---------- */
@@ -1297,6 +1325,7 @@ body[data-foil="ice"] .holo-rainbow {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   padding: 0.32rem 0.56rem;
+  min-block-size: 28px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.15);
   background: rgba(15, 19, 29, 0.85);
@@ -1520,6 +1549,7 @@ body[data-foil="ice"] .holo-rainbow {
   .panel-surface { padding: 1rem; border-radius: 18px; }
   .duel-hud { padding: 0.65rem 0.75rem; }
   .stake-controls { padding: 0.85rem 0.9rem; }
+  .search-input { width: 100%; min-width: 0; }
   .energy-pips {
     grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 6px;
@@ -1528,8 +1558,9 @@ body[data-foil="ice"] .holo-rainbow {
 }
 
 @media (pointer: coarse) {
-  .chip { min-height: 34px; padding: 0.44rem 0.85rem; }
-  .card-mini-btn { min-height: 32px; padding: 0.38rem 0.68rem; }
+  .chip { min-block-size: 34px; padding: 0.44rem 0.85rem; }
+  .lvl-pill { min-block-size: 38px; padding: 0.44rem 0.34rem; }
+  .card-mini-btn { min-block-size: 34px; padding: 0.38rem 0.68rem; }
 }
 
 .energy-pip.spent { background: rgba(255, 255, 255, 0.03); opacity: 0.25; cursor: not-allowed; }
