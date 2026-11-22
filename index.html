@@ -29,6 +29,7 @@
   <canvas id="fireworks-canvas" aria-hidden="true"></canvas>
 
   <div class="app-shell">
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <!-- TOP UTILITY BAR -->
     <div class="top-strip">
       <div class="top-strip-inner">
@@ -63,12 +64,13 @@
 
         <div class="nav-actions">
           <button id="open-squad-btn" class="btn btn-cyan btn-sm" type="button">🃏 My Squad (<span id="squad-count">3</span>/4)</button>
-          <button id="mute-btn" class="btn btn-ghost btn-sm" type="button">🔊 Sound</button>
+          <button id="mute-btn" class="btn btn-ghost btn-sm" type="button" aria-pressed="false">🔊 Sound</button>
           <button id="nav-pack-btn" class="btn btn-gold btn-sm" type="button">🎁 Rip Pack</button>
         </div>
       </div>
     </header>
 
+    <main id="main-content" tabindex="-1">
     <!-- HERO -->
     <section id="top" class="hero">
       <div class="hero-content">
@@ -132,11 +134,11 @@
         <div class="toolbar-row">
           <div class="toolbar-group" role="group" aria-label="Filter by team clan">
             <span class="toolbar-label">CLAN / TEAM:</span>
-            <button class="chip active" data-team-filter="all" type="button">All 6</button>
-            <button class="chip" data-team-filter="vikings" type="button">⚡ Vikings (3)</button>
-            <button class="chip" data-team-filter="bears" type="button">🐻 Bears (1)</button>
-            <button class="chip" data-team-filter="cowboys" type="button">⭐ Cowboys (1)</button>
-            <button class="chip" data-team-filter="patriots" type="button">🚀 Patriots (1)</button>
+            <button class="chip active" data-team-filter="all" type="button" aria-pressed="true">All 6</button>
+            <button class="chip" data-team-filter="vikings" type="button" aria-pressed="false">⚡ Vikings (3)</button>
+            <button class="chip" data-team-filter="bears" type="button" aria-pressed="false">🐻 Bears (1)</button>
+            <button class="chip" data-team-filter="cowboys" type="button" aria-pressed="false">⭐ Cowboys (1)</button>
+            <button class="chip" data-team-filter="patriots" type="button" aria-pressed="false">🚀 Patriots (1)</button>
           </div>
           <div class="toolbar-group">
             <input id="vault-search" class="search-input" type="search" placeholder="Search player, #number, keyword..." aria-label="Search cards" />
@@ -146,17 +148,17 @@
         <div class="toolbar-row">
           <div class="toolbar-group" role="group" aria-label="Collector foil finish">
             <span class="toolbar-label">FOIL FINISH:</span>
-            <button class="chip active" data-foil-btn="native" type="button">✨ Team Native</button>
-            <button class="chip" data-foil-btn="prism" type="button">🌈 Secret Prism</button>
-            <button class="chip" data-foil-btn="gold" type="button">🏆 Golden Aura</button>
-            <button class="chip" data-foil-btn="ghost" type="button">👻 Ghost Platinum</button>
-            <button class="chip" data-foil-btn="ice" type="button">❄️ Sapphire Ice</button>
+            <button class="chip active" data-foil-btn="native" type="button" aria-pressed="true">✨ Team Native</button>
+            <button class="chip" data-foil-btn="prism" type="button" aria-pressed="false">🌈 Secret Prism</button>
+            <button class="chip" data-foil-btn="gold" type="button" aria-pressed="false">🏆 Golden Aura</button>
+            <button class="chip" data-foil-btn="ghost" type="button" aria-pressed="false">👻 Ghost Platinum</button>
+            <button class="chip" data-foil-btn="ice" type="button" aria-pressed="false">❄️ Sapphire Ice</button>
           </div>
 
           <div class="toolbar-group">
-            <button id="toggle-view-btn" class="btn btn-ghost btn-sm" type="button">🗂️ Binder View: Full</button>
-            <button id="toggle-anim-btn" class="btn btn-ghost btn-sm" type="button">⏸ Pause Live 3D</button>
-            <button id="toggle-slab-btn" class="btn btn-cyan btn-sm" type="button">💎 B.A.D 10 Slab: OFF</button>
+            <button id="toggle-view-btn" class="btn btn-ghost btn-sm" type="button" aria-pressed="false">🗂️ Binder View: Full</button>
+            <button id="toggle-anim-btn" class="btn btn-ghost btn-sm" type="button" aria-pressed="true">⏸ Pause Live 3D</button>
+            <button id="toggle-slab-btn" class="btn btn-cyan btn-sm" type="button" aria-pressed="false">💎 B.A.D 10 Slab: OFF</button>
           </div>
         </div>
       </div>
@@ -204,8 +206,8 @@
           </div>
           <div class="battle-row">
             <span class="toolbar-label">MODE:</span>
-            <button class="chip active" data-opp-mode="crew" type="button">⚔️ Friend vs. Friend</button>
-            <button class="chip" data-opp-mode="rivals" type="button">🏟️ NFL Rivals</button>
+            <button class="chip active" data-opp-mode="crew" type="button" aria-pressed="true">⚔️ Friend vs. Friend</button>
+            <button class="chip" data-opp-mode="rivals" type="button" aria-pressed="false">🏟️ NFL Rivals</button>
             <span class="toolbar-label" style="margin-left:0.4rem;">OPPONENT:</span>
             <div id="opponent-picker" class="toolbar-group"></div>
           </div>
@@ -214,7 +216,7 @@
         <div class="battle-stage">
           <!-- HERO SIDE -->
           <div class="fighter-card" id="hero-fighter-box">
-            <img id="battle-hero-img" class="fighter-avatar" src="assets/card-shawn-elon.jpg" alt="Your fighter" />
+            <img id="battle-hero-img" class="fighter-avatar" src="assets/card-shawn-elon.jpg" alt="Your fighter" decoding="async" />
             <div id="battle-hero-name" class="fighter-name">SHAWN aka ELON! #12</div>
             <div class="fighter-stat-badges">
               <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">9</strong></span>
@@ -357,6 +359,7 @@
         </div>
       </div>
     </section>
+    </main>
 
     <footer class="site-footer">
       <strong>B.A.D CARDS 2400</strong> &bull; Build a Dream (B.A.D) Studio &bull; Moline, IL &bull; 1st Edition Mythic Collector Vault
@@ -405,7 +408,7 @@
       </div>
 
       <div class="inspect-layout">
-        <img id="inspect-img" class="inspect-art" src="assets/card-tavaris-too-too.jpg" alt="" />
+        <img id="inspect-img" class="inspect-art" src="assets/card-tavaris-too-too.jpg" alt="" decoding="async" />
         <div>
           <div id="inspect-edition" style="font-family:var(--font-display);font-size:0.68rem;letter-spacing:0.16em;color:#38bdf8;margin-bottom:0.2rem;"></div>
           <div id="inspect-name" style="font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:#ffe28a;margin-bottom:0.16rem;"></div>
