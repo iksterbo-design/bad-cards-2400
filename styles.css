@@ -735,6 +735,42 @@ body.slab-mode .slab-label { display: flex; }
   --chem-color: #e2f1ff;
 }
 
+.theme-patriots {
+  --card-border: #ff3355;
+  --card-bg: #030e22;
+  --card-glow-1: rgba(255, 42, 75, 0.50);
+  --card-glow-2: rgba(203, 213, 225, 0.30);
+  --card-inset: rgba(255, 86, 114, 0.34);
+  --ovr-bg: linear-gradient(155deg, #ffffff 0%, #e2e8f0 28%, #ff4766 70%, #b80c2c 100%);
+  --ovr-text: #041026;
+  --ovr-border: #ffffff;
+  --pill-bg: linear-gradient(90deg, rgba(2, 14, 34, 0.95), rgba(0, 34, 68, 0.94), rgba(145, 10, 34, 0.88));
+  --pill-border: #ff4766;
+  --pill-text: #ffe4e8;
+  --jersey-bg: linear-gradient(135deg, #c60c30, #002244);
+  --jersey-border: rgba(226, 232, 240, 0.84);
+  --footer-bg: linear-gradient(180deg, rgba(4, 22, 52, 0.97), #020a18 100%);
+  --footer-top: #ff2a4b;
+  --edition-color: #cbd5e1;
+  --name-grad: linear-gradient(90deg, #ffffff 12%, #ffe4e8 54%, #ff3b5c 100%);
+  --sub-color: #b4c6e0;
+  --stat-bg: rgba(0, 34, 68, 0.72);
+  --stat-border: rgba(226, 232, 240, 0.34);
+  --stat-hot-bg: linear-gradient(180deg, rgba(255, 42, 75, 0.30), rgba(0, 34, 68, 0.88));
+  --stat-hot-border: rgba(255, 110, 134, 0.90);
+  --stat-v: #ffe4e8;
+  --stat-k: #b7cae6;
+  --sig-bg: linear-gradient(90deg, rgba(0, 34, 68, 0.65), rgba(198, 12, 48, 0.34), rgba(226, 232, 240, 0.16));
+  --sig-border: rgba(255, 68, 100, 0.74);
+  --sig-text: #ffeef1;
+  --back-bg: linear-gradient(160deg, #002244 0%, #030e22 52%, #1d0919 100%);
+  --back-accent: #ff4d6d;
+  --bar-grad: linear-gradient(90deg, #60a5fa, #e2e8f0, #ff2a4b);
+  --chem-bg: rgba(255, 42, 75, 0.16);
+  --chem-border: rgba(255, 92, 120, 0.48);
+  --chem-color: #ffe4e8;
+}
+
 /* ---------- CARD ART & TOP HUD ---------- */
 .card-art-wrap { position: relative; flex: 1; overflow: hidden; background: #040914; }
 .card-art-img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1337,7 +1373,8 @@ dialog.squad-drawer:modal {
 .pack-foil-bag:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 26px 60px rgba(0, 0, 0, 0.85), 0 0 54px rgba(245, 185, 66, 0.65); }
 .pack-bag-logo { width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, #fff0b8, #f5b942 50%, #c98108); color: #070b14; font-family: var(--font-display); font-size: 1.2rem; font-weight: 900; display: grid; place-items: center; }
 
-.pack-reveal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.85rem; margin: 1rem 0 1.35rem; }
+.pack-reveal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; margin: 1rem 0 1.35rem; }
+@media (max-width: 640px) { .pack-reveal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .pack-reveal-card { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--bad-gold); background: #080f22; text-align: center; }
 .pack-reveal-card img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; }
 .pack-reveal-meta { padding: 0.5rem 0.4rem; }

@@ -19,7 +19,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-9901',
       serial: '#001 / 001 • VIK-2400-KD',
-      setCode: 'BAD-2400 • 001/005 ★',
+      setCode: 'BAD-2400 • 001/006 ★',
       number: '99',
       position: 'OLB',
       ovr: 99,
@@ -87,7 +87,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-2801',
       serial: '#001 / 001 • VIK-2400-JR',
-      setCode: 'BAD-2400 • 002/005 ★',
+      setCode: 'BAD-2400 • 002/006 ★',
       number: '28',
       position: 'WR / RB',
       ovr: 99,
@@ -155,7 +155,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-1101',
       serial: '#001 / 001 • VIK-2400-LB',
-      setCode: 'BAD-2400 • 003/005 ★',
+      setCode: 'BAD-2400 • 003/006 ★',
       number: '11',
       position: 'QB / HC',
       ovr: 99,
@@ -224,7 +224,7 @@ window.BAD_CARDS_DATA = {
       grade: 'BEAR 10 GEM MINT',
       cert: 'CERT #2400-5401',
       serial: '#001 / 001 • CHI-2400-TD',
-      setCode: 'BAD-2400 • 004/005 ★',
+      setCode: 'BAD-2400 • 004/006 ★',
       number: '54',
       position: 'MLB',
       ovr: 99,
@@ -292,7 +292,7 @@ window.BAD_CARDS_DATA = {
       grade: 'STAR 10 GEM MINT',
       cert: 'CERT #2400-2201',
       serial: '#001 / 001 • DAL-2400-TW',
-      setCode: 'BAD-2400 • 005/005 ★',
+      setCode: 'BAD-2400 • 005/006 ★',
       number: '22',
       position: 'RB',
       ovr: 99,
@@ -348,6 +348,74 @@ window.BAD_CARDS_DATA = {
         'Unstoppable Dallas #22 — Back-to-Back 2,200-Yard Seasons',
         'Certified 1st-Edition B.A.D Cards Founding Crew Legend'
       ]
+    },
+    {
+      id: 'shawn-elon',
+      name: 'SHAWN aka ELON!',
+      shortName: 'ELON #12',
+      subtitle: 'Shawn Clark • Foxborough Rocket Chief',
+      edition: '2400 FOXBOROUGH X-LAUNCH MYTHIC',
+      rarity: '🚀 MYTHIC 1/1',
+      rarityTier: 'mythic',
+      grade: 'PAT 10 GEM MINT',
+      cert: 'CERT #2400-1201',
+      serial: '#001 / 001 • NEP-2400-EL',
+      setCode: 'BAD-2400 • 006/006 ★',
+      number: '12',
+      position: 'QB / WR',
+      ovr: 99,
+      stars: 5,
+      atk: 3180,
+      def: 2900,
+      duelPower: 9,
+      duelDamage: 7,
+      keywords: ['Launch', 'Precision', 'Dynasty'],
+      clan: 'Foxborough Rocket Labs',
+      clanBonus: '+1 Bonus Hype Energy surge on Patriots clash turns',
+      team: 'NEW ENGLAND PATRIOTS',
+      teamKey: 'patriots',
+      theme: 'patriots',
+      fxTheme: 'patriots',
+      image: 'assets/card-shawn-elon.jpg',
+      objectPos: 'center 8%',
+      accent: '#ff2a4b',
+      quote: '“Countdown at Gillette — Elon is launching New England back into orbit.”',
+      chemistry: '🚀 SYNERGY: +20 AFC DYNASTY vs KARL, JROC!, LITTLE BILL, TYLER & TOO TOO',
+      signatureAbility: '🚀 FOXBOROUGH LAUNCH (X-FACTOR)',
+      miniStats: [
+        { k: 'ARM', v: 99 },
+        { k: 'TECH', v: 100 },
+        { k: 'PATS', v: 100, hot: true },
+        { k: 'CLUTCH', v: 99 }
+      ],
+      evolutions: [
+        { stars: 1, stage: 'Foxborough Rookie', ovr: 84, power: 6, dmg: 4, note: 'Stealth camo cap locked in — calculating Mach-2 deep routes under the Lighthouse.' },
+        { stars: 3, stage: 'Gillette X-Captain', ovr: 94, power: 8, dmg: 6, note: 'Unlocks Dynasty Hyperloop audible & icy January blizzard vision.' },
+        { stars: 5, stage: '2400 Mythic 1/1', ovr: 99, power: 9, dmg: 7, note: 'Max Rocket Labs evolution — undefeated snow-game general firing 90-yard plasma lasers.' }
+      ],
+      bio: 'Known across Gillette Stadium 2400 simply as "Elon". Shawn Clark engineers New England Patriots dynasty plays from the future — firing Mach-2 crimson lasers past the Foxborough Lighthouse with full-sleeve ink, icy calm precision, and 400-IQ gridiron telemetry.',
+      detailedStats: [
+        { label: 'Rocket Arm', val: 99 },
+        { label: 'Elon Tech IQ', val: 100 },
+        { label: 'Dynasty Clutch', val: 100 },
+        { label: 'Sleeve Swag', val: 100 },
+        { label: 'Foxborough Ice', val: 99 },
+        { label: 'Mars Range', val: 99 }
+      ],
+      moves: [
+        { title: '🚀 GILLETTE ORBIT BOMB', desc: 'Fires a 90-yard crimson-silver plasma laser straight past the Foxborough Lighthouse.', power: 9, dmg: 7, crit: 0.42 },
+        { title: '⚡ DYNASTY HYPERLOOP', desc: 'Patriots warp-speed audible leaves opposing defenses frozen in New England snow.', power: 8, dmg: 7, crit: 0.44 }
+      ],
+      combine: [
+        { k: '40-YD DASH', v: '4.19s' },
+        { k: 'RINGS IQ', v: '6×+' },
+        { k: 'LAUNCH VEL', v: 'MACH 2' }
+      ],
+      milestones: [
+        'Chief Playmaker of Foxborough Rocket Labs 2400',
+        'Undefeated January Snow-Game General at Gillette Stadium',
+        'Certified 1st-Edition B.A.D Cards New England Dynasty Legend'
+      ]
     }
   ],
 
@@ -369,7 +437,13 @@ window.BAD_CARDS_DATA = {
       author: 'ISAIAH aka LITTLE BILL #11',
       badge: 'VIKINGS • FOUNDER',
       time: 'B.A.D HQ',
-      text: 'Welcome to the official B.A.D Cards 2400 Flagship Vault! All 5 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡'
+      text: 'Welcome to the official B.A.D Cards 2400 Flagship Vault! All 6 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡'
+    },
+    {
+      author: 'SHAWN aka ELON! #12',
+      badge: 'PATRIOTS',
+      time: 'GILLETTE 2400',
+      text: 'Countdown complete from Foxborough!! Patriots #12 locked into the B.A.D Vault with the corner holo seal — step into the snow if you want smoke with Elon! 🚀🏈'
     },
     {
       author: 'TAVARIS aka TOO TOO #22',

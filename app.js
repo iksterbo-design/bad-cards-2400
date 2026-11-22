@@ -13,10 +13,10 @@
   const AUDIO = window.badAudio;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const SQUAD_KEY = 'bad_cards_2400_squad_v2';
-  const WALL_KEY = 'bad_cards_2400_wall_v2';
+  const SQUAD_KEY = 'bad_cards_2400_squad_v3';
+  const WALL_KEY = 'bad_cards_2400_wall_v3';
 
-  let initialSquad = ['tavaris-too-too', 'isaiah-little-bill', 'tyler-davis'];
+  let initialSquad = ['shawn-elon', 'tavaris-too-too', 'isaiah-little-bill'];
   try {
     const saved = JSON.parse(localStorage.getItem(SQUAD_KEY) || 'null');
     if (Array.isArray(saved) && saved.length) initialSquad = saved;
@@ -33,9 +33,9 @@
     squad: initialSquad,
 
     // Tactical 4-Round Duel State
-    heroId: 'tavaris-too-too',
+    heroId: 'shawn-elon',
     oppMode: 'crew',
-    oppId: 'tyler-davis',
+    oppId: 'tavaris-too-too',
     round: 1,
     maxRounds: 4,
     heroHp: 14,
@@ -233,7 +233,7 @@
     });
 
     if (!visible.length) {
-      grid.innerHTML = `<div style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-family:var(--font-display);font-size:0.86rem;">No cards matched "${q}". Clear the search or team filter to view all 5 Mythics.</div>`;
+      grid.innerHTML = `<div style="text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-family:var(--font-display);font-size:0.86rem;">No cards matched "${q}". Clear the search or team filter to view all ${state.cards.length} Mythics.</div>`;
       return;
     }
 
@@ -446,7 +446,8 @@
       chrome: { p1: '#ffc62f', p2: '#a855f7', glow1: 'rgba(255,198,47,', glow2: 'rgba(168,85,247,', stars: false },
       founder: { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false },
       bears: { p1: '#ff7b29', p2: '#38bdf8', glow1: 'rgba(255,130,50,', glow2: 'rgba(56,189,248,', stars: false },
-      cowboys: { p1: '#ffd166', p2: '#38bdf8', glow1: 'rgba(255,206,92,', glow2: 'rgba(56,189,248,', stars: true }
+      cowboys: { p1: '#ffd166', p2: '#38bdf8', glow1: 'rgba(255,206,92,', glow2: 'rgba(56,189,248,', stars: true },
+      patriots: { p1: '#ff2a4b', p2: '#e2e8f0', glow1: 'rgba(255,42,75,', glow2: 'rgba(147,197,253,', stars: true }
     }[fxTheme] || { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false };
 
     const sparks = Array.from({ length: 28 }, () => ({
@@ -591,9 +592,10 @@
   }
 
   function getExportColors(card) {
-    if (card.theme === 'bears') return { bgDark: '#071124', footer: '#081326', primary: '#ff6b2b', hot: '#ffd3ad', sub: '#a9c0e3', box: 'rgba(19,39,76,0.74)', pill: '#132952', bar1: '#38bdf8' };
-    if (card.theme === 'cowboys') return { bgDark: '#041026', footer: '#051430', primary: '#7dd3fc', hot: '#ffffff', sub: '#b7cae6', box: 'rgba(11,42,91,0.74)', pill: '#0d3270', bar1: '#1d63ed' };
-    return { bgDark: '#0e0522', footer: '#110628', primary: '#ffc62f', hot: '#ffe58f', sub: '#c8b8eb', box: 'rgba(79,38,131,0.58)', pill: '#4f2683', bar1: '#7c3aed' };
+    if (card.theme === 'bears') return { bgDark: '#071124', footer: '#081326', primary: '#ff6b2b', hot: '#ffd3ad', sub: '#a9c0e3', box: 'rgba(19,39,76,0.74)', pill: '#132952', bar1: '#38bdf8', ovrText: '#070b14' };
+    if (card.theme === 'cowboys') return { bgDark: '#041026', footer: '#051430', primary: '#7dd3fc', hot: '#ffffff', sub: '#b7cae6', box: 'rgba(11,42,91,0.74)', pill: '#0d3270', bar1: '#1d63ed', ovrText: '#070b14' };
+    if (card.theme === 'patriots') return { bgDark: '#030e22', footer: '#04132d', primary: '#ff2a4b', hot: '#ffe4e8', sub: '#b4c6e0', box: 'rgba(0,34,68,0.78)', pill: '#002244', bar1: '#60a5fa', ovrText: '#ffffff' };
+    return { bgDark: '#0e0522', footer: '#110628', primary: '#ffc62f', hot: '#ffe58f', sub: '#c8b8eb', box: 'rgba(79,38,131,0.58)', pill: '#4f2683', bar1: '#7c3aed', ovrText: '#070b14' };
   }
 
   function exportCardFrontPNG(cardId) {
@@ -614,7 +616,7 @@
         const artH = 720;
         const scale = Math.max(W / img.width, artH / img.height);
         const dw = img.width * scale, dh = img.height * scale;
-        const yBias = card.theme === 'cowboys' ? 0.22 : 0.10;
+        const yBias = card.theme === 'cowboys' ? 0.22 : (card.theme === 'patriots' ? 0.08 : 0.10);
         ctx.drawImage(img, (W - dw) / 2, -(dh - artH) * yBias, dw, dh);
 
         const vig = ctx.createLinearGradient(0, 440, 0, artH);
@@ -630,7 +632,7 @@
 
         ctx.fillStyle = col.primary;
         ctx.fillRect(30, 30, 114, 120);
-        ctx.fillStyle = '#070b14';
+        ctx.fillStyle = col.ovrText || '#070b14';
         ctx.font = '900 54px Orbitron, Arial Black, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(String(card.ovr), 87, 94);
