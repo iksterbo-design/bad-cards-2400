@@ -447,7 +447,7 @@
       founder: { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false },
       bears: { p1: '#ff7b29', p2: '#38bdf8', glow1: 'rgba(255,130,50,', glow2: 'rgba(56,189,248,', stars: false },
       cowboys: { p1: '#ffd166', p2: '#38bdf8', glow1: 'rgba(255,206,92,', glow2: 'rgba(56,189,248,', stars: true },
-      patriots: { p1: '#ff2a4b', p2: '#e2e8f0', glow1: 'rgba(255,42,75,', glow2: 'rgba(147,197,253,', stars: true }
+      patriots: { p1: '#e31837', p2: '#e2e8f0', glow1: 'rgba(227,24,55,', glow2: 'rgba(203,213,225,', stars: true }
     }[fxTheme] || { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false };
 
     const sparks = Array.from({ length: 28 }, () => ({
@@ -594,7 +594,7 @@
   function getExportColors(card) {
     if (card.theme === 'bears') return { bgDark: '#071124', footer: '#081326', primary: '#ff6b2b', hot: '#ffd3ad', sub: '#a9c0e3', box: 'rgba(19,39,76,0.74)', pill: '#132952', bar1: '#38bdf8', ovrText: '#070b14' };
     if (card.theme === 'cowboys') return { bgDark: '#041026', footer: '#051430', primary: '#7dd3fc', hot: '#ffffff', sub: '#b7cae6', box: 'rgba(11,42,91,0.74)', pill: '#0d3270', bar1: '#1d63ed', ovrText: '#070b14' };
-    if (card.theme === 'patriots') return { bgDark: '#030e22', footer: '#04132d', primary: '#ff2a4b', hot: '#ffe4e8', sub: '#b4c6e0', box: 'rgba(0,34,68,0.78)', pill: '#002244', bar1: '#60a5fa', ovrText: '#ffffff' };
+    if (card.theme === 'patriots') return { bgDark: '#020b1c', footer: '#021430', primary: '#e31837', hot: '#ffffff', sub: '#b5c7e0', box: 'rgba(0,30,66,0.82)', pill: '#c8102e', bar1: '#1d4ed8', ovrText: '#ffffff' };
     return { bgDark: '#0e0522', footer: '#110628', primary: '#ffc62f', hot: '#ffe58f', sub: '#c8b8eb', box: 'rgba(79,38,131,0.58)', pill: '#4f2683', bar1: '#7c3aed', ovrText: '#070b14' };
   }
 

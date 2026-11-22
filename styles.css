@@ -736,39 +736,39 @@ body.slab-mode .slab-label { display: flex; }
 }
 
 .theme-patriots {
-  --card-border: #ff3355;
-  --card-bg: #030e22;
-  --card-glow-1: rgba(255, 42, 75, 0.50);
-  --card-glow-2: rgba(203, 213, 225, 0.30);
-  --card-inset: rgba(255, 86, 114, 0.34);
-  --ovr-bg: linear-gradient(155deg, #ffffff 0%, #e2e8f0 28%, #ff4766 70%, #b80c2c 100%);
-  --ovr-text: #041026;
-  --ovr-border: #ffffff;
-  --pill-bg: linear-gradient(90deg, rgba(2, 14, 34, 0.95), rgba(0, 34, 68, 0.94), rgba(145, 10, 34, 0.88));
-  --pill-border: #ff4766;
-  --pill-text: #ffe4e8;
-  --jersey-bg: linear-gradient(135deg, #c60c30, #002244);
-  --jersey-border: rgba(226, 232, 240, 0.84);
-  --footer-bg: linear-gradient(180deg, rgba(4, 22, 52, 0.97), #020a18 100%);
-  --footer-top: #ff2a4b;
-  --edition-color: #cbd5e1;
-  --name-grad: linear-gradient(90deg, #ffffff 12%, #ffe4e8 54%, #ff3b5c 100%);
-  --sub-color: #b4c6e0;
-  --stat-bg: rgba(0, 34, 68, 0.72);
-  --stat-border: rgba(226, 232, 240, 0.34);
-  --stat-hot-bg: linear-gradient(180deg, rgba(255, 42, 75, 0.30), rgba(0, 34, 68, 0.88));
-  --stat-hot-border: rgba(255, 110, 134, 0.90);
-  --stat-v: #ffe4e8;
-  --stat-k: #b7cae6;
-  --sig-bg: linear-gradient(90deg, rgba(0, 34, 68, 0.65), rgba(198, 12, 48, 0.34), rgba(226, 232, 240, 0.16));
-  --sig-border: rgba(255, 68, 100, 0.74);
-  --sig-text: #ffeef1;
-  --back-bg: linear-gradient(160deg, #002244 0%, #030e22 52%, #1d0919 100%);
-  --back-accent: #ff4d6d;
-  --bar-grad: linear-gradient(90deg, #60a5fa, #e2e8f0, #ff2a4b);
-  --chem-bg: rgba(255, 42, 75, 0.16);
-  --chem-border: rgba(255, 92, 120, 0.48);
-  --chem-color: #ffe4e8;
+  --card-border: #dce5f2;
+  --card-bg: #020b1c;
+  --card-glow-1: rgba(217, 16, 46, 0.56);
+  --card-glow-2: rgba(208, 220, 236, 0.34);
+  --card-inset: rgba(227, 24, 55, 0.36);
+  --ovr-bg: linear-gradient(155deg, #ffffff 0%, #e4ebf5 36%, #a3b3c9 76%, #64748b 100%);
+  --ovr-text: #001838;
+  --ovr-border: #e31837;
+  --pill-bg: linear-gradient(90deg, rgba(0, 22, 52, 0.96), rgba(168, 12, 38, 0.92), rgba(0, 22, 52, 0.96));
+  --pill-border: #e2e8f0;
+  --pill-text: #ffffff;
+  --jersey-bg: linear-gradient(135deg, #d91636 0%, #7d0a1f 52%, #002244 100%);
+  --jersey-border: #ffffff;
+  --footer-bg: linear-gradient(180deg, rgba(2, 24, 56, 0.98) 0%, #010a1a 100%);
+  --footer-top: #e31837;
+  --edition-color: #ff3850;
+  --name-grad: linear-gradient(90deg, #ffffff 18%, #e2e8f0 64%, #cbd5e1 100%);
+  --sub-color: #b5c7e0;
+  --stat-bg: rgba(0, 30, 66, 0.78);
+  --stat-border: rgba(203, 213, 225, 0.42);
+  --stat-hot-bg: linear-gradient(180deg, rgba(217, 16, 46, 0.48), rgba(0, 26, 58, 0.92));
+  --stat-hot-border: rgba(248, 113, 113, 0.92);
+  --stat-v: #ffffff;
+  --stat-k: #b9cde6;
+  --sig-bg: linear-gradient(90deg, rgba(0, 34, 68, 0.85), rgba(200, 16, 46, 0.46), rgba(0, 34, 68, 0.85));
+  --sig-border: rgba(226, 232, 240, 0.65);
+  --sig-text: #ffffff;
+  --back-bg: linear-gradient(160deg, #002244 0%, #020c1f 52%, #1d0712 100%);
+  --back-accent: #e31837;
+  --bar-grad: linear-gradient(90deg, #1d4ed8, #e2e8f0 50%, #e31837);
+  --chem-bg: rgba(200, 16, 46, 0.20);
+  --chem-border: rgba(226, 232, 240, 0.46);
+  --chem-color: #ffffff;
 }
 
 /* ---------- CARD ART & TOP HUD ---------- */
