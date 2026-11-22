@@ -214,6 +214,7 @@
     saveSquad();
     renderCards();
     renderSquadDrawer();
+    renderDuelArena();
   }
 
   function renderCards() {
@@ -949,8 +950,31 @@
     for (const dlg of document.querySelectorAll('dialog')) {
       dlg.addEventListener('close', () => { dlg.returnValue = ''; });
     }
+    document.getElementById('inspect-duel-btn')?.addEventListener('click', () => {
+      if (state.inspectCardId) {
+        state.heroId = state.inspectCardId;
+        resetDuelMatch();
+        document.getElementById('inspect-dialog')?.close();
+        document.getElementById('battle')?.scrollIntoView({ behavior: 'smooth' });
+        showToast(`⚔️ ${getHeroCard().shortName} locked into the 4-Round Duel Arena!`);
+      }
+    });
     document.getElementById('inspect-dl-front')?.addEventListener('click', () => exportCardFrontPNG(state.inspectCardId));
     document.getElementById('inspect-dl-back')?.addEventListener('click', () => exportCardBackPNG(state.inspectCardId));
+  }
+
+  /* ---------- SQUAD SYNERGY COMPUTATION (WIRED INTO DUEL ARENA) ---------- */
+  function getSquadSynergy() {
+    const members = state.squad.map((id) => state.cards.find((c) => c.id === id)).filter(Boolean);
+    const vikCount = members.filter((c) => c.teamKey === 'vikings').length;
+    const uniqueTeams = new Set(members.map((c) => c.teamKey)).size;
+    if (vikCount >= 2) {
+      return { bonusPwr: 2, bonusDmg: 0, label: '⚡ VALHALLA +2 PWR' };
+    }
+    if (uniqueTeams >= 3) {
+      return { bonusPwr: 0, bonusDmg: 1, label: '⭐ ALLIANCE +1 DMG' };
+    }
+    return { bonusPwr: 0, bonusDmg: 0, label: '★ SYNERGY: NONE' };
   }
 
   /* ---------- TACTICAL 4-ROUND HYPE-ENERGY DUEL ENGINE ---------- */
@@ -1000,6 +1024,8 @@
 
   function renderEnergyControls() {
     const hero = getHeroCard();
+    const syn = getSquadSynergy();
+    const effPwr = hero.duelPower + syn.bonusPwr;
     const slider = document.getElementById('stake-slider');
     if (state.stake > state.heroEnergy) state.stake = state.heroEnergy;
     slider.max = String(state.heroEnergy);
@@ -1007,12 +1033,12 @@
 
     const instant = DATA.instants.find((ins) => ins.id === state.armedInstantId);
     const bonusAtk = instant ? instant.bonusAtk : 0;
-    const projected = hero.duelPower * (1 + state.stake) + bonusAtk;
+    const projected = effPwr * (1 + state.stake) + bonusAtk;
 
     document.getElementById('stake-val-label').textContent = String(state.stake);
-    document.getElementById('stake-formula-hint').textContent = `${hero.duelPower} PWR × ${1 + state.stake}${bonusAtk ? ` + ${bonusAtk}` : ''} = ${projected} ATK`;
+    document.getElementById('stake-formula-hint').textContent = `${effPwr} PWR × ${1 + state.stake}${bonusAtk ? ` + ${bonusAtk}` : ''} = ${projected} ATK`;
     document.getElementById('hero-atk-readout').textContent = String(projected);
-    document.getElementById('hero-atk-sub').textContent = `Projected: ${hero.duelPower} × (1 + ${state.stake} NRG)${bonusAtk ? ` + ${bonusAtk}` : ''}`;
+    document.getElementById('hero-atk-sub').textContent = `Projected: ${effPwr} × (1 + ${state.stake} NRG)${bonusAtk ? ` + ${bonusAtk}` : ''}`;
 
     const pipsWrap = document.getElementById('energy-pips');
     pipsWrap.innerHTML = '';
@@ -1089,11 +1115,14 @@
       b.addEventListener('click', () => { state.oppId = b.dataset.pickOpp; resetDuelMatch(); });
     });
 
+    const syn = getSquadSynergy();
+    const synPill = document.getElementById('duel-synergy-pill');
+    if (synPill) synPill.textContent = syn.label;
     document.getElementById('battle-hero-img').src = hero.image;
     document.getElementById('battle-hero-img').style.objectPosition = hero.objectPos || 'center 10%';
     document.getElementById('battle-hero-name').textContent = `${hero.name} #${hero.number}`;
-    document.getElementById('hero-pwr-val').textContent = String(hero.duelPower);
-    document.getElementById('hero-dmg-val').textContent = String(hero.duelDamage);
+    document.getElementById('hero-pwr-val').textContent = String(hero.duelPower + syn.bonusPwr);
+    document.getElementById('hero-dmg-val').textContent = String(hero.duelDamage + syn.bonusDmg);
 
     const oppVis = document.getElementById('battle-opp-visual');
     oppVis.innerHTML = opp.type === 'crew'
@@ -1140,7 +1169,8 @@
     state.heroEnergy = Math.min(12, state.heroEnergy);
     state.oppEnergy = Math.max(0, state.oppEnergy - oppStake);
 
-    const heroAtk = hero.duelPower * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0);
+    const syn = getSquadSynergy();
+    const heroAtk = (hero.duelPower + syn.bonusPwr) * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0);
     const oppAtk = opp.pwr * (1 + oppStake);
 
     if (usedInstant) {
@@ -1157,7 +1187,7 @@
     document.getElementById('opp-atk-sub').textContent = `Staked ${oppStake} NRG (${opp.pwr} × ${1 + oppStake})`;
 
     if (heroAtk >= oppAtk) {
-      const dealt = hero.duelDamage;
+      const dealt = hero.duelDamage + syn.bonusDmg;
       state.oppHp = Math.max(0, state.oppHp - dealt);
       heroBox.classList.add('round-win'); heroBox.classList.remove('round-loss');
       oppBox.classList.add('round-loss'); oppBox.classList.remove('round-win');
