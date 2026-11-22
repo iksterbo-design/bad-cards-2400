@@ -771,6 +771,42 @@ body.slab-mode .slab-label { display: flex; }
   --chem-color: #ffffff;
 }
 
+.theme-packers {
+  --card-border: #ffb612;
+  --card-bg: #04140d;
+  --card-glow-1: rgba(255, 182, 18, 0.54);
+  --card-glow-2: rgba(34, 197, 94, 0.34);
+  --card-inset: rgba(255, 182, 18, 0.34);
+  --ovr-bg: linear-gradient(155deg, #fff7cc 0%, #ffd449 42%, #ffb612 78%, #b87800 100%);
+  --ovr-text: #061b11;
+  --ovr-border: #ffffff;
+  --pill-bg: linear-gradient(90deg, rgba(8, 34, 22, 0.96), rgba(24, 59, 44, 0.95), rgba(145, 98, 0, 0.86));
+  --pill-border: #ffb612;
+  --pill-text: #fff7d6;
+  --jersey-bg: linear-gradient(135deg, #20523c 0%, #123324 55%, #071911 100%);
+  --jersey-border: #ffb612;
+  --footer-bg: linear-gradient(180deg, rgba(10, 38, 25, 0.98) 0%, #03100a 100%);
+  --footer-top: #ffb612;
+  --edition-color: #4ade80;
+  --name-grad: linear-gradient(90deg, #ffffff 12%, #fff3b8 54%, #ffb612 100%);
+  --sub-color: #b5dec9;
+  --stat-bg: rgba(16, 48, 34, 0.78);
+  --stat-border: rgba(255, 182, 18, 0.38);
+  --stat-hot-bg: linear-gradient(180deg, rgba(255, 182, 18, 0.34), rgba(14, 46, 32, 0.92));
+  --stat-hot-border: rgba(255, 209, 82, 0.92);
+  --stat-v: #fff8db;
+  --stat-k: #9dd4b8;
+  --sig-bg: linear-gradient(90deg, rgba(16, 52, 36, 0.85), rgba(255, 182, 18, 0.28), rgba(16, 52, 36, 0.85));
+  --sig-border: rgba(255, 182, 18, 0.72);
+  --sig-text: #fff9e6;
+  --back-bg: linear-gradient(160deg, #143a29 0%, #061b12 52%, #1d1706 100%);
+  --back-accent: #ffb612;
+  --bar-grad: linear-gradient(90deg, #22c55e, #fde047 52%, #ffb612);
+  --chem-bg: rgba(255, 182, 18, 0.16);
+  --chem-border: rgba(255, 200, 66, 0.50);
+  --chem-color: #fff6cc;
+}
+
 /* ---------- CARD ART & TOP HUD ---------- */
 .card-art-wrap { position: relative; flex: 1; overflow: hidden; background: #040914; }
 .card-art-img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1373,7 +1409,7 @@ dialog.squad-drawer:modal {
 .pack-foil-bag:hover { transform: translateY(-4px) scale(1.03); box-shadow: 0 26px 60px rgba(0, 0, 0, 0.85), 0 0 54px rgba(245, 185, 66, 0.65); }
 .pack-bag-logo { width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, #fff0b8, #f5b942 50%, #c98108); color: #070b14; font-family: var(--font-display); font-size: 1.2rem; font-weight: 900; display: grid; place-items: center; }
 
-.pack-reveal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.9rem; margin: 1rem 0 1.35rem; }
+.pack-reveal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.9rem; margin: 1rem 0 1.35rem; }
 @media (max-width: 640px) { .pack-reveal-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .pack-reveal-card { border-radius: 14px; overflow: hidden; border: 1.5px solid var(--bad-gold); background: #080f22; text-align: center; }
 .pack-reveal-card img { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block; }

@@ -19,7 +19,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-9901',
       serial: '#001 / 001 • VIK-2400-KD',
-      setCode: 'BAD-2400 • 001/006 ★',
+      setCode: 'BAD-2400 • 001/007 ★',
       number: '99',
       position: 'OLB',
       ovr: 99,
@@ -87,7 +87,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-2801',
       serial: '#001 / 001 • VIK-2400-JR',
-      setCode: 'BAD-2400 • 002/006 ★',
+      setCode: 'BAD-2400 • 002/007 ★',
       number: '28',
       position: 'WR / RB',
       ovr: 99,
@@ -155,7 +155,7 @@ window.BAD_CARDS_DATA = {
       grade: 'B.A.D 10 GEM MINT',
       cert: 'CERT #2400-1101',
       serial: '#001 / 001 • VIK-2400-LB',
-      setCode: 'BAD-2400 • 003/006 ★',
+      setCode: 'BAD-2400 • 003/007 ★',
       number: '11',
       position: 'QB / HC',
       ovr: 99,
@@ -224,7 +224,7 @@ window.BAD_CARDS_DATA = {
       grade: 'BEAR 10 GEM MINT',
       cert: 'CERT #2400-5401',
       serial: '#001 / 001 • CHI-2400-TD',
-      setCode: 'BAD-2400 • 004/006 ★',
+      setCode: 'BAD-2400 • 004/007 ★',
       number: '54',
       position: 'MLB',
       ovr: 99,
@@ -292,7 +292,7 @@ window.BAD_CARDS_DATA = {
       grade: 'STAR 10 GEM MINT',
       cert: 'CERT #2400-2201',
       serial: '#001 / 001 • DAL-2400-TW',
-      setCode: 'BAD-2400 • 005/006 ★',
+      setCode: 'BAD-2400 • 005/007 ★',
       number: '22',
       position: 'RB',
       ovr: 99,
@@ -360,7 +360,7 @@ window.BAD_CARDS_DATA = {
       grade: 'PAT 10 GEM MINT',
       cert: 'CERT #2400-1201',
       serial: '#001 / 001 • NEP-2400-EL',
-      setCode: 'BAD-2400 • 006/006 ★',
+      setCode: 'BAD-2400 • 006/007 ★',
       number: '12',
       position: 'QB / WR',
       ovr: 99,
@@ -416,6 +416,74 @@ window.BAD_CARDS_DATA = {
         'Undefeated January Snow-Game General at Gillette Stadium',
         'Certified 1st-Edition B.A.D Cards New England Dynasty Legend'
       ]
+    },
+    {
+      id: 'jerry-mack',
+      name: 'JERRY aka MACK',
+      shortName: 'MACK #4',
+      subtitle: 'Jerry Jernigan • Frozen Tundra QB1',
+      edition: '2400 TITLETOWN MYTHIC',
+      rarity: '🧀 MYTHIC 1/1',
+      rarityTier: 'mythic',
+      grade: 'PACK 10 GEM MINT',
+      cert: 'CERT #2400-0401',
+      serial: '#001 / 001 • GBP-2400-JM',
+      setCode: 'BAD-2400 • 007/007 ★',
+      number: '4',
+      position: 'QB',
+      ovr: 99,
+      stars: 5,
+      atk: 3190,
+      def: 2920,
+      duelPower: 9,
+      duelDamage: 7,
+      keywords: ['Gunslinger', 'Ice Veins', 'Hail Mary'],
+      clan: 'Titletown Tundra',
+      clanBonus: '+2 Duel Power on 4th-quarter & blizzard clash turns',
+      team: 'GREEN BAY PACKERS',
+      teamKey: 'packers',
+      theme: 'packers',
+      fxTheme: 'packers',
+      image: 'assets/card-jerry-mack.jpg',
+      objectPos: 'center 10%',
+      accent: '#ffb612',
+      quote: '“Frozen Tundra under the lights — MACK drops dimes in any blizzard.”',
+      chemistry: '🧀 SYNERGY: +20 NFC NORTH RIVALRY vs KARL, JROC!, LITTLE BILL & TYLER',
+      signatureAbility: '🧀 TUNDRA HAIL MARY (X-FACTOR)',
+      miniStats: [
+        { k: 'ARM', v: 99 },
+        { k: 'IQ', v: 100 },
+        { k: 'PACK', v: 100, hot: true },
+        { k: 'CLUTCH', v: 99 }
+      ],
+      evolutions: [
+        { stars: 1, stage: 'Tundra Rookie', ovr: 84, power: 6, dmg: 4, note: 'Ice-cold pocket general commanding sub-zero snaps at Lambeau.' },
+        { stars: 3, stage: 'Lambeau Field General', ovr: 94, power: 8, dmg: 6, note: 'Unlocks Mack Attack Audible & laser-guided 65-yard post routes.' },
+        { stars: 5, stage: '2400 Mythic 1/1', ovr: 99, power: 9, dmg: 7, note: 'Max Titletown evolution — undefeated Frozen Tundra gunslinger.' }
+      ],
+      bio: 'Born for sub-zero primetime under the lights of Lambeau Field 2400. Jerry Jernigan — known across Titletown as "MACK" — commands the Green Bay Packers offense at Quarterback with effortless pocket poise, cannon-arm deep balls, and unstoppable 4th-quarter Ice Veins.',
+      detailedStats: [
+        { label: 'Cannon Arm', val: 99 },
+        { label: 'Mack Field IQ', val: 100 },
+        { label: 'Tundra Clutch', val: 100 },
+        { label: 'Pocket Poise', val: 99 },
+        { label: 'Deep Accuracy', val: 99 },
+        { label: 'Titletown Aura', val: 100 }
+      ],
+      moves: [
+        { title: '🧀 LAMBEAU HAIL MARY', desc: 'Launches an unstoppable 80-yard golden laser through swirling Frozen Tundra snow.', power: 9, dmg: 7, crit: 0.43 },
+        { title: '⚡ MACK ATTACK AUDIBLE', desc: 'Reads the blitz pre-snap and shreds NFC North coverage for instant touchdown damage.', power: 8, dmg: 7, crit: 0.42 }
+      ],
+      combine: [
+        { k: 'THROW VEL', v: '78 MPH' },
+        { k: 'TUNDRA TEMP', v: '-15°F' },
+        { k: 'QB RATING', v: '158.3' }
+      ],
+      milestones: [
+        '2400 Lambeau Field Frozen Tundra Primetime Quarterback MVP',
+        'Undefeated Sub-Zero Titletown Gunslinger — Zero 4th-Quarter Picks',
+        'Certified 1st-Edition B.A.D Cards Green Bay Packers Legend'
+      ]
     }
   ],
 
@@ -437,7 +505,13 @@ window.BAD_CARDS_DATA = {
       author: 'ISAIAH aka LITTLE BILL #11',
       badge: 'VIKINGS • FOUNDER',
       time: 'B.A.D HQ',
-      text: 'Welcome to the official B.A.D Cards 2400 Flagship Vault! All 6 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡'
+      text: 'Welcome to the official B.A.D Cards 2400 Flagship Vault! All 7 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡'
+    },
+    {
+      author: 'JERRY aka MACK #4',
+      badge: 'PACKERS',
+      time: 'LAMBEAU 2400',
+      text: 'GO PACK GO!! MACK #4 under center at Lambeau Field — bring the Vikings, Bears, or anybody else into the Frozen Tundra and watch the dimes fly! 🧀🏈⚡'
     },
     {
       author: 'SHAWN aka ELON! #12',
