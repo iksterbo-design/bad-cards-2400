@@ -629,12 +629,13 @@ body.slab-mode .slab-label { display: flex; }
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
+  will-change: transform;
   transition: transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
-  transform: translateY(var(--fy, 0px)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transform: translate3d(0, var(--fy, 0px), 0) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
 }
 
 .holo-card-scene.is-tilting .holo-card-inner,
-.holo-card-scene.is-live-anim .holo-card-inner { transition: transform 0.08s linear; }
+.holo-card-scene.is-live-anim .holo-card-inner { transition: none; }
 
 .holo-card-scene.is-flipped .holo-card-inner {
   transform: rotateY(180deg);
@@ -646,6 +647,9 @@ body.slab-mode .slab-label { display: flex; }
   inset: 0;
   border-radius: 20px;
   overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  contain: layout paint;
   border: 2.5px solid var(--card-border, #ffc62f);
   background: var(--card-bg, #0d0521);
   box-shadow:
@@ -658,7 +662,7 @@ body.slab-mode .slab-label { display: flex; }
 .holo-front {
   display: flex;
   flex-direction: column;
-  transform: rotateY(0deg);
+  transform: rotateY(0deg) translateZ(1px);
   z-index: 2;
   visibility: visible;
   pointer-events: auto;
@@ -668,7 +672,7 @@ body.slab-mode .slab-label { display: flex; }
 .holo-card-scene.is-flipped .holo-front { visibility: hidden; pointer-events: none; }
 
 .holo-back {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px);
   z-index: 1;
   visibility: hidden;
   pointer-events: none;
@@ -984,9 +988,8 @@ body.slab-mode .card-column[data-level="3"] .holo-card-scene {
   z-index: 4;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 12%, rgba(255, 226, 138, 0.24) 0%, transparent 48%),
-    linear-gradient(180deg, rgba(255, 226, 138, 0.14) 0%, transparent 18%, transparent 74%, rgba(245, 185, 66, 0.22) 100%);
-  mix-blend-mode: screen;
+    radial-gradient(circle at 50% 10%, rgba(255, 226, 138, 0.16) 0%, transparent 45%),
+    linear-gradient(180deg, rgba(255, 226, 138, 0.10) 0%, transparent 16%, transparent 76%, rgba(245, 185, 66, 0.16) 100%);
 }
 
 .card-column[data-level="3"] .ovr-shield {
@@ -1094,10 +1097,9 @@ body.slab-mode .card-column[data-level="3"] .holo-card-scene {
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  background: rgba(5, 11, 24, 0.86);
+  background: rgba(5, 11, 24, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.22);
   color: #dbeafe;
-  backdrop-filter: blur(6px);
   pointer-events: none;
 }
 
@@ -1185,24 +1187,13 @@ body.slab-mode .card-column[data-level="3"] .holo-card-scene {
 
 /* ---------- CARD ART & TOP HUD ---------- */
 .card-art-wrap { position: relative; flex: 1; overflow: hidden; background: #040914; }
-.card-art-img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .holo-card-scene.is-live-anim .card-art-img { animation: heroBreathe 5.2s ease-in-out infinite; }
-}
+.card-art-img { width: 100%; height: 100%; object-fit: cover; display: block; transform: translateZ(0); }
 
 .holo-card-scene.is-tilting .card-art-img {
-  animation: none;
-  transform: scale(1.075) translate3d(var(--px, 0px), var(--py, 0px), 0);
-  transition: transform 0.08s linear;
+  transform: scale(1.04) translate3d(var(--px, 0px), var(--py, 0px), 0);
 }
 
-@keyframes heroBreathe {
-  0%, 100% { transform: scale(1.02) translateY(0px); }
-  50% { transform: scale(1.058) translateY(-3px); }
-}
-
-.card-fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; mix-blend-mode: screen; }
+.card-fx-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
 .card-art-vignette { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(4, 10, 24, 0.50) 0%, transparent 24%, transparent 60%, rgba(4, 10, 24, 0.96) 100%); pointer-events: none; z-index: 4; }
 
 .card-top-bar { position: absolute; top: 0.7rem; left: 0.7rem; right: 0.7rem; display: flex; align-items: flex-start; justify-content: space-between; z-index: 6; }
@@ -1355,9 +1346,8 @@ body.slab-mode .card-column[data-level="3"] .holo-card-scene {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  mix-blend-mode: overlay;
-  opacity: 0.38;
-  background: repeating-linear-gradient(125deg, rgba(255, 210, 120, 0.46) 0%, rgba(56, 189, 248, 0.44) 22%, rgba(255, 255, 255, 0.42) 44%, rgba(168, 85, 247, 0.40) 66%, rgba(255, 210, 120, 0.46) 88%);
+  opacity: 0.16;
+  background: repeating-linear-gradient(125deg, rgba(255, 210, 120, 0.36) 0%, rgba(56, 189, 248, 0.34) 22%, rgba(255, 255, 255, 0.28) 44%, rgba(168, 85, 247, 0.30) 66%, rgba(255, 210, 120, 0.36) 88%);
   background-size: 260% 260%;
   background-position: var(--mx, 50%) var(--my, 50%);
   z-index: 7;
@@ -1367,9 +1357,8 @@ body.slab-mode .card-column[data-level="3"] .holo-card-scene {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  mix-blend-mode: color-dodge;
-  opacity: var(--glare-op, 0.34);
-  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.72) 0%, rgba(180, 224, 255, 0.32) 28%, rgba(245, 185, 66, 0.20) 54%, transparent 78%);
+  opacity: var(--glare-op, 0.24);
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, 0.38) 0%, rgba(180, 224, 255, 0.16) 28%, rgba(245, 185, 66, 0.10) 54%, transparent 76%);
   z-index: 8;
 }
 

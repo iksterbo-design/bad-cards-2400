@@ -388,15 +388,101 @@
     }, 700);
   }
 
+  function updateSingleCardDOM(cardId) {
+    const card = state.cards.find((c) => c.id === cardId);
+    const scene = document.querySelector(`.holo-card-scene[data-card-id="${cardId}"]`);
+    if (!card || !scene) { renderCards(); return; }
+    const article = scene.closest('.card-column');
+    if (!article) { renderCards(); return; }
+
+    const lvl = getCardLevel(card);
+    const evo = getCardEvo(card);
+    const evoImg = getEvoImage(card, lvl);
+    const evoFx = getEvoVisualFx(card, lvl);
+    const statDelta = typeof evo.statDelta === 'number' ? evo.statDelta : 0;
+    const atkMult = typeof evo.atkMult === 'number' ? evo.atkMult : 1;
+    const liveAtk = Math.round(card.atk * atkMult);
+    const liveDef = Math.round(card.def * atkMult);
+    const tierLabel = lvl === 3 ? '⚡ LVL 3 MAX' : (lvl === 2 ? '✦ LVL 2 AWAKENED' : 'LVL 1 ROOKIE');
+
+    article.dataset.level = String(lvl);
+    scene.classList.remove('is-evolving');
+    void scene.offsetWidth;
+    scene.classList.add('is-evolving');
+    setTimeout(() => scene.classList.remove('is-evolving'), 700);
+
+    const img = article.querySelector('.card-art-img');
+    if (img) {
+      img.src = evoImg;
+      img.dataset.visualFx = evoFx;
+      img.alt = `${card.name} #${card.number} ${card.team} Level ${lvl} ${evo.stage}`;
+    }
+    const ovrEl = article.querySelector('.ovr-num');
+    if (ovrEl) ovrEl.textContent = String(evo.ovr);
+    const rarityEl = article.querySelector('.rarity-pill');
+    if (rarityEl) rarityEl.textContent = lvl === 3 ? card.rarity : `LVL ${lvl} • ${evo.stage.split(' ')[0]}`;
+    const tierEl = article.querySelector('.card-tier-stamp');
+    if (tierEl) tierEl.textContent = tierLabel;
+    const banner = article.querySelector('.mascot-crest-banner');
+    if (banner) {
+      banner.title = evo.mascotTrait || evo.note;
+      const spans = banner.querySelectorAll('span');
+      if (spans[0]) spans[0].textContent = evo.mascotBadge || `LVL ${lvl} • ${evo.stage}`;
+      if (spans[1]) spans[1].textContent = '★'.repeat(evo.stars);
+    }
+    const edEl = article.querySelector('.card-edition-tag');
+    if (edEl) edEl.textContent = lvl === 3 ? `${card.edition} • APEX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`;
+    const subEl = article.querySelector('.card-player-sub');
+    if (subEl) subEl.textContent = lvl === 3 ? `${evo.stage} • ${card.mascot || card.team}` : card.subtitle;
+    const sigEl = article.querySelector('.card-sig-ability span');
+    if (sigEl) sigEl.textContent = evo.onEvolve ? evo.onEvolve.label : card.signatureAbility;
+
+    const miniEls = article.querySelectorAll('.mini-stat');
+    card.miniStats.forEach((s, i) => {
+      const box = miniEls[i];
+      if (!box) return;
+      const val = Math.max(70, Math.min(100, s.v + statDelta));
+      box.classList.toggle('hot', Boolean(s.hot && lvl === 3));
+      const vEl = box.querySelector('.mini-stat-v');
+      if (vEl) vEl.textContent = String(val);
+    });
+
+    const backSub = article.querySelector('.back-sub');
+    if (backSub) backSub.textContent = `${card.team} • LVL ${lvl} • ATK ${liveAtk} / DEF ${liveDef}`;
+    const backSer = article.querySelector('.back-serial');
+    if (backSer) backSer.textContent = lvl === 3 ? 'LVL 3 MAX' : `LVL ${lvl}/3`;
+    const backBio = article.querySelector('.back-bio');
+    if (backBio) backBio.innerHTML = `<strong>${evo.mascotBadge}:</strong> ${evo.mascotTrait || card.bio}`;
+    const backChem = article.querySelector('.back-chem');
+    if (backChem) backChem.textContent = evo.inherited ? `🧬 ${evo.inherited}` : card.chemistry;
+    const statRows = article.querySelectorAll('.back-stat-bars .stat-row');
+    card.detailedStats.forEach((st, i) => {
+      const row = statRows[i];
+      if (!row) return;
+      const val = Math.max(70, Math.min(100, st.val + statDelta));
+      const fill = row.querySelector('.stat-fill');
+      const vEl = row.querySelector('.stat-val');
+      if (fill) fill.style.width = `${val}%`;
+      if (vEl) vEl.textContent = String(val);
+    });
+    const slabSub = article.querySelector('.slab-meta div:last-child');
+    if (slabSub) slabSub.textContent = `${card.cert} • LVL ${lvl} ${evo.stage}`;
+
+    article.querySelectorAll('[data-set-lvl]').forEach((b) => {
+      const active = Number(b.dataset.setLvl) === lvl;
+      b.classList.toggle('active', active);
+      b.setAttribute('aria-pressed', String(active));
+    });
+  }
+
   function setCardLevel(cardId, lvl) {
     const card = state.cards.find((c) => c.id === cardId);
     if (!card) return;
     const clamped = Math.min(3, Math.max(1, Number(lvl)));
     state.cardLevels[cardId] = clamped;
     saveCardLevels();
-    triggerEvoFlash([cardId]);
     const evo = getCardEvo(card);
-    renderCards();
+    updateSingleCardDOM(cardId);
     renderSquadDrawer();
     if (state.duelFormat === 'max') {
       state.duelLevels[cardId] = clamped;
@@ -420,14 +506,12 @@
 
   function setAllCardsLevel(lvl, silent = false) {
     const clamped = Math.min(3, Math.max(1, Number(lvl)));
-    const allIds = state.cards.map((c) => c.id);
     state.cards.forEach((c) => {
       state.cardLevels[c.id] = clamped;
       if (state.duelFormat === 'max') state.duelLevels[c.id] = clamped;
+      updateSingleCardDOM(c.id);
     });
     saveCardLevels();
-    triggerEvoFlash(allIds);
-    renderCards();
     renderSquadDrawer();
     renderDuelArena();
     syncToolbarLevelChips();
@@ -760,47 +844,56 @@
       'packers-boss': { p1: '#ffe066', p2: '#34d399', glow1: 'rgba(255,224,102,', glow2: 'rgba(52,211,153,', stars: true }
     }[fxTheme] || { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false };
 
-    const sparkCount = level === 3 ? 48 : (level === 2 ? 26 : 10);
+    const sparkCount = level === 3 ? 28 : (level === 2 ? 16 : 8);
     const sparks = Array.from({ length: sparkCount }, () => ({
       x: Math.random() * cw, y: Math.random() * ch,
-      r: (level === 3 ? 1.4 : (level === 2 ? 1.05 : 0.8)) + Math.random() * (level === 3 ? 2.4 : 1.6),
-      vx: (Math.random() - 0.5) * (level === 3 ? 0.72 : 0.45),
-      vy: (level === 3 ? 0.68 : (level === 2 ? 0.44 : 0.25)) + Math.random() * 0.9,
+      r: (level === 3 ? 1.3 : (level === 2 ? 1.0 : 0.8)) + Math.random() * (level === 3 ? 1.9 : 1.3),
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (level === 3 ? 0.45 : (level === 2 ? 0.32 : 0.22)) + Math.random() * 0.55,
       alt: Math.random() > 0.5,
-      star: (palette.stars || level === 3) && Math.random() > (level === 3 ? 0.52 : 0.75),
+      star: (palette.stars || level === 3) && Math.random() > (level === 3 ? 0.58 : 0.78),
       life: Math.random()
     }));
-    const arcs = [];
+
+    let inView = true;
+    if ('IntersectionObserver' in window) {
+      const obs = new IntersectionObserver((entries) => {
+        if (entries[0]) inView = entries[0].isIntersecting;
+      }, { rootMargin: '120px' });
+      obs.observe(scene);
+    }
 
     return {
       scene, idx, resize,
+      isVisible() { return inView; },
       step(tick) {
+        if (!inView) return;
         const flipped = scene.classList.contains('is-flipped');
         ctx.clearRect(0, 0, cw, ch);
         if (flipped || !state.liveAnim) return;
 
-        const glowMult = level === 3 ? 1.35 : (level === 2 ? 0.9 : 0.45);
-        const pulse = 0.5 + 0.5 * Math.sin(tick * 0.055 + idx);
-        const g1 = ctx.createRadialGradient(cw * 0.24, ch * 0.80, 4, cw * 0.24, ch * 0.80, cw * 0.32);
-        g1.addColorStop(0, `${palette.glow1}${((0.16 + pulse * 0.14) * glowMult).toFixed(2)})`);
+        const glowMult = level === 3 ? 0.85 : (level === 2 ? 0.55 : 0.28);
+        const pulse = 0.5 + 0.5 * Math.sin(tick * 0.025 + idx);
+        const g1 = ctx.createRadialGradient(cw * 0.24, ch * 0.80, 4, cw * 0.24, ch * 0.80, cw * 0.30);
+        g1.addColorStop(0, `${palette.glow1}${((0.12 + pulse * 0.08) * glowMult).toFixed(2)})`);
         g1.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = g1;
         ctx.fillRect(0, 0, cw, ch);
 
-        const g2 = ctx.createRadialGradient(cw * 0.72, ch * 0.58, 4, cw * 0.72, ch * 0.58, cw * 0.28);
-        g2.addColorStop(0, `${palette.glow2}${((0.16 + (1 - pulse) * 0.14) * glowMult).toFixed(2)})`);
+        const g2 = ctx.createRadialGradient(cw * 0.72, ch * 0.58, 4, cw * 0.72, ch * 0.58, cw * 0.26);
+        g2.addColorStop(0, `${palette.glow2}${((0.12 + (1 - pulse) * 0.08) * glowMult).toFixed(2)})`);
         g2.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = g2;
         ctx.fillRect(0, 0, cw, ch);
 
         for (const s of sparks) {
-          s.x += s.vx + Math.sin(tick * 0.035 + s.y * 0.03) * 0.28;
+          s.x += s.vx + Math.sin(tick * 0.02 + s.y * 0.025) * 0.18;
           s.y -= s.vy;
-          s.life += 0.012;
+          s.life += 0.008;
           if (s.y < -6 || s.x < -8 || s.x > cw + 8) { s.x = Math.random() * cw; s.y = ch + 6; s.life = 0; }
-          ctx.globalAlpha = Math.max(0.14, Math.sin(Math.min(1, s.life) * Math.PI) * (level === 3 ? 0.92 : 0.72));
+          ctx.globalAlpha = Math.max(0.12, Math.sin(Math.min(1, s.life) * Math.PI) * (level === 3 ? 0.78 : 0.56));
           if (s.star) {
-            drawStar(ctx, s.x, s.y, 5, s.r * 1.9, s.r * 0.75);
+            drawStar(ctx, s.x, s.y, 5, s.r * 1.7, s.r * 0.7);
             ctx.fillStyle = level === 3 ? '#fffbeb' : '#ffffff';
             ctx.fill();
           } else {
@@ -811,41 +904,6 @@
           }
         }
         ctx.globalAlpha = 1;
-
-        const arcInterval = level === 3 ? 14 : (level === 2 ? 28 : 54);
-        const maxArcs = level === 3 ? 5 : (level === 2 ? 3 : 1);
-        if ((tick + idx * 7) % arcInterval === 0 && arcs.length < maxArcs) {
-          const fromBall = Math.random() > 0.5;
-          let x = fromBall ? cw * (0.12 + Math.random() * 0.2) : cw * (0.62 + Math.random() * 0.26);
-          let y = fromBall ? ch * (0.64 + Math.random() * 0.22) : ch * (0.40 + Math.random() * 0.30);
-          const pts = [{ x, y }];
-          for (let i = 0; i < 6; i++) {
-            x += (fromBall ? -1 : 1) * (5 + Math.random() * 14) + (Math.random() - 0.5) * 16;
-            y += (Math.random() - 0.58) * 24;
-            pts.push({ x, y });
-          }
-          arcs.push({ pts, life: 1, decay: 0.055, col: fromBall ? palette.p1 : palette.p2 });
-        }
-
-        for (let i = arcs.length - 1; i >= 0; i--) {
-          const a = arcs[i];
-          a.life -= a.decay;
-          if (a.life <= 0) { arcs.splice(i, 1); continue; }
-          ctx.save();
-          ctx.globalAlpha = a.life;
-          ctx.lineCap = 'round';
-          ctx.beginPath();
-          a.pts.forEach((pt, j) => (j === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
-          ctx.strokeStyle = a.col;
-          ctx.lineWidth = level === 3 ? 3.2 : 2.4;
-          ctx.shadowBlur = level === 3 ? 14 : 8;
-          ctx.shadowColor = a.col;
-          ctx.stroke();
-          ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1.1;
-          ctx.stroke();
-          ctx.restore();
-        }
       }
     };
   }
@@ -854,20 +912,22 @@
   function masterAnimLoop(ts) {
     if (!document.hidden) {
       masterTick += 1;
+      const drawCanvas = (masterTick % 2) === 0;
       for (const eng of fxEngines) {
-        eng.step(masterTick);
+        if (!eng.isVisible()) continue;
+        if (drawCanvas) eng.step(masterTick);
         const sc = eng.scene;
         if (state.liveAnim && !sc.classList.contains('is-tilting') && !sc.classList.contains('is-flipped')) {
           const inner = sc.querySelector('.holo-card-inner');
           if (inner) {
-            const phase = ((ts / 4400) + eng.idx * 0.19) % 1;
+            const phase = ((ts / 6200) + eng.idx * 0.19) % 1;
             const tau = Math.PI * 2;
-            inner.style.setProperty('--fy', `${(Math.sin(phase * tau) * -4.5).toFixed(2)}px`);
-            inner.style.setProperty('--rx', `${(Math.sin(phase * tau * 2) * 3.8).toFixed(2)}deg`);
-            inner.style.setProperty('--ry', `${(Math.sin(phase * tau) * 8.5).toFixed(2)}deg`);
-            inner.style.setProperty('--mx', `${(50 + Math.sin(phase * tau) * 28).toFixed(1)}%`);
-            inner.style.setProperty('--my', `${(42 + Math.cos(phase * tau) * 20).toFixed(1)}%`);
-            inner.style.setProperty('--glare-op', `${(0.28 + Math.abs(Math.sin(phase * tau)) * 0.2).toFixed(2)}`);
+            inner.style.setProperty('--fy', `${(Math.sin(phase * tau) * -2.8).toFixed(2)}px`);
+            inner.style.setProperty('--rx', `${(Math.sin(phase * tau * 2) * 2.1).toFixed(2)}deg`);
+            inner.style.setProperty('--ry', `${(Math.sin(phase * tau) * 4.8).toFixed(2)}deg`);
+            inner.style.setProperty('--mx', `${(50 + Math.sin(phase * tau) * 24).toFixed(1)}%`);
+            inner.style.setProperty('--my', `${(44 + Math.cos(phase * tau) * 16).toFixed(1)}%`);
+            inner.style.setProperty('--glare-op', `${(0.18 + Math.abs(Math.sin(phase * tau)) * 0.14).toFixed(2)}`);
           }
         }
       }
