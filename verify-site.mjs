@@ -6,7 +6,11 @@ import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+const CHROME_PATH = process.env.CHROME_PATH || (
+  process.platform === 'win32'
+    ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+    : '/usr/bin/google-chrome'
+);
 const MIME = {
   '.html': 'text/html; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
@@ -37,6 +41,7 @@ const dbg = 9450 + Math.floor(Math.random() * 200);
 const udir = fs.mkdtempSync(path.join(os.tmpdir(), 'bad-verify-'));
 const ch = spawn(CHROME_PATH, [
   '--headless=new',
+  ...(process.platform === 'win32' ? [] : ['--no-sandbox', '--disable-gpu']),
   `--remote-debugging-port=${dbg}`,
   `--user-data-dir=${udir}`,
   '--window-size=1360,900',
@@ -78,9 +83,11 @@ try {
   await send('Page.navigate', { url: `http://127.0.0.1:${port}/` });
   await new Promise((r) => setTimeout(r, 1400));
 
-  // Scroll through vault so lazy images load cleanly
-  await send('Runtime.evaluate', { expression: `window.scrollTo(0, document.body.scrollHeight * 0.5);` });
-  await new Promise((r) => setTimeout(r, 700));
+  // Scroll through vault & duel arena so all 9 images decode cleanly
+  for (const frac of [0.3, 0.55, 0.78]) {
+    await send('Runtime.evaluate', { expression: `window.scrollTo(0, document.body.scrollHeight * ${frac});` });
+    await new Promise((r) => setTimeout(r, 400));
+  }
   await send('Runtime.evaluate', { expression: `window.scrollTo(0, 0);` });
   await new Promise((r) => setTimeout(r, 300));
 
@@ -152,7 +159,7 @@ try {
   if (
     errs.length ||
     http404s.length ||
-    desktopStats.result.value.cards !== 8 ||
+    desktopStats.result.value.cards !== 9 ||
     desktopStats.result.value.brokenImgs > 0 ||
     imgCheck.result.value > 0 ||
     !desktopStats.result.value.l3BannerHasGradient ||

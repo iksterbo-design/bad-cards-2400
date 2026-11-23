@@ -20,7 +20,7 @@ window.BAD_CARDS_DATA = {
       "grade": "B.A.D 10 GEM MINT",
       "cert": "CERT #2400-9901",
       "serial": "#001 / 001 • VIK-2400-KD",
-      "setCode": "BAD-2400 • 001/008 ★",
+      "setCode": "BAD-2400 • 001/009 ★",
       "number": "99",
       "position": "OLB",
       "ovr": 99,
@@ -205,7 +205,7 @@ window.BAD_CARDS_DATA = {
       "grade": "B.A.D 10 GEM MINT",
       "cert": "CERT #2400-2801",
       "serial": "#001 / 001 • VIK-2400-JR",
-      "setCode": "BAD-2400 • 002/008 ★",
+      "setCode": "BAD-2400 • 002/009 ★",
       "number": "28",
       "position": "WR / RB",
       "ovr": 99,
@@ -389,7 +389,7 @@ window.BAD_CARDS_DATA = {
       "grade": "B.A.D 10 GEM MINT",
       "cert": "CERT #2400-1101",
       "serial": "#001 / 001 • VIK-2400-LB",
-      "setCode": "BAD-2400 • 003/008 ★",
+      "setCode": "BAD-2400 • 003/009 ★",
       "number": "11",
       "position": "QB / HC",
       "ovr": 99,
@@ -576,7 +576,7 @@ window.BAD_CARDS_DATA = {
       "grade": "BEAR 10 GEM MINT",
       "cert": "CERT #2400-5401",
       "serial": "#001 / 001 • CHI-2400-TD",
-      "setCode": "BAD-2400 • 004/008 ★",
+      "setCode": "BAD-2400 • 004/009 ★",
       "number": "54",
       "position": "MLB",
       "ovr": 99,
@@ -761,7 +761,7 @@ window.BAD_CARDS_DATA = {
       "grade": "STAR 10 GEM MINT",
       "cert": "CERT #2400-2201",
       "serial": "#001 / 001 • DAL-2400-TW",
-      "setCode": "BAD-2400 • 005/008 ★",
+      "setCode": "BAD-2400 • 005/009 ★",
       "number": "22",
       "position": "RB",
       "ovr": 99,
@@ -947,7 +947,7 @@ window.BAD_CARDS_DATA = {
       "grade": "PAT 10 GEM MINT",
       "cert": "CERT #2400-1201",
       "serial": "#001 / 001 • NEP-2400-EL",
-      "setCode": "BAD-2400 • 006/008 ★",
+      "setCode": "BAD-2400 • 006/009 ★",
       "number": "12",
       "position": "QB / WR",
       "ovr": 99,
@@ -1132,7 +1132,7 @@ window.BAD_CARDS_DATA = {
       "grade": "PACK 10 GEM MINT",
       "cert": "CERT #2400-0401",
       "serial": "#001 / 001 • GBP-2400-JM",
-      "setCode": "BAD-2400 • 007/008 ★",
+      "setCode": "BAD-2400 • 007/009 ★",
       "number": "4",
       "position": "QB",
       "ovr": 99,
@@ -1156,7 +1156,7 @@ window.BAD_CARDS_DATA = {
       "objectPos": "center 10%",
       "accent": "#ffb612",
       "quote": "“Frozen Tundra under the lights — MACK drops dimes in any blizzard.”",
-      "chemistry": "🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with DAVID aka DA BOSS #92",
+      "chemistry": "🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with DA BOSS #92 & PORKY! #80",
       "signatureAbility": "🧀 TUNDRA HAIL MARY (X-FACTOR)",
       "miniStats": [
         {
@@ -1317,7 +1317,7 @@ window.BAD_CARDS_DATA = {
       "grade": "PACK 10 GEM MINT",
       "cert": "CERT #2400-9201",
       "serial": "#001 / 001 • GBP-2400-DB",
-      "setCode": "BAD-2400 • 008/008 ★",
+      "setCode": "BAD-2400 • 008/009 ★",
       "number": "92",
       "position": "DE / OLB",
       "ovr": 99,
@@ -1341,7 +1341,7 @@ window.BAD_CARDS_DATA = {
       "objectPos": "center 10%",
       "accent": "#ffb612",
       "quote": "“Lambeau runs through Da Boss — QBs don’t survive the Frozen Tundra.”",
-      "chemistry": "🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with JERRY aka MACK #4",
+      "chemistry": "🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with MACK #4 & PORKY! #80",
       "signatureAbility": "🧀 BOSS MODE SACK (X-FACTOR)",
       "miniStats": [
         {
@@ -1491,6 +1491,192 @@ window.BAD_CARDS_DATA = {
         "Certified 1st-Edition B.A.D Cards Green Bay Packers Legend"
       ],
       "mascot": "Titletown Tundra Titan"
+    },
+    {
+      "id": "justin-porky",
+      "name": "JUSTIN aka PORKY!",
+      "shortName": "PORKY! #80",
+      "subtitle": "Justin Coutts • Lambeau Leap WR1",
+      "edition": "2400 LAMBEAU LEAP MYTHIC",
+      "rarity": "🧀 MYTHIC 1/1",
+      "rarityTier": "mythic",
+      "grade": "PACK 10 GEM MINT",
+      "cert": "CERT #2400-8001",
+      "serial": "#001 / 001 • GBP-2400-JC",
+      "setCode": "BAD-2400 • 009/009 ★",
+      "number": "80",
+      "position": "WR / TE",
+      "ovr": 99,
+      "stars": 5,
+      "atk": 3180,
+      "def": 2940,
+      "duelPower": 9,
+      "duelDamage": 7,
+      "keywords": [
+        "Lambeau Leap",
+        "Double Strike",
+        "Haste"
+      ],
+      "clan": "Titletown Tundra",
+      "clanBonus": "+2 Duel Power (2 Packers) or +3 PWR / +1 DMG Trio Dynasty (3 Packers)",
+      "mascot": "Titletown Lambeau Leaper",
+      "team": "GREEN BAY PACKERS",
+      "teamKey": "packers",
+      "theme": "packers-leap",
+      "fxTheme": "packers-leap",
+      "image": "assets/card-justin-porky.jpg",
+      "objectPos": "center 10%",
+      "accent": "#34d399",
+      "quote": "“Catch it in the snow, leap into the front row — Porky! owns Lambeau.”",
+      "chemistry": "🧀 SYNERGY: +15 TITLETOWN TUNDRA POWER with MACK #4 & DA BOSS #92",
+      "signatureAbility": "🧀 LAMBEAU LEAP MOSS (X-FACTOR)",
+      "miniStats": [
+        {
+          "k": "SPD",
+          "v": 99
+        },
+        {
+          "k": "CTH",
+          "v": 100,
+          "hot": true
+        },
+        {
+          "k": "PACK",
+          "v": 100,
+          "hot": true
+        },
+        {
+          "k": "LEAP",
+          "v": 99
+        }
+      ],
+      "evolutions": [
+        {
+          "level": 1,
+          "stars": 1,
+          "stage": "Tundra Slot Rookie",
+          "ovr": 84,
+          "power": 6,
+          "dmg": 4,
+          "statDelta": -14,
+          "atkMult": 0.81,
+          "mascotBadge": "LVL 1 • ROOKIE",
+          "mascotTrait": "Fearless Lambeau wideout catching lasers in sub-zero snow.",
+          "note": "Fearless Lambeau wideout catching lasers in sub-zero snow.",
+          "image": "assets/card-justin-porky.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: Lambeau Haste (+4 ATK on First Clash)",
+          "onEvolve": null
+        },
+        {
+          "level": 2,
+          "stars": 3,
+          "stage": "Cheesehead Route Sprinter",
+          "ovr": 94,
+          "power": 9,
+          "dmg": 6,
+          "statDelta": -5,
+          "atkMult": 0.93,
+          "mascotBadge": "LVL 2 • 🧀 CHEESEHEAD SPRINTER",
+          "mascotTrait": "Ignites Titletown golden frost routes & one-handed sideline grabs.",
+          "note": "Ignites Titletown golden frost routes & one-handed sideline grabs.",
+          "image": "assets/card-justin-porky.jpg",
+          "visualFx": "packers-leap-l2",
+          "evolveCost": 2,
+          "inherited": "Inherited: +1 Bonus Clash DMG on Snow Routes",
+          "onEvolve": {
+            "label": "🧀 Cheesehead Route: +9 ATK this round!",
+            "effect": "atk",
+            "atk": 9
+          }
+        },
+        {
+          "level": 3,
+          "stars": 5,
+          "stage": "Lambeau Leap King",
+          "ovr": 99,
+          "power": 11,
+          "dmg": 9,
+          "statDelta": 0,
+          "atkMult": 1.14,
+          "mascotBadge": "LVL 3 MAX • 🧀⚡ LAMBEAU LEAP KING",
+          "mascotTrait": "MAX MASCOT FORM: Titletown’s Blazing Cheesehead Wings, Sub-Zero Catch Radius & Iconic Lambeau Leap Shockwave!",
+          "note": "MAX MASCOT FORM: Titletown’s Blazing Cheesehead Wings, Sub-Zero Catch Radius & Iconic Lambeau Leap Shockwave!",
+          "image": "assets/card-justin-porky.jpg",
+          "visualFx": "packers-leap-l3",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "🧀⚡ Lambeau Leap King: Shatter 1 Shield & +10 ATK!",
+            "effect": "pierce_atk",
+            "val": 1,
+            "atk": 10
+          }
+        }
+      ],
+      "bio": "Built for December toe-tap touchdowns at Lambeau Field 2400. Justin Coutts — known across Titletown as \"Porky!\" — rocks the legendary Green Bay #80 with magnetic hands, white-sleeve speed, and signature front-row Lambeau Leaps alongside QB Jerry aka MACK #4 and DE David aka DA BOSS #92.",
+      "detailedStats": [
+        {
+          "label": "Lambeau Leap",
+          "val": 100
+        },
+        {
+          "label": "Snow Hands",
+          "val": 100
+        },
+        {
+          "label": "Route Speed",
+          "val": 99
+        },
+        {
+          "label": "4th Qtr Clutch",
+          "val": 99
+        },
+        {
+          "label": "YAC Burst",
+          "val": 99
+        },
+        {
+          "label": "Titletown Aura",
+          "val": 100
+        }
+      ],
+      "moves": [
+        {
+          "title": "🧀 LAMBEAU LEAP MOSS",
+          "desc": "Skies over double coverage in blizzard snow and launches straight into the Titletown front row.",
+          "power": 9,
+          "dmg": 7,
+          "crit": 0.43
+        },
+        {
+          "title": "⚡ PORKY! TUNDRA SLANT",
+          "desc": "Ankle-breaking route off a MACK #4 laser — turns 5-yard slants into 75-yard house calls.",
+          "power": 8,
+          "dmg": 7,
+          "crit": 0.42
+        }
+      ],
+      "combine": [
+        {
+          "k": "40-YD DASH",
+          "v": "4.26s"
+        },
+        {
+          "k": "VERTICAL",
+          "v": "46.0\""
+        },
+        {
+          "k": "LEAP HEIGHT",
+          "v": "12 FT"
+        }
+      ],
+      "milestones": [
+        "2400 Lambeau Field Touchdown & Lambeau Leap Champion — #80",
+        "Completes the 3-Man Packers Titletown Tundra Squad with MACK #4 & DA BOSS #92",
+        "Certified 1st-Edition B.A.D Cards Green Bay Packers Legend"
+      ]
     }
   ],
   "instants": [
@@ -1579,7 +1765,13 @@ window.BAD_CARDS_DATA = {
       "author": "ISAIAH aka LITTLE BILL #11",
       "badge": "VIKINGS • FOUNDER",
       "time": "B.A.D HQ",
-      "text": "Welcome to the official B.A.D Cards 2400 Flagship Vault! All 8 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡"
+      "text": "Welcome to the official B.A.D Cards 2400 Flagship Vault! All 9 1st-Edition Mythic 1/1s live right here — build your 4-card squad, bet Hype Energy in the Duel Arena, and rep your team! 🏆⚡"
+    },
+    {
+      "author": "JUSTIN aka PORKY! #80",
+      "badge": "PACKERS",
+      "time": "LAMBEAU 2400",
+      "text": "PORKY! #80 TOUCHDOWN!! MACK throwing lasers, DA BOSS wrecking QBs, and Porky! leaping straight into the Lambeau front row — Titletown Tundra 3-deep! 🧀🏈⚡"
     },
     {
       "author": "DAVID aka DA BOSS #92",
@@ -1672,7 +1864,7 @@ window.BAD_CARDS_DATA = {
       "id": "max-vault",
       "icon": "👑",
       "name": "Apex Mascot Collector",
-      "desc": "Ascend all 8 cards to Level 3 MAX",
+      "desc": "Ascend all 9 cards to Level 3 MAX",
       "xp": 100
     },
     {
@@ -1714,7 +1906,7 @@ window.BAD_CARDS_DATA = {
       "id": "pack-ripper",
       "icon": "🎁",
       "name": "Mythic Pack Hunter",
-      "desc": "Rip open an 8-Card 1st-Edition God Pack",
+      "desc": "Rip open a 9-Card 1st-Edition God Pack",
       "xp": 75
     }
   ]

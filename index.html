@@ -11,18 +11,18 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://iksterbo-design.github.io/bad-cards-2400/" />
   <meta property="og:title" content="B.A.D CARDS 2400 — Interactive 3D Mythic Collector Vault" />
-  <meta property="og:description" content="Flip all 8 live-animated 99 OVR 1st-Edition holographic collector cards, rip a Mythic God Pack, build your 4-card squad, and battle friends in the Tactical Duel Arena." />
-  <meta property="og:image" content="https://iksterbo-design.github.io/bad-cards-2400/assets/card-david-da-boss.jpg" />
+  <meta property="og:description" content="Flip all 9 live-animated 99 OVR 1st-Edition holographic collector cards, rip a Mythic God Pack, build your 4-card squad, and battle friends in the Tactical Duel Arena." />
+  <meta property="og:image" content="https://iksterbo-design.github.io/bad-cards-2400/assets/card-justin-porky.jpg" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="B.A.D CARDS 2400 — Interactive 3D Mythic Collector Vault" />
-  <meta name="twitter:description" content="8 live-animated 99 OVR Mythic 1/1 cards • Pack Ripper • 4-Card Squad Builder • Tactical Hype-Energy Duel Arena." />
-  <meta name="twitter:image" content="https://iksterbo-design.github.io/bad-cards-2400/assets/card-david-da-boss.jpg" />
+  <meta name="twitter:description" content="9 live-animated 99 OVR Mythic 1/1 cards • Pack Ripper • 4-Card Squad Builder • Tactical Hype-Energy Duel Arena." />
+  <meta name="twitter:image" content="https://iksterbo-design.github.io/bad-cards-2400/assets/card-justin-porky.jpg" />
 
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%23f5b942'/><text x='32' y='40' font-family='Arial Black' font-size='20' font-weight='900' fill='%23070b14' text-anchor='middle'>B.A.D</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2.2" />
+  <link rel="stylesheet" href="styles.css?v=2.3" />
 </head>
 <body data-foil="native">
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -35,7 +35,7 @@
       <div class="top-strip-inner">
         <div class="top-strip-group">
           <span class="live-pill"><span class="live-dot" aria-hidden="true"></span> LIVE &bull; SEASON 2400 &bull; 1ST EDITION</span>
-          <span class="grade-crest">★ GRADE: DIVINITY (8/8)</span>
+          <span class="grade-crest">★ GRADE: DIVINITY (9/9)</span>
         </div>
         <div class="top-strip-group">
           <span>Build a Dream (B.A.D) Studio &bull; Moline, IL</span>
@@ -85,14 +85,14 @@
 
         <ul class="clan-strip" role="list" aria-label="Active team clans">
           <li class="clan-badge">⚡ VALHALLA SQUAD &bull; 3</li>
-          <li class="clan-badge">🧀 TITLETOWN TUNDRA &bull; 2</li>
+          <li class="clan-badge">🧀 TITLETOWN TUNDRA &bull; 3</li>
           <li class="clan-badge">🐻 MIDWAY MONSTERS &bull; 1</li>
           <li class="clan-badge">⭐ LONE STAR EMPIRE &bull; 1</li>
           <li class="clan-badge">🚀 FOXBOROUGH ROCKET LABS &bull; 1</li>
         </ul>
 
         <div class="hero-cta-row">
-          <button id="hero-pack-btn" class="btn btn-gold" type="button">🎁 Rip 8-Card Mythic Pack</button>
+          <button id="hero-pack-btn" class="btn btn-gold" type="button">🎁 Rip 9-Card Mythic Pack</button>
           <a href="#vault" class="btn btn-cyan">⚡ Evolve &amp; Open Binder</a>
           <a href="#battle" class="btn btn-emerald">⚔️ Play Tactical TCG Duel</a>
           <button id="open-compare-hero-btn" class="btn btn-ghost" type="button">⚖️ Compare Cards</button>
@@ -100,7 +100,7 @@
 
         <div class="hero-stats">
           <div class="stat-pill-box">
-            <div class="stat-pill-val">8 × 3</div>
+            <div class="stat-pill-val">9 × 3</div>
             <div class="stat-pill-lbl">3-Level Mascot Evolutions</div>
           </div>
           <div class="stat-pill-box">
@@ -154,9 +154,9 @@
         <div class="toolbar-row">
           <div class="toolbar-group" role="group" aria-label="Filter by team clan">
             <span class="toolbar-label">CLAN / TEAM:</span>
-            <button class="chip active" data-team-filter="all" type="button" aria-pressed="true">All 8</button>
+            <button class="chip active" data-team-filter="all" type="button" aria-pressed="true">All 9</button>
             <button class="chip" data-team-filter="vikings" type="button" aria-pressed="false">⚡ Vikings (3)</button>
-            <button class="chip" data-team-filter="packers" type="button" aria-pressed="false">🧀 Packers (2)</button>
+            <button class="chip" data-team-filter="packers" type="button" aria-pressed="false">🧀 Packers (3)</button>
             <button class="chip" data-team-filter="bears" type="button" aria-pressed="false">🐻 Bears (1)</button>
             <button class="chip" data-team-filter="cowboys" type="button" aria-pressed="false">⭐ Cowboys (1)</button>
             <button class="chip" data-team-filter="patriots" type="button" aria-pressed="false">🚀 Patriots (1)</button>
@@ -264,8 +264,8 @@
         <div class="battle-stage">
           <!-- HERO SIDE -->
           <div class="fighter-card" id="hero-fighter-box">
-            <img id="battle-hero-img" class="fighter-avatar" src="assets/card-david-da-boss.jpg" alt="Your fighter" decoding="async" />
-            <div id="battle-hero-name" class="fighter-name">DAVID aka DA BOSS #92</div>
+            <img id="battle-hero-img" class="fighter-avatar" src="assets/card-justin-porky.jpg" alt="Your fighter" decoding="async" />
+            <div id="battle-hero-name" class="fighter-name">JUSTIN aka PORKY! #80</div>
             <div id="battle-hero-mascot" class="duel-mascot-tag">LVL 1 • ROOKIE</div>
             <div id="battle-evo-bar" class="battle-evo-bar"></div>
             <div id="hero-inherited-stack" class="inherited-stack"></div>
@@ -408,6 +408,7 @@
                 <label class="field-label" for="wall-author-select">REP YOUR CARD</label>
                 <select id="wall-author-select" class="select-input">
                   <option value="ISAIAH aka LITTLE BILL #11|VIKINGS • FOUNDER">ISAIAH aka LITTLE BILL #11</option>
+                  <option value="JUSTIN aka PORKY! #80|PACKERS">JUSTIN aka PORKY! #80</option>
                   <option value="DAVID aka DA BOSS #92|PACKERS">DAVID aka DA BOSS #92</option>
                   <option value="JERRY aka MACK #4|PACKERS">JERRY aka MACK #4</option>
                   <option value="SHAWN aka ELON! #12|PATRIOTS">SHAWN aka ELON! #12</option>
@@ -437,7 +438,7 @@
     </footer>
   </div>
 
-  <!-- NATIVE MODAL DIALOG: RIP 8-CARD MYTHIC PACK -->
+  <!-- NATIVE MODAL DIALOG: RIP 9-CARD MYTHIC PACK -->
   <dialog id="pack-dialog" closedby="any" aria-labelledby="pack-dialog-title">
     <div class="modal-inner">
       <div class="modal-head">
@@ -451,15 +452,15 @@
         <button id="pack-foil-bag" class="pack-foil-bag" type="button" autofocus>
           <span class="pack-bag-logo">B.A.D</span>
           <div style="font-family:var(--font-display);font-size:0.86rem;font-weight:900;color:#ffe28a;letter-spacing:0.12em;">1ST EDITION</div>
-          <div style="font-size:0.82rem;color:#b8cceb;">8 GUARANTEED 99 OVR<br />MYTHIC 1/1 PULLS</div>
+          <div style="font-size:0.82rem;color:#b8cceb;">9 GUARANTEED 99 OVR<br />MYTHIC 1/1 PULLS</div>
           <span class="btn btn-gold btn-sm">⚡ TAP TO RIP OPEN</span>
         </button>
-        <p style="color:var(--text-muted);font-size:0.9rem;">Click or tap the sealed foil pack to reveal all 8 1st-Edition Crew Legends.</p>
+        <p style="color:var(--text-muted);font-size:0.9rem;">Click or tap the sealed foil pack to reveal all 9 1st-Edition Crew Legends.</p>
       </div>
 
       <div id="pack-revealed" class="pack-stage" hidden>
         <div style="font-family:var(--font-display);font-size:0.74rem;letter-spacing:0.18em;color:#38bdf8;margin-bottom:0.25rem;">🔥 MYTHIC GOD PACK UNLOCKED 🔥</div>
-        <div style="font-family:var(--font-display);font-size:1.22rem;font-weight:900;color:#ffe28a;">ALL 8 1ST-EDITION B.A.D CARDS!</div>
+        <div style="font-family:var(--font-display);font-size:1.22rem;font-weight:900;color:#ffe28a;">ALL 9 1ST-EDITION B.A.D CARDS!</div>
         <div id="pack-reveal-grid" class="pack-reveal-grid"></div>
         <form method="dialog">
           <button class="btn btn-gold" type="submit">🏟️ Enter the Vault</button>
@@ -576,8 +577,8 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=2.2"></script>
-  <script src="audio.js?v=2.2"></script>
-  <script src="app.js?v=2.2"></script>
+  <script src="data.js?v=2.3"></script>
+  <script src="audio.js?v=2.3"></script>
+  <script src="app.js?v=2.3"></script>
 </body>
 </html>

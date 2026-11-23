@@ -15,12 +15,12 @@
   const AUDIO = window.badAudio;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const SQUAD_KEY = 'bad_cards_2400_squad_v6';
-  const WALL_KEY = 'bad_cards_2400_wall_v5';
+  const SQUAD_KEY = 'bad_cards_2400_squad_v7';
+  const WALL_KEY = 'bad_cards_2400_wall_v6';
   const LEVELS_KEY = 'bad_cards_2400_levels_v2';
   const PROFILE_KEY = 'bad_cards_2400_profile_v1';
 
-  let initialSquad = ['david-da-boss', 'jerry-mack', 'isaiah-little-bill', 'tyler-davis'];
+  let initialSquad = ['justin-porky', 'jerry-mack', 'david-da-boss', 'isaiah-little-bill'];
   try {
     const saved = JSON.parse(localStorage.getItem(SQUAD_KEY) || 'null');
     if (Array.isArray(saved)) {
@@ -73,8 +73,8 @@
     oppMode: 'crew',         // 'crew' | 'rivals'
     hand: [],                // 4 card IDs for Urban Rivals hand
     usedCards: new Set(),
-    heroId: 'david-da-boss',
-    oppId: 'karl-danger',
+    heroId: 'justin-porky',
+    oppId: 'jared-jroc',
     duelLevels: {},          // per-card active level inside current duel
     duelBonusAtk: 0,         // When-Evolving bonus ATK for current round
     evolvedThisRound: false,
@@ -520,13 +520,13 @@
       unlockTrophy('max-vault');
       AUDIO.playEvolve(3);
       launchFireworks(6);
-      if (!silent) showToast('⚡ ALL 8 CARDS ASCENDED TO LEVEL 3 APEX MASCOT FORM!');
+      if (!silent) showToast(`⚡ ALL ${state.cards.length} CARDS ASCENDED TO LEVEL 3 APEX MASCOT FORM!`);
     } else if (clamped === 2) {
       AUDIO.playEvolve(2);
-      if (!silent) showToast('✨ ALL 8 CARDS EVOLVED TO LEVEL 2 AWAKENED ARMOR!');
+      if (!silent) showToast(`✨ ALL ${state.cards.length} CARDS EVOLVED TO LEVEL 2 AWAKENED ARMOR!`);
     } else {
       AUDIO.playCardFlip();
-      if (!silent) showToast('All 8 cards set to Level 1 Rookie Base Form');
+      if (!silent) showToast(`All ${state.cards.length} cards set to Level 1 Rookie Base Form`);
     }
   }
 
@@ -625,7 +625,7 @@
               <!-- FRONT -->
               <div class="holo-face holo-front">
                 <div class="card-art-wrap">
-                  <img class="card-art-img" src="${evoImg}" data-visual-fx="${evoFx}" alt="${card.name} #${card.number} ${card.team} Level ${lvl} ${evo.stage}" decoding="async" ${idx < 2 ? 'fetchpriority="high"' : (idx >= 4 ? 'loading="lazy"' : '')} style="object-position:${card.objectPos || 'center 10%'};" />
+                  <img class="card-art-img" src="${evoImg}" data-visual-fx="${evoFx}" alt="${card.name} #${card.number} ${card.team} Level ${lvl} ${evo.stage}" decoding="async" ${idx < 3 ? 'fetchpriority="high"' : ''} style="object-position:${card.objectPos || 'center 10%'};" />
                   <canvas class="card-fx-canvas" data-fx-theme="${card.fxTheme}" aria-hidden="true"></canvas>
                   <div class="chrome-sweep" style="--sweep-delay:${(idx * 0.95).toFixed(2)}s;" aria-hidden="true"></div>
                   <div class="card-art-vignette"></div>
@@ -841,7 +841,8 @@
       cowboys: { p1: '#ffd166', p2: '#38bdf8', glow1: 'rgba(255,206,92,', glow2: 'rgba(56,189,248,', stars: true },
       patriots: { p1: '#e31837', p2: '#e2e8f0', glow1: 'rgba(227,24,55,', glow2: 'rgba(203,213,225,', stars: true },
       packers: { p1: '#ffb612', p2: '#22c55e', glow1: 'rgba(255,182,18,', glow2: 'rgba(34,197,94,', stars: true },
-      'packers-boss': { p1: '#ffe066', p2: '#34d399', glow1: 'rgba(255,224,102,', glow2: 'rgba(52,211,153,', stars: true }
+      'packers-boss': { p1: '#ffe066', p2: '#34d399', glow1: 'rgba(255,224,102,', glow2: 'rgba(52,211,153,', stars: true },
+      'packers-leap': { p1: '#34d399', p2: '#fde047', glow1: 'rgba(52,211,153,', glow2: 'rgba(253,224,71,', stars: true }
     }[fxTheme] || { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false };
 
     const sparkCount = level === 3 ? 28 : (level === 2 ? 16 : 8);
@@ -973,6 +974,7 @@
     if (card.theme === 'patriots') return { bgDark: '#020b1c', footer: '#021430', primary: '#e31837', hot: '#ffffff', sub: '#b5c7e0', box: 'rgba(0,30,66,0.82)', pill: '#c8102e', bar1: '#1d4ed8', ovrText: '#ffffff' };
     if (card.theme === 'packers') return { bgDark: '#04140d', footer: '#061f14', primary: '#ffb612', hot: '#fff3c4', sub: '#b5dec9', box: 'rgba(20,59,42,0.82)', pill: '#183b2c', bar1: '#22c55e', ovrText: '#061b11' };
     if (card.theme === 'packers-boss') return { bgDark: '#030d09', footer: '#051a12', primary: '#ffe066', hot: '#fef9c3', sub: '#a7f3d0', box: 'rgba(10,36,24,0.86)', pill: '#0d2b1f', bar1: '#10b981', ovrText: '#04140d' };
+    if (card.theme === 'packers-leap') return { bgDark: '#031510', footer: '#062a1e', primary: '#34d399', hot: '#fde047', sub: '#a7f3d0', box: 'rgba(8,48,34,0.84)', pill: '#0f4c35', bar1: '#fde047', ovrText: '#041b13' };
     return { bgDark: '#0e0522', footer: '#110628', primary: '#ffc62f', hot: '#ffe58f', sub: '#c8b8eb', box: 'rgba(79,38,131,0.58)', pill: '#4f2683', bar1: '#7c3aed', ovrText: '#070b14' };
   }
 
@@ -1227,6 +1229,7 @@
       imgEl.src = getEvoImage(card, lvl);
       imgEl.alt = `${card.name} #${card.number} Level ${lvl} ${evo.stage}`;
       imgEl.dataset.visualFx = getEvoVisualFx(card, lvl);
+      imgEl.style.objectPosition = card.objectPos || 'center 10%';
     }
 
     starsEl.innerHTML = starsHtml;
@@ -1357,7 +1360,9 @@
     const uniqueTeams = new Set(members.map((c) => c.teamKey)).size;
 
     let synText = `Squad Power: ${members.length}/4 Cards • ${totalStars}/20 ★ Stars. `;
-    if (vikCount >= 2) synText += '⚡ VALHALLA CLAN RESONANCE ACTIVE (+2 Duel Power)!';
+    if (vikCount >= 3) synText += '⚡ VALHALLA TRIO DYNASTY ACTIVE (+3 Duel Power & +1 Clash Damage)!';
+    else if (packCount >= 3) synText += '🧀 TITLETOWN TRIO DYNASTY ACTIVE (+3 Duel Power & +1 Clash Damage)!';
+    else if (vikCount >= 2) synText += '⚡ VALHALLA CLAN RESONANCE ACTIVE (+2 Duel Power)!';
     else if (packCount >= 2) synText += '🧀 TITLETOWN TUNDRA RESONANCE ACTIVE (+2 Duel Power)!';
     else if (uniqueTeams >= 3) synText += '⭐ MULTI-TEAM ALLIANCE ACTIVE (+1 Bonus Clash Damage)!';
     else synText += 'Add 2+ Vikings, 2+ Packers, or 3+ Teams to activate Clan Synergy!';
@@ -1413,19 +1418,28 @@
       packSealed.hidden = true;
       packRevealed.hidden = false;
       revealGrid.innerHTML = state.cards
-        .map((c) => `
-          <div class="pack-reveal-card">
-            <img src="${getEvoImage(c, 3)}" alt="${c.name} Level 3 MAX" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
+        .map((c) => {
+          const evo = getCardEvoAt(c, 3);
+          return `
+          <button class="pack-reveal-card" data-pack-inspect="${c.id}" type="button" aria-label="Inspect ${c.name} #${c.number}">
+            <img src="${getEvoImage(c, 3)}" data-visual-fx="${getEvoVisualFx(c, 3)}" alt="${c.name} Level 3 MAX" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
             <div class="pack-reveal-meta">
-              <div style="font-size:0.58rem;color:#7dd3fc;font-family:var(--font-display);">LVL 3 MAX • ${c.ovr} OVR</div>
+              <div style="font-size:0.56rem;color:#7dd3fc;font-family:var(--font-display);">${evo.mascotBadge || 'LVL 3 MAX'} • ${evo.ovr} OVR</div>
               <div style="font-size:0.8rem;color:#ffe28a;font-weight:900;font-family:var(--font-display);margin-top:2px;">${c.name} #${c.number}</div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 4px;">
                 <span class="bad-set-code" style="font-size:0.44rem;">${c.setCode}</span>
                 <span class="bad-holo-seal" style="height:15px;font-size:0.4rem;">B.A.D</span>
               </div>
             </div>
-          </div>`)
+          </button>`;
+        })
         .join('');
+      revealGrid.querySelectorAll('[data-pack-inspect]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          packDialog?.close();
+          openInspectDialog(btn.dataset.packInspect);
+        });
+      });
     });
 
     const squadDialog = document.getElementById('squad-dialog');
@@ -1496,7 +1510,15 @@
     let bonusDmg = 0;
     let label = hasCommander ? '👑 COMMANDER +1 PWR' : '★ SYNERGY: NONE';
 
-    if (vikCount >= 2) {
+    if (vikCount >= 3) {
+      bonusPwr += 3;
+      bonusDmg += 1;
+      label = `⚡ VALHALLA TRIO +${bonusPwr} PWR / +1 DMG`;
+    } else if (packCount >= 3) {
+      bonusPwr += 3;
+      bonusDmg += 1;
+      label = `🧀 TITLETOWN TRIO +${bonusPwr} PWR / +1 DMG`;
+    } else if (vikCount >= 2) {
       bonusPwr += 2;
       label = `⚡ VALHALLA +${bonusPwr} PWR`;
     } else if (packCount >= 2) {
@@ -1547,9 +1569,10 @@
       if (card.id === 'jerry-mack') { bonusAtk += 5; notes.push('Inherited L1 (+5 Gunslinger ATK)'); }
       if (card.id === 'tavaris-too-too') { bonusDmg += 1; notes.push('Inherited L1 (+1 Clash DMG)'); }
       if (card.id === 'david-da-boss') { bonusAtk += 3; notes.push('Inherited L1 (Boss Pressure)'); }
+      if (card.id === 'justin-porky') { bonusAtk += 4; notes.push('Inherited L1 (+4 Lambeau Haste)'); }
     }
     if (duelLvl >= 3) {
-      if (card.id === 'jared-jroc' || card.id === 'jerry-mack') { bonusDmg += 1; notes.push('Inherited L2 (+1 DMG)'); }
+      if (card.id === 'jared-jroc' || card.id === 'jerry-mack' || card.id === 'justin-porky') { bonusDmg += 1; notes.push('Inherited L2 (+1 DMG)'); }
       if (card.id === 'karl-danger') { drainOnWin += 1; notes.push('Inherited L2 (-1 Opp NRG)'); }
       if (card.id === 'shawn-elon') { bonusAtk += 6; notes.push('Inherited L2 (+6 Hyperloop ATK)'); }
       if (card.id === 'tavaris-too-too') { extraShieldBreak += 1; notes.push('Inherited L2 (Double Strike)'); }
