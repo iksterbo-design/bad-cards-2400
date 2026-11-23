@@ -1,11 +1,13 @@
 /* ============================================================
-   B.A.D CARDS 2400 — FLAGSHIP PRO INTERACTIVE ENGINE
-   - Pure Per-Team 3D Holographic Cards + Yu-Gi-Oh! Corner Seal
-   - 5 Foil Finishes + Compact Binder View + Search
-   - Urban Rivals-Style 4-Round Tactical Hype-Energy Duel Arena
-   - Yu-Gi-Oh! Trap / MTG Instant Counterplay Slot
-   - 1★ → 3★ → 5★ Evolution Inspector & 4-Card Squad Drawer
-   - Custom Card Request Desk & Crew Wall
+   B.A.D CARDS 2400 — FLAGSHIP PRO INTERACTIVE ENGINE (v2.0)
+   - 3-Stage Visual Mascot Evolutions (L1 Rookie -> L2 Awakened -> L3 MAX)
+   - Digimon TCG: Shared Memory Gauge, Live Mid-Match Evolution,
+     Inherited Skills Stack & 4-Card End-Zone Security Shields
+   - Urban Rivals: 4-Card Squad Hand, Pillz Bluffing, Fury Mode,
+     Clan Resonance & Revenge Comebacks
+   - Yu-Gi-Oh!: Face-Down Traps, Mirror Sack, Foil Tiers & B.A.D Seal
+   - MTG: Active Combat Keywords (Haste, Double Strike, Ward, Commander)
+   - Collector XP Rank, 8 Achievement Trophies, Comparator & Evo Showcase
    ============================================================ */
 
 (() => {
@@ -13,11 +15,12 @@
   const AUDIO = window.badAudio;
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  const SQUAD_KEY = 'bad_cards_2400_squad_v5';
+  const SQUAD_KEY = 'bad_cards_2400_squad_v6';
   const WALL_KEY = 'bad_cards_2400_wall_v5';
-  const LEVELS_KEY = 'bad_cards_2400_levels_v1';
+  const LEVELS_KEY = 'bad_cards_2400_levels_v2';
+  const PROFILE_KEY = 'bad_cards_2400_profile_v1';
 
-  let initialSquad = ['david-da-boss', 'jerry-mack', 'isaiah-little-bill'];
+  let initialSquad = ['david-da-boss', 'jerry-mack', 'isaiah-little-bill', 'tyler-davis'];
   try {
     const saved = JSON.parse(localStorage.getItem(SQUAD_KEY) || 'null');
     if (Array.isArray(saved)) {
@@ -38,6 +41,19 @@
     }
   } catch (_) {}
 
+  let initialProfile = { xp: 0, wins: 0, streak: 0, trophies: [] };
+  try {
+    const savedProf = JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null');
+    if (savedProf && typeof savedProf === 'object') {
+      initialProfile = {
+        xp: Number(savedProf.xp) || 0,
+        wins: Number(savedProf.wins) || 0,
+        streak: Number(savedProf.streak) || 0,
+        trophies: Array.isArray(savedProf.trophies) ? savedProf.trophies : []
+      };
+    }
+  } catch (_) {}
+
   const state = {
     cards: DATA.cards,
     teamFilter: 'all',
@@ -48,26 +64,137 @@
     inspectEvoIdx: 2,
     squad: initialSquad,
     cardLevels: initialLevels,
+    profile: initialProfile,
+    evolvingCards: new Set(),
+    showcaseRunning: false,
 
-    // Tactical 4-Round Duel State
+    // Tactical 4-Round TCG Duel State
+    duelFormat: 'ascension', // 'ascension' (start L1 & digivolve live) | 'max'
+    oppMode: 'crew',         // 'crew' | 'rivals'
+    hand: [],                // 4 card IDs for Urban Rivals hand
+    usedCards: new Set(),
     heroId: 'david-da-boss',
-    oppMode: 'crew',
     oppId: 'karl-danger',
+    duelLevels: {},          // per-card active level inside current duel
+    duelBonusAtk: 0,         // When-Evolving bonus ATK for current round
+    evolvedThisRound: false,
+    revengeActive: false,
+    memory: 2,               // Shared Digimon Memory Gauge: +5 (You) .. 0 .. -5 (Opp)
     round: 1,
     maxRounds: 4,
     heroHp: 14,
     heroMaxHp: 14,
     oppHp: 14,
     oppMaxHp: 14,
+    heroShields: 4,
+    oppShields: 4,
     heroEnergy: 12,
     oppEnergy: 12,
     stake: 2,
+    furyActive: false,
     armedInstantId: null,
     instantUsed: false,
     duelOver: false,
-    wins: 0,
     wallPosts: []
   };
+
+  /* ---------- HELPERS: LEVEL & EVOLUTION ARTWORK ---------- */
+  function getCardLevel(card) {
+    const lvl = Number(state.cardLevels[card.id] || 3);
+    return Math.min(3, Math.max(1, lvl));
+  }
+
+  function getCardEvoAt(card, lvl) {
+    const clamped = Math.min(3, Math.max(1, Number(lvl || 3)));
+    return card.evolutions[clamped - 1] || card.evolutions[card.evolutions.length - 1];
+  }
+
+  function getCardEvo(card) {
+    return getCardEvoAt(card, getCardLevel(card));
+  }
+
+  function getEvoImage(card, lvl) {
+    const evo = getCardEvoAt(card, lvl);
+    return (evo && evo.image) || card.image;
+  }
+
+  function getEvoVisualFx(card, lvl) {
+    const evo = getCardEvoAt(card, lvl);
+    return (evo && evo.visualFx) || 'base';
+  }
+
+  /* ---------- PROFILE, XP RANKS & TROPHIES ---------- */
+  const RANKS = [
+    { min: 0, name: '★ ROOKIE COLLECTOR', next: 200 },
+    { min: 200, name: '⚡ PRO DUELIST', next: 450 },
+    { min: 450, name: '🔥 GRIDIRON STRATEGIST', next: 800 },
+    { min: 800, name: '👑 B.A.D 2400 LEGEND', next: 1200 },
+    { min: 1200, name: '💎 HALL OF FAME DIVINITY', next: 1200 }
+  ];
+
+  function saveProfile() {
+    try { localStorage.setItem(PROFILE_KEY, JSON.stringify(state.profile)); } catch (_) {}
+  }
+
+  function renderProfileBar() {
+    const xp = state.profile.xp;
+    let rank = RANKS[0];
+    for (const r of RANKS) {
+      if (xp >= r.min) rank = r;
+    }
+    const pct = rank.next > rank.min
+      ? Math.min(100, Math.round(((xp - rank.min) / (rank.next - rank.min)) * 100))
+      : 100;
+
+    const pill = document.getElementById('profile-rank-pill');
+    const xpLbl = document.getElementById('profile-xp-label');
+    const xpFill = document.getElementById('profile-xp-fill');
+    const streakLbl = document.getElementById('profile-streak-label');
+    const trophyCnt = document.getElementById('trophy-count');
+
+    if (pill) pill.textContent = rank.name;
+    if (xpLbl) xpLbl.textContent = rank.next > rank.min ? `${xp} / ${rank.next} XP` : `${xp} XP (MAX)`;
+    if (xpFill) xpFill.style.width = `${pct}%`;
+    if (streakLbl) streakLbl.textContent = `WINS: ${state.profile.wins} • STREAK: ${state.profile.streak}`;
+    if (trophyCnt) trophyCnt.textContent = String(state.profile.trophies.length);
+  }
+
+  function awardXp(amount) {
+    state.profile.xp += amount;
+    saveProfile();
+    renderProfileBar();
+  }
+
+  function unlockTrophy(id) {
+    if (state.profile.trophies.includes(id)) return;
+    const ach = (DATA.achievements || []).find((a) => a.id === id);
+    if (!ach) return;
+    state.profile.trophies.push(id);
+    state.profile.xp += ach.xp;
+    saveProfile();
+    renderProfileBar();
+    showToast(`🏆 TROPHY UNLOCKED: ${ach.icon} ${ach.name} (+${ach.xp} XP)!`);
+  }
+
+  function renderTrophyDialog() {
+    const grid = document.getElementById('trophy-grid');
+    const summary = document.getElementById('trophy-summary');
+    if (!grid || !summary) return;
+    const total = (DATA.achievements || []).length;
+    summary.textContent = `Total XP: ${state.profile.xp} • Match Wins: ${state.profile.wins} • Active Streak: ${state.profile.streak} • Trophies Unlocked: ${state.profile.trophies.length}/${total}`;
+    grid.innerHTML = (DATA.achievements || [])
+      .map((a) => {
+        const unlocked = state.profile.trophies.includes(a.id);
+        return `
+        <div class="trophy-card ${unlocked ? 'unlocked' : ''}">
+          <div style="font-size:1.45rem;margin-bottom:0.25rem;">${unlocked ? a.icon : '🔒'}</div>
+          <div style="font-family:var(--font-display);font-size:0.74rem;font-weight:900;color:${unlocked ? '#ffe28a' : '#94a3b8'};">${a.name}</div>
+          <div style="font-size:0.76rem;color:#cbd5e1;margin:0.22rem 0 0.38rem;">${a.desc}</div>
+          <div style="font-family:var(--font-mono);font-size:0.64rem;color:${unlocked ? '#86efac' : '#64748b'};">${unlocked ? `✓ UNLOCKED (+${a.xp} XP)` : `+${a.xp} XP`}</div>
+        </div>`;
+      })
+      .join('');
+  }
 
   /* ---------- TOAST ---------- */
   let toastTimer = null;
@@ -77,7 +204,7 @@
     el.textContent = msg;
     el.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
   }
 
   /* ---------- 5-POINT STAR HELPER ---------- */
@@ -236,17 +363,8 @@
     saveSquad();
     renderCards();
     renderSquadDrawer();
+    buildDuelHand();
     renderDuelArena();
-  }
-
-  function getCardLevel(card) {
-    const lvl = Number(state.cardLevels[card.id] || 3);
-    return Math.min(3, Math.max(1, lvl));
-  }
-
-  function getCardEvo(card) {
-    const lvl = getCardLevel(card);
-    return card.evolutions[lvl - 1] || card.evolutions[card.evolutions.length - 1];
   }
 
   function saveCardLevels() {
@@ -263,43 +381,89 @@
     });
   }
 
+  function triggerEvoFlash(cardIds) {
+    cardIds.forEach((id) => state.evolvingCards.add(id));
+    setTimeout(() => {
+      cardIds.forEach((id) => state.evolvingCards.delete(id));
+    }, 700);
+  }
+
   function setCardLevel(cardId, lvl) {
     const card = state.cards.find((c) => c.id === cardId);
     if (!card) return;
     const clamped = Math.min(3, Math.max(1, Number(lvl)));
     state.cardLevels[cardId] = clamped;
     saveCardLevels();
+    triggerEvoFlash([cardId]);
     const evo = getCardEvo(card);
     renderCards();
     renderSquadDrawer();
-    renderDuelArena();
+    if (state.duelFormat === 'max') {
+      state.duelLevels[cardId] = clamped;
+      renderDuelArena();
+    }
     syncToolbarLevelChips();
+    unlockTrophy('first-evo');
+    if (state.cards.every((c) => getCardLevel(c) === 3)) unlockTrophy('max-vault');
     if (clamped === 3) {
-      AUDIO.playMythicFanfare();
+      AUDIO.playEvolve(3);
       launchFireworks(4);
-      showToast(`⚡ ${card.shortName} MAXED TO LVL 3: ${evo.stage.toUpperCase()}!`);
+      showToast(`⚡ ${card.shortName} ASCENDED TO LVL 3 MAX: ${evo.stage.toUpperCase()}!`);
+    } else if (clamped === 2) {
+      AUDIO.playEvolve(2);
+      showToast(`✨ ${card.shortName} EVOLVED TO LVL 2: ${evo.stage.toUpperCase()}!`);
     } else {
       AUDIO.playCardFlip();
-      showToast(`${card.shortName} set to LVL ${clamped} (${evo.stage})`);
+      showToast(`${card.shortName} set to LVL 1 (${evo.stage})`);
     }
   }
 
-  function setAllCardsLevel(lvl) {
+  function setAllCardsLevel(lvl, silent = false) {
     const clamped = Math.min(3, Math.max(1, Number(lvl)));
-    state.cards.forEach((c) => { state.cardLevels[c.id] = clamped; });
+    const allIds = state.cards.map((c) => c.id);
+    state.cards.forEach((c) => {
+      state.cardLevels[c.id] = clamped;
+      if (state.duelFormat === 'max') state.duelLevels[c.id] = clamped;
+    });
     saveCardLevels();
+    triggerEvoFlash(allIds);
     renderCards();
     renderSquadDrawer();
     renderDuelArena();
     syncToolbarLevelChips();
+    unlockTrophy('first-evo');
     if (clamped === 3) {
-      AUDIO.playMythicFanfare();
+      unlockTrophy('max-vault');
+      AUDIO.playEvolve(3);
       launchFireworks(6);
-      showToast('⚡ ALL 8 CARDS MAXED TO LEVEL 3 MASCOT ASCENSION!');
+      if (!silent) showToast('⚡ ALL 8 CARDS ASCENDED TO LEVEL 3 APEX MASCOT FORM!');
+    } else if (clamped === 2) {
+      AUDIO.playEvolve(2);
+      if (!silent) showToast('✨ ALL 8 CARDS EVOLVED TO LEVEL 2 AWAKENED ARMOR!');
     } else {
       AUDIO.playCardFlip();
-      showToast(`All 8 cards set to Level ${clamped}`);
+      if (!silent) showToast('All 8 cards set to Level 1 Rookie Base Form');
     }
+  }
+
+  function runEvolutionShowcase() {
+    if (state.showcaseRunning) return;
+    state.showcaseRunning = true;
+    const btn = document.getElementById('evo-showcase-btn');
+    if (btn) btn.disabled = true;
+    document.getElementById('vault')?.scrollIntoView({ behavior: 'smooth' });
+    setAllCardsLevel(1, true);
+    showToast('🎬 STAGE 1 / 3 — BASE ROOKIE FORMS');
+    setTimeout(() => {
+      setAllCardsLevel(2, true);
+      showToast('⚡ STAGE 2 / 3 — AWAKENED MASCOT ARMOR!');
+    }, 1450);
+    setTimeout(() => {
+      setAllCardsLevel(3, true);
+      showToast('👑 STAGE 3 / 3 — LEVEL 3 MAX APEX MASCOT ASCENSION!!');
+      state.showcaseRunning = false;
+      if (btn) btn.disabled = false;
+    }, 3000);
   }
 
   function renderCards() {
@@ -348,11 +512,16 @@
       const inSquad = state.squad.includes(card.id);
       const lvl = getCardLevel(card);
       const evo = getCardEvo(card);
+      const evoImg = getEvoImage(card, lvl);
+      const evoFx = getEvoVisualFx(card, lvl);
       const statDelta = typeof evo.statDelta === 'number' ? evo.statDelta : 0;
       const atkMult = typeof evo.atkMult === 'number' ? evo.atkMult : 1;
       const liveAtk = Math.round(card.atk * atkMult);
       const liveDef = Math.round(card.def * atkMult);
       const starsStr = '★'.repeat(evo.stars);
+      const tierLabel = lvl === 3 ? '⚡ LVL 3 MAX' : (lvl === 2 ? '✦ LVL 2 AWAKENED' : 'LVL 1 ROOKIE');
+      const isEvoFlash = state.evolvingCards.has(card.id);
+
       const article = document.createElement('article');
       article.className = `card-column theme-${card.theme}`;
       article.dataset.level = String(lvl);
@@ -366,12 +535,13 @@
             <span class="slab-grade-badge">${card.grade}</span>
           </div>
 
-          <div class="holo-card-scene ${state.liveAnim ? 'is-live-anim' : ''}" data-card-id="${card.id}" data-card-idx="${idx}" tabindex="0" role="button" aria-pressed="false" aria-label="Flip ${card.name} number ${card.number} card">
+          <div class="holo-card-scene ${state.liveAnim ? 'is-live-anim' : ''} ${isEvoFlash ? 'is-evolving' : ''}" data-card-id="${card.id}" data-card-idx="${idx}" tabindex="0" role="button" aria-pressed="false" aria-label="Flip ${card.name} number ${card.number} card">
+            <div class="evo-burst-ring" aria-hidden="true"></div>
             <div class="holo-card-inner">
               <!-- FRONT -->
               <div class="holo-face holo-front">
                 <div class="card-art-wrap">
-                  <img class="card-art-img" src="${card.image}" alt="${card.name} #${card.number} ${card.team}" decoding="async" ${idx < 2 ? 'fetchpriority="high"' : (idx >= 4 ? 'loading="lazy"' : '')} style="object-position:${card.objectPos || 'center 10%'};" />
+                  <img class="card-art-img" src="${evoImg}" data-visual-fx="${evoFx}" alt="${card.name} #${card.number} ${card.team} Level ${lvl} ${evo.stage}" decoding="async" ${idx < 2 ? 'fetchpriority="high"' : (idx >= 4 ? 'loading="lazy"' : '')} style="object-position:${card.objectPos || 'center 10%'};" />
                   <canvas class="card-fx-canvas" data-fx-theme="${card.fxTheme}" aria-hidden="true"></canvas>
                   <div class="chrome-sweep" style="--sweep-delay:${(idx * 0.95).toFixed(2)}s;" aria-hidden="true"></div>
                   <div class="card-art-vignette"></div>
@@ -383,6 +553,7 @@
                     <div class="card-rarity-stack">
                       <span class="rarity-pill">${lvl === 3 ? card.rarity : `LVL ${lvl} • ${evo.stage.split(' ')[0]}`}</span>
                       <span class="jersey-pill">#${card.number}</span>
+                      <span class="card-tier-stamp">${tierLabel}</span>
                     </div>
                   </div>
                   <div class="mascot-crest-banner" title="${evo.mascotTrait || evo.note}">
@@ -391,7 +562,7 @@
                   </div>
                 </div>
                 <div class="card-front-footer">
-                  <div class="card-edition-tag">${lvl === 3 ? `${card.edition} • MAX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`}</div>
+                  <div class="card-edition-tag">${lvl === 3 ? `${card.edition} • APEX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`}</div>
                   <div class="card-player-name">${card.name}</div>
                   <div class="card-player-sub">${lvl === 3 ? `${evo.stage} • ${card.mascot || card.team}` : card.subtitle}</div>
                   <div class="card-mini-stats">
@@ -407,7 +578,7 @@
                       .join('')}
                   </div>
                   <div class="card-sig-ability">
-                    <span>${card.signatureAbility}</span>
+                    <span>${evo.onEvolve ? evo.onEvolve.label : card.signatureAbility}</span>
                     <span class="flip-hint">FLIP ↻</span>
                   </div>
                   <div class="bad-card-rim">
@@ -465,7 +636,7 @@
                     .join('')}
                 </div>
 
-                <div class="back-chem">${card.chemistry}</div>
+                <div class="back-chem">${evo.inherited ? `🧬 ${evo.inherited}` : card.chemistry}</div>
 
                 <div class="bad-card-rim" style="margin-top:0.1rem;">
                   <span class="bad-set-code">${card.serial}</span>
@@ -485,7 +656,7 @@
 
         <div class="card-action-bar">
           <button class="card-mini-btn" data-action="flip" data-card-id="${card.id}" type="button" aria-label="Flip ${card.name}">🔄 Flip</button>
-          <button class="card-mini-btn" data-action="inspect" data-card-id="${card.id}" type="button" aria-label="Mascot details for ${card.name}">★ Mascot</button>
+          <button class="card-mini-btn" data-action="inspect" data-card-id="${card.id}" type="button" aria-label="Mascot details for ${card.name}">★ Evolve Tree</button>
           <button class="card-mini-btn ${inSquad ? 'in-squad' : ''}" data-action="squad" data-card-id="${card.id}" type="button" aria-pressed="${inSquad}" aria-label="${inSquad ? 'In Squad' : 'Squad'} — ${card.name}">${inSquad ? '✓ In Squad' : '+ Squad'}</button>
           <button class="card-mini-btn" data-action="dl-front" data-card-id="${card.id}" type="button" aria-label="PNG export for ${card.name}">⬇️ PNG</button>
         </div>
@@ -536,21 +707,12 @@
 
       scene.addEventListener('pointerleave', resetTilt);
       scene.addEventListener('pointercancel', resetTilt);
-
       scene.addEventListener('click', toggleFlip);
       scene.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          toggleFlip();
-        } else if (e.key === ' ') {
-          e.preventDefault();
-        }
+        if (e.key === 'Enter') { e.preventDefault(); toggleFlip(); }
+        else if (e.key === ' ') { e.preventDefault(); }
       });
-      scene.addEventListener('keyup', (e) => {
-        if (e.key === ' ') {
-          toggleFlip();
-        }
-      });
+      scene.addEventListener('keyup', (e) => { if (e.key === ' ') toggleFlip(); });
 
       article.querySelectorAll('[data-set-lvl]').forEach((btn) => {
         btn.addEventListener('click', () => setCardLevel(card.id, Number(btn.dataset.setLvl)));
@@ -570,7 +732,7 @@
     });
   }
 
-  /* ---------- PER-TEAM 60FPS CARD FX ENGINE ---------- */
+  /* ---------- PER-TEAM & PER-LEVEL 60FPS CARD FX ENGINE ---------- */
   function createCardFxEngine(canvas, scene, fxTheme, idx, level = 3) {
     const ctx = canvas.getContext('2d');
     let cw = 340, ch = 360;
@@ -598,14 +760,14 @@
       'packers-boss': { p1: '#ffe066', p2: '#34d399', glow1: 'rgba(255,224,102,', glow2: 'rgba(52,211,153,', stars: true }
     }[fxTheme] || { p1: '#ffc62f', p2: '#38bdf8', glow1: 'rgba(255,198,47,', glow2: 'rgba(56,189,248,', stars: false };
 
-    const sparkCount = level === 3 ? 40 : (level === 2 ? 26 : 14);
+    const sparkCount = level === 3 ? 48 : (level === 2 ? 26 : 10);
     const sparks = Array.from({ length: sparkCount }, () => ({
       x: Math.random() * cw, y: Math.random() * ch,
-      r: (level === 3 ? 1.25 : 0.95) + Math.random() * 2.1,
-      vx: (Math.random() - 0.5) * 0.56,
-      vy: (level === 3 ? 0.56 : 0.36) + Math.random() * 0.92,
+      r: (level === 3 ? 1.4 : (level === 2 ? 1.05 : 0.8)) + Math.random() * (level === 3 ? 2.4 : 1.6),
+      vx: (Math.random() - 0.5) * (level === 3 ? 0.72 : 0.45),
+      vy: (level === 3 ? 0.68 : (level === 2 ? 0.44 : 0.25)) + Math.random() * 0.9,
       alt: Math.random() > 0.5,
-      star: (palette.stars || level === 3) && Math.random() > 0.65,
+      star: (palette.stars || level === 3) && Math.random() > (level === 3 ? 0.52 : 0.75),
       life: Math.random()
     }));
     const arcs = [];
@@ -617,15 +779,16 @@
         ctx.clearRect(0, 0, cw, ch);
         if (flipped || !state.liveAnim) return;
 
+        const glowMult = level === 3 ? 1.35 : (level === 2 ? 0.9 : 0.45);
         const pulse = 0.5 + 0.5 * Math.sin(tick * 0.055 + idx);
-        const g1 = ctx.createRadialGradient(cw * 0.24, ch * 0.80, 4, cw * 0.24, ch * 0.80, cw * 0.30);
-        g1.addColorStop(0, `${palette.glow1}${(0.18 + pulse * 0.14).toFixed(2)})`);
+        const g1 = ctx.createRadialGradient(cw * 0.24, ch * 0.80, 4, cw * 0.24, ch * 0.80, cw * 0.32);
+        g1.addColorStop(0, `${palette.glow1}${((0.16 + pulse * 0.14) * glowMult).toFixed(2)})`);
         g1.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = g1;
         ctx.fillRect(0, 0, cw, ch);
 
-        const g2 = ctx.createRadialGradient(cw * 0.72, ch * 0.58, 4, cw * 0.72, ch * 0.58, cw * 0.26);
-        g2.addColorStop(0, `${palette.glow2}${(0.18 + (1 - pulse) * 0.14).toFixed(2)})`);
+        const g2 = ctx.createRadialGradient(cw * 0.72, ch * 0.58, 4, cw * 0.72, ch * 0.58, cw * 0.28);
+        g2.addColorStop(0, `${palette.glow2}${((0.16 + (1 - pulse) * 0.14) * glowMult).toFixed(2)})`);
         g2.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = g2;
         ctx.fillRect(0, 0, cw, ch);
@@ -635,10 +798,10 @@
           s.y -= s.vy;
           s.life += 0.012;
           if (s.y < -6 || s.x < -8 || s.x > cw + 8) { s.x = Math.random() * cw; s.y = ch + 6; s.life = 0; }
-          ctx.globalAlpha = Math.max(0.16, Math.sin(Math.min(1, s.life) * Math.PI) * 0.85);
+          ctx.globalAlpha = Math.max(0.14, Math.sin(Math.min(1, s.life) * Math.PI) * (level === 3 ? 0.92 : 0.72));
           if (s.star) {
-            drawStar(ctx, s.x, s.y, 5, s.r * 1.8, s.r * 0.75);
-            ctx.fillStyle = '#ffffff';
+            drawStar(ctx, s.x, s.y, 5, s.r * 1.9, s.r * 0.75);
+            ctx.fillStyle = level === 3 ? '#fffbeb' : '#ffffff';
             ctx.fill();
           } else {
             ctx.beginPath();
@@ -649,17 +812,19 @@
         }
         ctx.globalAlpha = 1;
 
-        if ((tick + idx * 7) % 24 === 0 && arcs.length < 4) {
+        const arcInterval = level === 3 ? 14 : (level === 2 ? 28 : 54);
+        const maxArcs = level === 3 ? 5 : (level === 2 ? 3 : 1);
+        if ((tick + idx * 7) % arcInterval === 0 && arcs.length < maxArcs) {
           const fromBall = Math.random() > 0.5;
           let x = fromBall ? cw * (0.12 + Math.random() * 0.2) : cw * (0.62 + Math.random() * 0.26);
-          let y = fromBall ? ch * (0.64 + Math.random() * 0.22) : ch * (0.44 + Math.random() * 0.28);
+          let y = fromBall ? ch * (0.64 + Math.random() * 0.22) : ch * (0.40 + Math.random() * 0.30);
           const pts = [{ x, y }];
           for (let i = 0; i < 6; i++) {
-            x += (fromBall ? -1 : 1) * (5 + Math.random() * 13) + (Math.random() - 0.5) * 16;
+            x += (fromBall ? -1 : 1) * (5 + Math.random() * 14) + (Math.random() - 0.5) * 16;
             y += (Math.random() - 0.58) * 24;
             pts.push({ x, y });
           }
-          arcs.push({ pts, life: 1, decay: 0.06, col: fromBall ? palette.p1 : palette.p2 });
+          arcs.push({ pts, life: 1, decay: 0.055, col: fromBall ? palette.p1 : palette.p2 });
         }
 
         for (let i = arcs.length - 1; i >= 0; i--) {
@@ -672,12 +837,12 @@
           ctx.beginPath();
           a.pts.forEach((pt, j) => (j === 0 ? ctx.moveTo(pt.x, pt.y) : ctx.lineTo(pt.x, pt.y)));
           ctx.strokeStyle = a.col;
-          ctx.lineWidth = 2.8;
-          ctx.shadowBlur = 10;
+          ctx.lineWidth = level === 3 ? 3.2 : 2.4;
+          ctx.shadowBlur = level === 3 ? 14 : 8;
           ctx.shadowColor = a.col;
           ctx.stroke();
           ctx.strokeStyle = '#ffffff';
-          ctx.lineWidth = 1.05;
+          ctx.lineWidth = 1.1;
           ctx.stroke();
           ctx.restore();
         }
@@ -711,7 +876,7 @@
   }
   window.addEventListener('resize', () => fxEngines.forEach((e) => e.resize()));
 
-  /* ---------- HIGH-RES PNG EXPORTER (WITH CORNER B.A.D HOLO SEAL) ---------- */
+  /* ---------- HIGH-RES PNG EXPORTER (LEVEL-AWARE ARTWORK + CORNER SEAL) ---------- */
   function drawCornerBadSeal(ctx, W, H, setCode) {
     ctx.strokeStyle = 'rgba(255,255,255,0.14)';
     ctx.lineWidth = 1.5;
@@ -782,7 +947,6 @@
         ctx.fillStyle = vig;
         ctx.fillRect(0, 440, W, artH - 440);
 
-        // Mascot Crest Banner on art bottom
         ctx.fillStyle = 'rgba(6,12,26,0.92)';
         ctx.fillRect(30, artH - 54, W - 60, 38);
         ctx.strokeStyle = col.primary;
@@ -828,7 +992,7 @@
         ctx.textAlign = 'left';
         ctx.fillStyle = '#38bdf8';
         ctx.font = '700 19px Orbitron, Arial, sans-serif';
-        ctx.fillText(lvl === 3 ? `${card.edition} • MAX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`, 34, artH + 40);
+        ctx.fillText(lvl === 3 ? `${card.edition} • APEX MASCOT` : `LVL ${lvl} / 3 • ${evo.stage.toUpperCase()}`, 34, artH + 40);
         ctx.fillStyle = col.hot;
         ctx.font = '900 40px Orbitron, Arial Black, sans-serif';
         ctx.fillText(card.name, 34, artH + 92);
@@ -860,24 +1024,24 @@
         ctx.strokeRect(34, artH + 246, W - 68, 46);
         ctx.textAlign = 'center';
         ctx.fillStyle = col.hot;
-        ctx.font = '700 21px Orbitron, Arial, sans-serif';
-        ctx.fillText(card.signatureAbility, W / 2, artH + 277);
+        ctx.font = '700 20px Orbitron, Arial, sans-serif';
+        ctx.fillText(evo.onEvolve ? evo.onEvolve.label : card.signatureAbility, W / 2, artH + 277);
 
         drawCornerBadSeal(ctx, W, H, card.setCode);
-        ctx.strokeStyle = col.primary;
-        ctx.lineWidth = 14;
-        ctx.strokeRect(7, 7, W - 14, H - 14);
+        ctx.strokeStyle = lvl === 3 ? '#ffe28a' : col.primary;
+        ctx.lineWidth = lvl === 3 ? 16 : 12;
+        ctx.strokeRect(8, 8, W - 16, H - 16);
 
         const a = document.createElement('a');
         a.download = `${card.id}-lvl${lvl}-front-bad-cards-2400.png`;
         a.href = canvas.toDataURL('image/png');
         a.click();
-        showToast(`⬇️ Saved ${card.name} (LVL ${lvl}) Front PNG with B.A.D corner seal!`);
+        showToast(`⬇️ Saved ${card.name} (LVL ${lvl}) Front PNG with B.A.D seal!`);
       } catch (_) {
         showToast('💡 Open via the live URL to enable one-click PNG export!');
       }
     };
-    img.src = card.image;
+    img.src = getEvoImage(card, lvl);
   }
 
   function wrapText(ctx, text, x, y, maxW, lineH) {
@@ -987,19 +1151,61 @@
     a.download = `${card.id}-lvl${lvl}-back-bad-cards-2400.png`;
     a.href = canvas.toDataURL('image/png');
     a.click();
-    showToast(`⬇️ Saved ${card.name} (LVL ${lvl}) Back PNG with B.A.D corner seal!`);
+    showToast(`⬇️ Saved ${card.name} (LVL ${lvl}) Back PNG with B.A.D seal!`);
   }
 
-  /* ---------- EVOLUTION INSPECTOR, PACK RIPPER & SQUAD DRAWER ---------- */
+  /* ---------- EVOLUTION INSPECTOR, PACK RIPPER, COMPARATOR & SQUAD DRAWER ---------- */
   function renderInspectorEvo(card) {
+    const lvl = state.inspectEvoIdx + 1;
     const evo = card.evolutions[state.inspectEvoIdx] || card.evolutions[card.evolutions.length - 1];
     const starsEl = document.getElementById('inspect-stars');
     const starsHtml = Array.from({ length: 5 }, (_, i) => (i < evo.stars ? '<span aria-hidden="true">★</span>' : '<span class="star-dim" aria-hidden="true">★</span>')).join('');
     const mult = typeof evo.atkMult === 'number' ? evo.atkMult : (evo.ovr / 99);
+
+    const imgEl = document.getElementById('inspect-img');
+    if (imgEl) {
+      imgEl.src = getEvoImage(card, lvl);
+      imgEl.alt = `${card.name} #${card.number} Level ${lvl} ${evo.stage}`;
+      imgEl.dataset.visualFx = getEvoVisualFx(card, lvl);
+    }
+
     starsEl.innerHTML = starsHtml;
     starsEl.setAttribute('aria-label', `${evo.stars} out of 5 stars`);
     document.getElementById('inspect-atkdef').textContent = `ATK ${Math.round(card.atk * mult)} / DEF ${Math.round(card.def * mult)} • PWR ${evo.power} / DMG ${evo.dmg}`;
     document.getElementById('inspect-evo-note').textContent = `${evo.mascotBadge || `LVL ${evo.level}`} (${evo.ovr} OVR) — ${evo.mascotTrait || evo.note}`;
+
+    // 3-Stage Side-by-Side Evolution Visual Preview Strip
+    const trioEl = document.getElementById('inspect-evo-trio');
+    if (trioEl) {
+      trioEl.innerHTML = card.evolutions
+        .map((e, i) => `
+          <button class="evo-trio-card ${i === state.inspectEvoIdx ? 'active' : ''}" data-trio-idx="${i}" type="button" aria-pressed="${i === state.inspectEvoIdx}">
+            <img src="${e.image || card.image}" data-visual-fx="${e.visualFx || 'base'}" alt="Level ${i + 1} ${e.stage}" decoding="async" style="object-position:${card.objectPos || 'center 10%'};" />
+            <div class="evo-trio-lbl">${i === 2 ? '⚡ LVL 3 MAX' : `LVL ${i + 1} (${e.ovr})`}</div>
+            <div class="evo-trio-stage">${e.stage}</div>
+          </button>`)
+        .join('');
+      trioEl.querySelectorAll('[data-trio-idx]').forEach((b) => {
+        b.addEventListener('click', () => {
+          state.inspectEvoIdx = Number(b.dataset.trioIdx);
+          setCardLevel(card.id, state.inspectEvoIdx + 1);
+          renderInspectorEvo(card);
+        });
+      });
+    }
+
+    // Inherited & When-Evolving Digimon Skill Readout
+    const skillsEl = document.getElementById('inspect-evo-skills');
+    if (skillsEl) {
+      const chips = [];
+      if (evo.onEvolve) chips.push(`<div class="inherited-chip" style="border-left-color:#38bdf8;background:rgba(56,189,248,0.14);color:#e0f2fe;"><strong>WHEN EVOLVING (-${evo.evolveCost} MEM):</strong> ${evo.onEvolve.label}</div>`);
+      if (evo.inherited) chips.push(`<div class="inherited-chip"><strong>🧬 DIGIVOLUTION SOURCE:</strong> ${evo.inherited}</div>`);
+      if (lvl === 3) {
+        const lower = card.evolutions.slice(0, 2).filter((e) => e.inherited).map((e) => e.inherited.replace('Inherited: ', '')).join(' + ');
+        if (lower) chips.push(`<div class="inherited-chip"><strong>🧬 STACKED L1+L2 INHERITED:</strong> ${lower}</div>`);
+      }
+      skillsEl.innerHTML = chips.join('');
+    }
 
     const evoBar = document.getElementById('inspect-evo-bar');
     evoBar.innerHTML = card.evolutions
@@ -1020,8 +1226,6 @@
     if (!card || !dialog) return;
     state.inspectCardId = cardId;
     state.inspectEvoIdx = getCardLevel(card) - 1;
-    document.getElementById('inspect-img').src = card.image;
-    document.getElementById('inspect-img').alt = `${card.name} #${card.number}`;
     document.getElementById('inspect-edition').textContent = `${card.edition} • ${card.clan.toUpperCase()} • MASCOT: ${(card.mascot || card.team).toUpperCase()}`;
     document.getElementById('inspect-name').textContent = `${card.name} #${card.number}`;
     document.getElementById('inspect-sub').textContent = `${card.team} • ${card.subtitle}`;
@@ -1033,6 +1237,52 @@
     renderInspectorEvo(card);
     dialog.showModal();
     AUDIO.playCardFlip();
+  }
+
+  function renderCompareDialog() {
+    const selA = document.getElementById('compare-select-a');
+    const selB = document.getElementById('compare-select-b');
+    const grid = document.getElementById('compare-grid');
+    if (!selA || !selB || !grid) return;
+
+    if (!selA.options.length) {
+      const opts = state.cards.map((c) => `<option value="${c.id}">${c.name} #${c.number} (${c.team})</option>`).join('');
+      selA.innerHTML = opts;
+      selB.innerHTML = opts;
+      selA.value = 'david-da-boss';
+      selB.value = 'karl-danger';
+    }
+
+    const cardA = state.cards.find((c) => c.id === selA.value) || state.cards[0];
+    const cardB = state.cards.find((c) => c.id === selB.value) || state.cards[1];
+    const lvlA = getCardLevel(cardA);
+    const lvlB = getCardLevel(cardB);
+    const evoA = getCardEvoAt(cardA, lvlA);
+    const evoB = getCardEvoAt(cardB, lvlB);
+    const atkA = Math.round(cardA.atk * (evoA.atkMult || 1));
+    const atkB = Math.round(cardB.atk * (evoB.atkMult || 1));
+    const defA = Math.round(cardA.def * (evoA.atkMult || 1));
+    const defB = Math.round(cardB.def * (evoB.atkMult || 1));
+
+    const buildCol = (c, lvl, evo, atk, def, oppOvr, oppPwr, oppDmg, oppAtk, oppDef) => `
+      <div class="compare-card-box">
+        <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:900;color:#ffe28a;">${c.name} #${c.number}</div>
+        <div style="font-size:0.74rem;color:#7dd3fc;">LVL ${lvl} • ${evo.stage}</div>
+        <img src="${getEvoImage(c, lvl)}" data-visual-fx="${getEvoVisualFx(c, lvl)}" alt="${c.name}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
+        <div class="compare-stat-list">
+          <div class="compare-stat-line ${evo.ovr > oppOvr ? 'win' : ''}"><span>OVR Rating</span><strong>${evo.ovr}</strong></div>
+          <div class="compare-stat-line ${evo.power > oppPwr ? 'win' : ''}"><span>Duel Power</span><strong>${evo.power}</strong></div>
+          <div class="compare-stat-line ${evo.dmg > oppDmg ? 'win' : ''}"><span>Clash Damage</span><strong>${evo.dmg}</strong></div>
+          <div class="compare-stat-line ${atk > oppAtk ? 'win' : ''}"><span>Yu-Gi-Oh! ATK</span><strong>${atk}</strong></div>
+          <div class="compare-stat-line ${def > oppDef ? 'win' : ''}"><span>Yu-Gi-Oh! DEF</span><strong>${def}</strong></div>
+          <div class="compare-stat-line"><span>Keywords</span><strong>${c.keywords.join(', ')}</strong></div>
+          <div class="compare-stat-line"><span>Mascot</span><strong>${c.mascot}</strong></div>
+        </div>
+      </div>`;
+
+    grid.innerHTML =
+      buildCol(cardA, lvlA, evoA, atkA, defA, evoB.ovr, evoB.power, evoB.dmg, atkB, defB) +
+      buildCol(cardB, lvlB, evoB, atkB, defB, evoA.ovr, evoA.power, evoA.dmg, atkA, defA);
   }
 
   function renderSquadDrawer() {
@@ -1064,7 +1314,7 @@
         const evo = getCardEvo(c);
         return `
         <div class="squad-slot">
-          <img src="${c.image}" alt="${c.name}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
+          <img src="${getEvoImage(c, lvl)}" alt="${c.name}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
           <div style="flex:1;">
             <div style="font-family:var(--font-display);font-size:0.78rem;color:var(--bad-gold-hot);font-weight:800;">${c.name} #${c.number} • LVL ${lvl}</div>
             <div style="font-size:0.74rem;color:var(--text-muted);">${evo.stage} • PWR ${evo.power} / DMG ${evo.dmg} • ${'★'.repeat(evo.stars)}</div>
@@ -1099,15 +1349,16 @@
     document.getElementById('pack-foil-bag')?.addEventListener('click', () => {
       AUDIO.playMythicFanfare();
       launchFireworks(6);
+      unlockTrophy('pack-ripper');
       packSealed.hidden = true;
       packRevealed.hidden = false;
       revealGrid.innerHTML = state.cards
         .map((c) => `
           <div class="pack-reveal-card">
-            <img src="${c.image}" alt="${c.name}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
+            <img src="${getEvoImage(c, 3)}" alt="${c.name} Level 3 MAX" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
             <div class="pack-reveal-meta">
-              <div style="font-size:0.6rem;color:#7dd3fc;font-family:var(--font-display);">${c.rarity} • ${c.ovr} OVR</div>
-              <div style="font-size:0.82rem;color:#ffe28a;font-weight:900;font-family:var(--font-display);margin-top:2px;">${c.name} #${c.number}</div>
+              <div style="font-size:0.58rem;color:#7dd3fc;font-family:var(--font-display);">LVL 3 MAX • ${c.ovr} OVR</div>
+              <div style="font-size:0.8rem;color:#ffe28a;font-weight:900;font-family:var(--font-display);margin-top:2px;">${c.name} #${c.number}</div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding:0 4px;">
                 <span class="bad-set-code" style="font-size:0.44rem;">${c.setCode}</span>
                 <span class="bad-holo-seal" style="height:15px;font-size:0.4rem;">B.A.D</span>
@@ -1127,53 +1378,152 @@
       saveSquad();
       renderCards();
       renderSquadDrawer();
+      buildDuelHand();
       renderDuelArena();
       showToast('Cleared My Squad');
     });
     document.getElementById('squad-launch-duel')?.addEventListener('click', () => {
-      if (state.squad.length) {
-        state.heroId = state.squad[0];
-        resetDuelMatch();
-      }
+      if (state.squad.length) state.heroId = state.squad[0];
+      resetDuelMatch();
       squadDialog?.close();
       document.getElementById('battle')?.scrollIntoView({ behavior: 'smooth' });
     });
+
+    const trophyDialog = document.getElementById('trophy-dialog');
+    document.getElementById('open-trophy-btn')?.addEventListener('click', () => {
+      renderTrophyDialog();
+      trophyDialog?.showModal();
+    });
+
+    const compareDialog = document.getElementById('compare-dialog');
+    const openCompare = () => {
+      renderCompareDialog();
+      compareDialog?.showModal();
+    };
+    document.getElementById('open-compare-btn')?.addEventListener('click', openCompare);
+    document.getElementById('open-compare-hero-btn')?.addEventListener('click', openCompare);
+    document.getElementById('compare-select-a')?.addEventListener('change', renderCompareDialog);
+    document.getElementById('compare-select-b')?.addEventListener('change', renderCompareDialog);
 
     for (const dlg of document.querySelectorAll('dialog')) {
       dlg.addEventListener('close', () => { dlg.returnValue = ''; });
     }
     document.getElementById('inspect-duel-btn')?.addEventListener('click', () => {
       if (state.inspectCardId) {
+        if (!state.squad.includes(state.inspectCardId)) {
+          state.squad = [state.inspectCardId, ...state.squad].slice(0, 4);
+          saveSquad();
+        }
         state.heroId = state.inspectCardId;
         resetDuelMatch();
         document.getElementById('inspect-dialog')?.close();
         document.getElementById('battle')?.scrollIntoView({ behavior: 'smooth' });
-        showToast(`⚔️ ${getHeroCard().shortName} locked into the 4-Round Duel Arena!`);
+        showToast(`⚔️ ${getHeroCard().shortName} locked into your 4-Card Duel Hand!`);
       }
     });
     document.getElementById('inspect-dl-front')?.addEventListener('click', () => exportCardFrontPNG(state.inspectCardId));
     document.getElementById('inspect-dl-back')?.addEventListener('click', () => exportCardBackPNG(state.inspectCardId));
   }
 
-  /* ---------- SQUAD SYNERGY COMPUTATION (WIRED INTO DUEL ARENA) ---------- */
+  /* ---------- SQUAD SYNERGY + MTG KEYWORDS ENGINE ---------- */
   function getSquadSynergy() {
-    const members = state.squad.map((id) => state.cards.find((c) => c.id === id)).filter(Boolean);
+    const members = state.hand.map((id) => state.cards.find((c) => c.id === id)).filter(Boolean);
     const vikCount = members.filter((c) => c.teamKey === 'vikings').length;
     const packCount = members.filter((c) => c.teamKey === 'packers').length;
     const uniqueTeams = new Set(members.map((c) => c.teamKey)).size;
+    const hasCommander = members.some((c) => c.keywords.includes('Commander'));
+    let bonusPwr = hasCommander ? 1 : 0;
+    let bonusDmg = 0;
+    let label = hasCommander ? '👑 COMMANDER +1 PWR' : '★ SYNERGY: NONE';
+
     if (vikCount >= 2) {
-      return { bonusPwr: 2, bonusDmg: 0, label: '⚡ VALHALLA +2 PWR' };
+      bonusPwr += 2;
+      label = `⚡ VALHALLA +${bonusPwr} PWR`;
+    } else if (packCount >= 2) {
+      bonusPwr += 2;
+      label = `🧀 TITLETOWN +${bonusPwr} PWR`;
+    } else if (uniqueTeams >= 3) {
+      bonusDmg += 1;
+      label = bonusPwr ? `⭐ ALLIANCE +${bonusPwr} PWR / +1 DMG` : '⭐ ALLIANCE +1 DMG';
     }
-    if (packCount >= 2) {
-      return { bonusPwr: 2, bonusDmg: 0, label: '🧀 TITLETOWN +2 PWR' };
-    }
-    if (uniqueTeams >= 3) {
-      return { bonusPwr: 0, bonusDmg: 1, label: '⭐ ALLIANCE +1 DMG' };
-    }
-    return { bonusPwr: 0, bonusDmg: 0, label: '★ SYNERGY: NONE' };
+    return { bonusPwr, bonusDmg, label };
   }
 
-  /* ---------- TACTICAL 4-ROUND HYPE-ENERGY DUEL ENGINE ---------- */
+  function getActiveKeywordBonuses(card, duelLvl) {
+    const kw = card.keywords || [];
+    let bonusAtk = 0;
+    let bonusDmg = 0;
+    let dmgReduce = 0;
+    let drainOnWin = 0;
+    let extraShieldBreak = 0;
+    const notes = [];
+
+    if ((kw.includes('Haste') || kw.includes('Blitz')) && state.round === 1) {
+      bonusAtk += 4;
+      notes.push('Haste/Blitz (+4 ATK R1)');
+    }
+    if ((kw.includes('Gunslinger') || kw.includes('Launch')) && state.stake >= 2) {
+      bonusAtk += 6;
+      notes.push('Gunslinger/Launch (+6 ATK)');
+    }
+    if (kw.includes('Ward')) {
+      dmgReduce += 1;
+      notes.push('Ward (-1 Incoming DMG)');
+    }
+    if (kw.includes('Double Strike')) {
+      extraShieldBreak += 1;
+      notes.push('Double Strike (+1 Shield Break on 15+ win)');
+    }
+    if (kw.includes('Menace') || kw.includes('Intimidate')) {
+      drainOnWin += 1;
+      notes.push('Intimidate (-1 Opp NRG on win)');
+    }
+
+    // Inherited Digimon passives stacked when evolved above L1
+    if (duelLvl >= 2) {
+      if (card.id === 'karl-danger') notes.push('Inherited L1 (+1 Blitz PWR)');
+      if (card.id === 'jared-jroc') { bonusAtk += 4; notes.push('Inherited L1 (+4 Haste ATK)'); }
+      if (card.id === 'tyler-davis') { dmgReduce += 1; notes.push('Inherited L1 (Ward -1 DMG)'); }
+      if (card.id === 'jerry-mack') { bonusAtk += 5; notes.push('Inherited L1 (+5 Gunslinger ATK)'); }
+      if (card.id === 'tavaris-too-too') { bonusDmg += 1; notes.push('Inherited L1 (+1 Clash DMG)'); }
+      if (card.id === 'david-da-boss') { bonusAtk += 3; notes.push('Inherited L1 (Boss Pressure)'); }
+    }
+    if (duelLvl >= 3) {
+      if (card.id === 'jared-jroc' || card.id === 'jerry-mack') { bonusDmg += 1; notes.push('Inherited L2 (+1 DMG)'); }
+      if (card.id === 'karl-danger') { drainOnWin += 1; notes.push('Inherited L2 (-1 Opp NRG)'); }
+      if (card.id === 'shawn-elon') { bonusAtk += 6; notes.push('Inherited L2 (+6 Hyperloop ATK)'); }
+      if (card.id === 'tavaris-too-too') { extraShieldBreak += 1; notes.push('Inherited L2 (Double Strike)'); }
+    }
+    return { bonusAtk, bonusDmg, dmgReduce, drainOnWin, extraShieldBreak, notes };
+  }
+
+  /* ---------- TACTICAL 4-ROUND DIGIMON × URBAN RIVALS DUEL ENGINE ---------- */
+  function buildDuelHand() {
+    const hand = [...state.squad];
+    for (const c of state.cards) {
+      if (hand.length >= 4) break;
+      if (!hand.includes(c.id)) hand.push(c.id);
+    }
+    state.hand = hand.slice(0, 4);
+    if (!state.hand.includes(state.heroId) || state.usedCards.has(state.heroId)) {
+      const next = state.hand.find((id) => !state.usedCards.has(id)) || state.hand[0];
+      state.heroId = next;
+    }
+    state.cards.forEach((c) => {
+      if (!state.duelLevels[c.id]) {
+        state.duelLevels[c.id] = state.duelFormat === 'ascension' ? 1 : getCardLevel(c);
+      }
+    });
+  }
+
+  function getDuelLevel(cardId) {
+    if (state.duelFormat === 'max') {
+      const c = state.cards.find((x) => x.id === cardId);
+      return c ? getCardLevel(c) : 3;
+    }
+    return state.duelLevels[cardId] || 1;
+  }
+
   function getHeroCard() {
     return state.cards.find((c) => c.id === state.heroId) || state.cards[0];
   }
@@ -1183,12 +1533,37 @@
       const opp = state.cards.find((c) => c.id === state.oppId && c.id !== state.heroId)
         || state.cards.find((c) => c.id !== state.heroId);
       state.oppId = opp.id;
-      const oppEvo = getCardEvo(opp);
-      return { type: 'crew', name: `${opp.name} #${opp.number}`, image: opp.image, objectPos: opp.objectPos, pwr: oppEvo.power, dmg: oppEvo.dmg, maxHp: 14, mascotBadge: oppEvo.mascotBadge };
+      const oppLvl = state.duelFormat === 'ascension' ? Math.min(3, Math.max(1, state.round)) : getCardLevel(opp);
+      const oppEvo = getCardEvoAt(opp, oppLvl);
+      return {
+        type: 'crew',
+        id: opp.id,
+        name: `${opp.name} #${opp.number}`,
+        image: getEvoImage(opp, oppLvl),
+        visualFx: getEvoVisualFx(opp, oppLvl),
+        objectPos: opp.objectPos,
+        lvl: oppLvl,
+        pwr: oppEvo.power,
+        dmg: oppEvo.dmg,
+        maxHp: 14,
+        mascotBadge: oppEvo.mascotBadge,
+        evo: oppEvo
+      };
     }
     const r = DATA.rivals.find((rv) => rv.id === state.oppId) || DATA.rivals[0];
     state.oppId = r.id;
-    return { type: 'rival', name: r.name, badge: r.badge, ovr: r.ovr, pwr: r.duelPower, dmg: r.duelDamage, maxHp: r.hp, mascotBadge: `${r.badge} NFL RIVAL • ${r.ovr} OVR` };
+    return {
+      type: 'rival',
+      id: r.id,
+      name: r.name,
+      badge: r.badge,
+      ovr: r.ovr,
+      lvl: 2,
+      pwr: r.duelPower,
+      dmg: r.duelDamage,
+      maxHp: r.hp,
+      mascotBadge: `${r.badge} NFL RIVAL • ${r.ovr} OVR`
+    };
   }
 
   function appendDuelLog(line) {
@@ -1200,15 +1575,28 @@
   }
 
   function resetDuelMatch() {
+    state.usedCards.clear();
+    state.duelLevels = {};
+    state.cards.forEach((c) => {
+      state.duelLevels[c.id] = state.duelFormat === 'ascension' ? 1 : getCardLevel(c);
+    });
+    buildDuelHand();
     const opp = getOpponent();
     state.round = 1;
     state.heroHp = 14;
     state.heroMaxHp = 14;
     state.oppHp = opp.maxHp;
     state.oppMaxHp = opp.maxHp;
+    state.heroShields = 4;
+    state.oppShields = 4;
+    state.memory = 2;
     state.heroEnergy = 12;
     state.oppEnergy = 12;
     state.stake = Math.min(2, state.heroEnergy);
+    state.furyActive = false;
+    state.duelBonusAtk = 0;
+    state.evolvedThisRound = false;
+    state.revengeActive = false;
     state.armedInstantId = null;
     state.instantUsed = false;
     state.duelOver = false;
@@ -1217,35 +1605,217 @@
     const banner = document.getElementById('round-result-banner');
     if (banner) { banner.textContent = 'STAKE ENERGY & CLASH'; banner.className = 'round-banner'; }
     const insDesc = document.getElementById('instant-desc');
-    if (insDesc) insDesc.textContent = 'Optional: Arm a 1-per-match Instant or Trap before playing the round.';
+    if (insDesc) insDesc.textContent = 'Optional: Set 1 Face-Down Trap or Instant spell before playing the round.';
+    renderDuelArena();
+  }
+
+  function shiftMemory(delta) {
+    state.memory = Math.max(-5, Math.min(5, state.memory + delta));
+  }
+
+  function renderMemoryGauge() {
+    const track = document.getElementById('memory-track');
+    const lbl = document.getElementById('memory-readout-label');
+    if (!track || !lbl) return;
+    const values = [5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5];
+    track.innerHTML = values
+      .map((v) => {
+        const side = v > 0 ? 'side-hero' : (v < 0 ? 'side-opp' : 'side-zero');
+        const active = v === state.memory ? 'active' : '';
+        return `<div class="mem-node ${side} ${active}">${Math.abs(v)}</div>`;
+      })
+      .join('');
+    if (state.memory > 0) lbl.textContent = `SHARED MEMORY: +${state.memory} YOU (NEXT ROUND +${state.memory >= 3 ? 2 : 1} NRG)`;
+    else if (state.memory < 0) lbl.textContent = `SHARED MEMORY: +${Math.abs(state.memory)} OPP (OPP COUNTER +${Math.abs(state.memory) >= 3 ? 2 : 1} NRG)`;
+    else lbl.textContent = 'SHARED MEMORY: 0 (NEUTRAL)';
+    track.setAttribute('aria-label', lbl.textContent);
+  }
+
+  function renderSecurityStacks() {
+    const heroSec = document.getElementById('hero-security-stack');
+    const oppSec = document.getElementById('opp-security-stack');
+    if (heroSec) {
+      heroSec.innerHTML = Array.from({ length: 4 }, (_, i) => {
+        const intact = i < state.heroShields;
+        return `<div class="sec-shield ${intact ? '' : 'broken'}">${intact ? '🛡️ B.A.D' : '💥'}</div>`;
+      }).join('');
+    }
+    if (oppSec) {
+      oppSec.innerHTML = Array.from({ length: 4 }, (_, i) => {
+        const intact = i < state.oppShields;
+        return `<div class="sec-shield opp ${intact ? '' : 'broken'}">${intact ? '🛡️ SEC' : '💥'}</div>`;
+      }).join('');
+    }
+    const hc = document.getElementById('hero-sec-count');
+    const oc = document.getElementById('opp-sec-count');
+    if (hc) hc.textContent = `${state.heroShields} / 4`;
+    if (oc) oc.textContent = `${state.oppShields} / 4`;
+  }
+
+  function triggerSecurityCheck(defender) {
+    const triggers = DATA.securityTriggers || [];
+    if (!triggers.length) return;
+    const pick = triggers[Math.floor(Math.random() * triggers.length)];
+    AUDIO.playShieldBreak();
+    if (defender === 'opp') {
+      if (pick.type === 'drain_attacker') {
+        state.heroEnergy = Math.max(0, state.heroEnergy - pick.val);
+        appendDuelLog(`🛡️ OPP SECURITY CHECK: ${pick.icon} ${pick.name} — You lost ${pick.val} NRG!`);
+      } else if (pick.type === 'boost_defender') {
+        state.oppEnergy = Math.min(12, state.oppEnergy + pick.val);
+        shiftMemory(-pick.val);
+        appendDuelLog(`🛡️ OPP SECURITY CHECK: ${pick.icon} ${pick.name} — Opp gained +${pick.val} NRG & +${pick.val} Memory!`);
+      } else if (pick.type === 'counter_dmg') {
+        state.heroHp = Math.max(1, state.heroHp - pick.val);
+        appendDuelLog(`🛡️ OPP SECURITY CHECK: ${pick.icon} ${pick.name} — Opp dealt ${pick.val} retaliation damage!`);
+      } else if (pick.type === 'heal_defender') {
+        state.oppHp = Math.min(state.oppMaxHp, state.oppHp + pick.val);
+        appendDuelLog(`🛡️ OPP SECURITY CHECK: ${pick.icon} ${pick.name} — Opp recovered +${pick.val} Life!`);
+      } else {
+        appendDuelLog(`🛡️ OPP SECURITY CHECK: ${pick.icon} ${pick.desc}`);
+      }
+    } else {
+      if (pick.type === 'drain_attacker') {
+        state.oppEnergy = Math.max(0, state.oppEnergy - pick.val);
+        appendDuelLog(`🛡️ YOUR SECURITY CHECK: ${pick.icon} ${pick.name} — Opp lost ${pick.val} NRG!`);
+      } else if (pick.type === 'boost_defender') {
+        state.heroEnergy = Math.min(12, state.heroEnergy + pick.val);
+        shiftMemory(pick.val);
+        appendDuelLog(`🛡️ YOUR SECURITY CHECK: ${pick.icon} ${pick.name} — You gained +${pick.val} NRG & +${pick.val} Memory!`);
+      } else if (pick.type === 'counter_dmg') {
+        state.oppHp = Math.max(1, state.oppHp - pick.val);
+        appendDuelLog(`🛡️ YOUR SECURITY CHECK: ${pick.icon} ${pick.name} — You dealt ${pick.val} retaliation damage!`);
+      } else if (pick.type === 'heal_defender') {
+        state.heroHp = Math.min(state.heroMaxHp, state.heroHp + pick.val);
+        appendDuelLog(`🛡️ YOUR SECURITY CHECK: ${pick.icon} ${pick.name} — You recovered +${pick.val} Life!`);
+      } else {
+        appendDuelLog(`🛡️ YOUR SECURITY CHECK: ${pick.icon} ${pick.desc}`);
+      }
+    }
+  }
+
+  function digivolveActiveHero() {
+    if (state.duelOver || state.duelFormat !== 'ascension') return;
+    const hero = getHeroCard();
+    const curLvl = getDuelLevel(hero.id);
+    if (curLvl >= 3) return;
+    const nextLvl = curLvl + 1;
+    const nextEvo = getCardEvoAt(hero, nextLvl);
+    const memCost = nextEvo.evolveCost || 2;
+
+    state.duelLevels[hero.id] = nextLvl;
+    state.evolvedThisRound = true;
+    shiftMemory(-memCost);
+    AUDIO.playEvolve(nextLvl);
+    if (nextLvl === 3) launchFireworks(4);
+
+    // Apply Digimon "When Evolving" burst effect!
+    const eff = nextEvo.onEvolve;
+    let effNote = '';
+    if (eff) {
+      effNote = ` — ${eff.label}`;
+      if (eff.effect === 'drain') state.oppEnergy = Math.max(0, state.oppEnergy - eff.val);
+      else if (eff.effect === 'burst_drain') {
+        state.duelBonusAtk += eff.atk || 0;
+        state.oppEnergy = Math.max(0, state.oppEnergy - (eff.val || 1));
+      } else if (eff.effect === 'atk') state.duelBonusAtk += eff.atk || 0;
+      else if (eff.effect === 'energy') state.heroEnergy = Math.min(12, state.heroEnergy + (eff.val || 2));
+      else if (eff.effect === 'founder_decree') {
+        state.heroEnergy = Math.min(12, state.heroEnergy + (eff.val || 2));
+        state.heroHp = Math.min(state.heroMaxHp, state.heroHp + (eff.heal || 2));
+      } else if (eff.effect === 'heal') state.heroHp = Math.min(state.heroMaxHp, state.heroHp + (eff.val || 2));
+      else if (eff.effect === 'grizzly') {
+        state.heroHp = Math.min(state.heroMaxHp, state.heroHp + (eff.heal || 3));
+        state.duelBonusAtk += eff.atk || 8;
+      } else if (eff.effect === 'atk_energy') {
+        state.duelBonusAtk += eff.atk || 8;
+        state.heroEnergy = Math.min(12, state.heroEnergy + (eff.val || 1));
+      } else if (eff.effect === 'pierce_shield' || eff.effect === 'pierce_atk') {
+        state.duelBonusAtk += eff.atk || 0;
+        if (state.oppShields > 0) {
+          state.oppShields = Math.max(0, state.oppShields - 1);
+          triggerSecurityCheck('opp');
+          unlockTrophy('shield-breaker');
+        }
+      }
+    }
+
+    // Inherited L1 Energy refund for Isaiah
+    if (hero.id === 'isaiah-little-bill' && nextLvl >= 2) {
+      state.heroEnergy = Math.min(12, state.heroEnergy + 1);
+    }
+
+    appendDuelLog(`🧬 LIVE DIGIVOLUTION! ${hero.shortName} ascended to LVL ${nextLvl} [${nextEvo.stage}] (-${memCost} Memory)${effNote}`);
+    showToast(`🧬 ${hero.shortName} ASCENDED TO LVL ${nextLvl}: ${nextEvo.stage.toUpperCase()}!`);
+    unlockTrophy('mid-match-evo');
+    awardXp(25);
     renderDuelArena();
   }
 
   function renderEnergyControls() {
     const hero = getHeroCard();
-    const heroEvo = getCardEvo(hero);
+    const heroLvl = getDuelLevel(hero.id);
+    const heroEvo = getCardEvoAt(hero, heroLvl);
     const syn = getSquadSynergy();
-    const effPwr = heroEvo.power + syn.bonusPwr;
+    const kw = getActiveKeywordBonuses(hero, heroLvl);
+    const revengePwr = state.revengeActive ? 2 : 0;
+    const effPwr = heroEvo.power + syn.bonusPwr + revengePwr;
+
+    const furyCost = state.furyActive ? 3 : 0;
+    const maxStakeAllowed = Math.max(0, state.heroEnergy - furyCost);
+    if (state.stake > maxStakeAllowed) state.stake = maxStakeAllowed;
+
     const slider = document.getElementById('stake-slider');
-    if (state.stake > state.heroEnergy) state.stake = state.heroEnergy;
-    slider.max = String(state.heroEnergy);
+    slider.max = String(maxStakeAllowed);
     slider.value = String(state.stake);
 
     const instant = DATA.instants.find((ins) => ins.id === state.armedInstantId);
-    const bonusAtk = instant ? instant.bonusAtk : 0;
+    const bonusAtk = (instant ? instant.bonusAtk : 0) + state.duelBonusAtk + kw.bonusAtk;
     const projected = effPwr * (1 + state.stake) + bonusAtk;
+    const projDmg = heroEvo.dmg + syn.bonusDmg + kw.bonusDmg + (state.furyActive ? 2 : 0);
 
-    document.getElementById('stake-val-label').textContent = String(state.stake);
+    document.getElementById('hero-pwr-val').textContent = String(effPwr);
+    document.getElementById('hero-dmg-val').textContent = String(projDmg);
+    document.getElementById('stake-val-label').textContent = `${state.stake}${state.furyActive ? ' + 3 FURY' : ''}`;
     document.getElementById('stake-formula-hint').textContent = `${effPwr} PWR × ${1 + state.stake}${bonusAtk ? ` + ${bonusAtk}` : ''} = ${projected} ATK`;
     document.getElementById('hero-atk-readout').textContent = String(projected);
     document.getElementById('hero-atk-sub').textContent = `Projected: ${effPwr} × (1 + ${state.stake} NRG)${bonusAtk ? ` + ${bonusAtk}` : ''}`;
+
+    const kwHint = document.getElementById('keyword-active-hint');
+    if (kwHint) kwHint.textContent = kw.notes.length ? `✨ Active: ${kw.notes.join(' • ')}` : '';
+
+    // Fury toggle button
+    const furyBtn = document.getElementById('fury-toggle-btn');
+    if (furyBtn) {
+      const canFury = state.heroEnergy >= 3 && !state.duelOver;
+      if (!canFury) state.furyActive = false;
+      furyBtn.disabled = !canFury;
+      furyBtn.classList.toggle('active', state.furyActive);
+      furyBtn.setAttribute('aria-pressed', String(state.furyActive));
+      furyBtn.textContent = state.furyActive ? '🔥 FURY: ARMED! (-3 NRG → +2 DMG)' : '🔥 FURY: OFF (+3 NRG → +2 DMG)';
+    }
+
+    // Trap Zone Indicator
+    const trapBadge = document.getElementById('trap-zone-badge');
+    if (trapBadge) {
+      if (instant) {
+        trapBadge.classList.add('armed');
+        trapBadge.textContent = `🪤 FACE-DOWN SET: ${instant.type}`;
+      } else if (state.instantUsed) {
+        trapBadge.classList.remove('armed');
+        trapBadge.textContent = '🪤 TRAP ZONE: SPENT';
+      } else {
+        trapBadge.classList.remove('armed');
+        trapBadge.textContent = '🪤 TRAP ZONE: EMPTY';
+      }
+    }
 
     const pipsWrap = document.getElementById('energy-pips');
     pipsWrap.innerHTML = '';
     for (let i = 1; i <= 12; i++) {
       const pip = document.createElement('button');
       pip.type = 'button';
-      const available = i <= state.heroEnergy;
+      const available = i <= maxStakeAllowed;
       const isSelected = available && i <= state.stake;
       pip.className = `energy-pip ${!available ? 'spent' : (isSelected ? 'active' : '')}`;
       pip.disabled = !available || state.duelOver;
@@ -1272,7 +1842,7 @@
         const id = b.dataset.insId;
         state.armedInstantId = state.armedInstantId === id ? null : id;
         const cur = DATA.instants.find((x) => x.id === state.armedInstantId);
-        document.getElementById('instant-desc').textContent = cur ? `${cur.type}: ${cur.desc}` : 'Optional: Arm a 1-per-match Instant or Trap before playing the round.';
+        document.getElementById('instant-desc').textContent = cur ? `${cur.type}: ${cur.desc}` : 'Optional: Set 1 Face-Down Trap or Instant spell before playing the round.';
         renderEnergyControls();
         AUDIO.playCardFlip();
       });
@@ -1280,35 +1850,73 @@
   }
 
   function renderDuelArena() {
+    buildDuelHand();
     const hero = getHeroCard();
-    const heroEvo = getCardEvo(hero);
+    const heroLvl = getDuelLevel(hero.id);
+    const heroEvo = getCardEvoAt(hero, heroLvl);
     const opp = getOpponent();
 
     document.getElementById('duel-round-label').textContent = state.duelOver ? 'MATCH COMPLETE' : `ROUND ${state.round} / ${state.maxRounds}`;
-    const dashes = document.querySelectorAll('#round-dashes .round-dash');
-    dashes.forEach((d, i) => {
+    document.querySelectorAll('#round-dashes .round-dash').forEach((d, i) => {
       d.classList.toggle('done', i + 1 < state.round || state.duelOver);
       d.classList.toggle('active', !state.duelOver && i + 1 === state.round);
     });
 
     document.getElementById('hero-energy-val').textContent = String(state.heroEnergy);
     document.getElementById('opp-energy-val').textContent = String(state.oppEnergy);
-    document.getElementById('battle-wins-badge').textContent = `WINS: ${state.wins}`;
+    document.getElementById('battle-wins-badge').textContent = `WINS: ${state.profile.wins}`;
 
-    // Pickers
-    const fPicker = document.getElementById('fighter-picker');
-    fPicker.innerHTML = state.cards
-      .map((c) => `<button class="chip ${c.id === state.heroId ? 'active' : ''}" data-pick-hero="${c.id}" type="button" aria-pressed="${c.id === state.heroId}">${c.shortName} (L${getCardLevel(c)})</button>`)
-      .join('');
-    fPicker.querySelectorAll('[data-pick-hero]').forEach((b) => {
-      b.addEventListener('click', () => { state.heroId = b.dataset.pickHero; resetDuelMatch(); });
-    });
+    renderMemoryGauge();
+    renderSecurityStacks();
 
+    // 4-Card Urban Rivals Hand Grid
+    const handGrid = document.getElementById('duel-hand-grid');
+    if (handGrid) {
+      handGrid.innerHTML = state.hand
+        .map((id) => {
+          const c = state.cards.find((x) => x.id === id);
+          if (!c) return '';
+          const lvl = getDuelLevel(id);
+          const evo = getCardEvoAt(c, lvl);
+          const spent = state.usedCards.has(id);
+          const selected = id === state.heroId && !spent;
+          return `
+            <button class="hand-card-btn ${selected ? 'selected' : ''} ${spent ? 'spent' : ''}" data-hand-id="${id}" type="button" ${spent || state.duelOver ? 'disabled' : ''} aria-pressed="${selected}">
+              <img src="${getEvoImage(c, lvl)}" alt="${c.shortName}" decoding="async" style="object-position:${c.objectPos || 'center 10%'};" />
+              <div class="hand-card-meta">
+                <div class="hand-card-name">${c.shortName}</div>
+                <div class="hand-card-stats">${spent ? '✓ PLAYED' : `L${lvl} • PWR ${evo.power} • DMG ${evo.dmg}`}</div>
+              </div>
+            </button>`;
+        })
+        .join('');
+      handGrid.querySelectorAll('[data-hand-id]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const id = b.dataset.handId;
+          if (state.usedCards.has(id) || state.duelOver) return;
+          state.heroId = id;
+          state.duelBonusAtk = 0;
+          state.evolvedThisRound = false;
+          AUDIO.playCardFlip();
+          renderDuelArena();
+        });
+      });
+    }
+
+    const revTag = document.getElementById('hand-revenge-tag');
+    if (revTag) {
+      revTag.textContent = state.revengeActive
+        ? '🔥 URBAN RIVALS REVENGE ACTIVE (+2 PWR THIS ROUND!)'
+        : `${4 - state.usedCards.size} unused card(s) left in hand • Clan bonuses active`;
+      revTag.style.color = state.revengeActive ? '#f5b942' : '#94a3b8';
+    }
+
+    // Opponent picker
     const oPicker = document.getElementById('opponent-picker');
     if (state.oppMode === 'crew') {
       oPicker.innerHTML = state.cards
         .filter((c) => c.id !== state.heroId)
-        .map((c) => `<button class="chip ${c.id === state.oppId ? 'active' : ''}" data-pick-opp="${c.id}" type="button" aria-pressed="${c.id === state.oppId}">${c.shortName} (L${getCardLevel(c)})</button>`)
+        .map((c) => `<button class="chip ${c.id === state.oppId ? 'active' : ''}" data-pick-opp="${c.id}" type="button" aria-pressed="${c.id === state.oppId}">${c.shortName}</button>`)
         .join('');
     } else {
       oPicker.innerHTML = DATA.rivals
@@ -1322,23 +1930,59 @@
     const syn = getSquadSynergy();
     const synPill = document.getElementById('duel-synergy-pill');
     if (synPill) synPill.textContent = syn.label;
-    document.getElementById('battle-hero-img').src = hero.image;
-    document.getElementById('battle-hero-img').style.objectPosition = hero.objectPos || 'center 10%';
-    document.getElementById('battle-hero-name').textContent = `${hero.name} #${hero.number}`;
-    const mascotTag = document.getElementById('battle-hero-mascot');
-    if (mascotTag) mascotTag.textContent = heroEvo.mascotBadge || `LVL ${getCardLevel(hero)} • ${heroEvo.stage}`;
-    document.getElementById('hero-pwr-val').textContent = String(heroEvo.power + syn.bonusPwr);
-    document.getElementById('hero-dmg-val').textContent = String(heroEvo.dmg + syn.bonusDmg);
 
+    const heroImg = document.getElementById('battle-hero-img');
+    heroImg.src = getEvoImage(hero, heroLvl);
+    heroImg.dataset.visualFx = getEvoVisualFx(hero, heroLvl);
+    heroImg.style.objectPosition = hero.objectPos || 'center 10%';
+    document.getElementById('battle-hero-name').textContent = `${hero.name} #${hero.number}`;
+    document.getElementById('battle-hero-mascot').textContent = heroEvo.mascotBadge || `LVL ${heroLvl} • ${heroEvo.stage}`;
+
+    // Mid-Match Digivolution Button Bar
+    const evoBar = document.getElementById('battle-evo-bar');
+    if (evoBar) {
+      if (state.duelFormat === 'ascension' && !state.duelOver && heroLvl < 3) {
+        const nextLvl = heroLvl + 1;
+        const nextEvo = getCardEvoAt(hero, nextLvl);
+        evoBar.innerHTML = `<button id="live-digivolve-btn" class="battle-evo-btn" type="button">${nextLvl === 3 ? '👑 ASCEND TO LVL 3 MAX' : '⚡ DIGIVOLVE TO LVL 2'} (-${nextEvo.evolveCost} MEM)</button>`;
+        document.getElementById('live-digivolve-btn')?.addEventListener('click', digivolveActiveHero);
+      } else if (heroLvl === 3) {
+        evoBar.innerHTML = `<span style="font-family:var(--font-display);font-size:0.58rem;color:#ffe28a;">👑 APEX MASCOT FORM ACTIVE</span>`;
+      } else {
+        evoBar.innerHTML = '';
+      }
+    }
+
+    // Stacked Inherited Skills (Digimon!)
+    const inhStack = document.getElementById('hero-inherited-stack');
+    if (inhStack) {
+      const stacked = [];
+      for (let l = 1; l < heroLvl; l++) {
+        const prev = getCardEvoAt(hero, l);
+        if (prev.inherited) stacked.push(`<div class="inherited-chip">🧬 L${l} ${prev.inherited}</div>`);
+      }
+      if (state.duelBonusAtk > 0) {
+        stacked.push(`<div class="inherited-chip" style="border-left-color:#38bdf8;color:#bae6fd;">⚡ When-Evolving Surge: +${state.duelBonusAtk} ATK</div>`);
+      }
+      inhStack.innerHTML = stacked.join('');
+    }
+
+    // Opponent Fighter Visuals
     const oppVis = document.getElementById('battle-opp-visual');
     oppVis.innerHTML = opp.type === 'crew'
-      ? `<img class="fighter-avatar" src="${opp.image}" alt="${opp.name}" decoding="async" style="object-position:${opp.objectPos || 'center 10%'};border-color:#ef4444;" />`
+      ? `<img class="fighter-avatar" src="${opp.image}" data-visual-fx="${opp.visualFx || 'base'}" alt="${opp.name}" decoding="async" style="object-position:${opp.objectPos || 'center 10%'};border-color:#ef4444;" />`
       : `<div class="rival-emblem">${opp.badge}</div>`;
     document.getElementById('battle-opp-name').textContent = opp.name;
-    const oppMascotTag = document.getElementById('battle-opp-mascot');
-    if (oppMascotTag) oppMascotTag.textContent = opp.mascotBadge || '';
+    document.getElementById('battle-opp-mascot').textContent = opp.mascotBadge || '';
     document.getElementById('opp-pwr-val').textContent = String(opp.pwr);
     document.getElementById('opp-dmg-val').textContent = String(opp.dmg);
+
+    const oppInh = document.getElementById('opp-inherited-stack');
+    if (oppInh) {
+      oppInh.innerHTML = opp.type === 'crew' && opp.lvl >= 2
+        ? `<div class="inherited-chip" style="border-left-color:#ef4444;background:rgba(239,68,68,0.12);color:#fecaca;">🧬 Opponent Ascended to LVL ${opp.lvl}</div>`
+        : '';
+    }
 
     if (!state.duelOver) {
       document.getElementById('opp-atk-readout').textContent = '?';
@@ -1360,10 +2004,12 @@
   function playDuelRound() {
     if (state.duelOver) { resetDuelMatch(); return; }
     const hero = getHeroCard();
-    const heroEvo = getCardEvo(hero);
+    const heroLvl = getDuelLevel(hero.id);
+    const heroEvo = getCardEvoAt(hero, heroLvl);
     const opp = getOpponent();
+    const syn = getSquadSynergy();
+    const kw = getActiveKeywordBonuses(hero, heroLvl);
 
-    // Opponent AI bluffing stake across remaining rounds
     const roundsLeft = state.maxRounds - state.round + 1;
     const maxOppStake = Math.min(state.oppEnergy, roundsLeft === 1 ? state.oppEnergy : Math.min(6, state.oppEnergy));
     const oppStake = roundsLeft === 1
@@ -1374,17 +2020,24 @@
       ? DATA.instants.find((x) => x.id === state.armedInstantId)
       : null;
 
-    state.heroEnergy = Math.max(0, state.heroEnergy - state.stake - (usedInstant ? usedInstant.drainEnergy : 0));
-    state.heroEnergy = Math.min(12, state.heroEnergy);
+    const furyCost = state.furyActive ? 3 : 0;
+    const totalSpent = state.stake + furyCost + (usedInstant ? usedInstant.drainEnergy : 0);
+    state.heroEnergy = Math.max(0, Math.min(12, state.heroEnergy - totalSpent));
+    // Shawn Inherited L1 refund when staking 2+
+    if (hero.id === 'shawn-elon' && state.stake >= 2 && heroLvl >= 2) {
+      state.heroEnergy = Math.min(12, state.heroEnergy + 1);
+    }
     state.oppEnergy = Math.max(0, state.oppEnergy - oppStake);
 
-    const syn = getSquadSynergy();
-    const heroAtk = (heroEvo.power + syn.bonusPwr) * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0);
+    const revengePwr = state.revengeActive ? 2 : 0;
+    const effPwr = heroEvo.power + syn.bonusPwr + revengePwr;
+    const heroAtk = effPwr * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0) + state.duelBonusAtk + kw.bonusAtk;
     const oppAtk = opp.pwr * (1 + oppStake);
 
     if (usedInstant) {
       state.instantUsed = true;
       state.armedInstantId = null;
+      unlockTrophy('trap-master');
     }
 
     const heroBox = document.getElementById('hero-fighter-box');
@@ -1396,61 +2049,112 @@
     document.getElementById('opp-atk-sub').textContent = `Staked ${oppStake} NRG (${opp.pwr} × ${1 + oppStake})`;
 
     if (heroAtk >= oppAtk) {
-      const dealt = heroEvo.dmg + syn.bonusDmg;
+      const dealt = heroEvo.dmg + syn.bonusDmg + kw.bonusDmg + (state.furyActive ? 2 : 0);
       state.oppHp = Math.max(0, state.oppHp - dealt);
+      state.revengeActive = false;
+      if (kw.drainOnWin > 0) state.oppEnergy = Math.max(0, state.oppEnergy - kw.drainOnWin);
+      shiftMemory(1);
+
+      // Shatter Digimon Security Shields!
+      let shieldsBroken = 1;
+      if ((heroAtk - oppAtk >= 15 && kw.extraShieldBreak > 0) || state.furyActive) {
+        shieldsBroken = Math.min(2, state.oppShields);
+      }
+      for (let s = 0; s < shieldsBroken; s++) {
+        if (state.oppShields > 0) {
+          state.oppShields -= 1;
+          unlockTrophy('shield-breaker');
+          triggerSecurityCheck('opp');
+        }
+      }
+
+      if (state.furyActive) unlockTrophy('fury-clash');
+
       heroBox.classList.add('round-win'); heroBox.classList.remove('round-loss');
       oppBox.classList.add('round-loss'); oppBox.classList.remove('round-win');
       document.getElementById('hero-atk-readout').classList.add('gold');
       document.getElementById('opp-atk-readout').classList.remove('gold');
       const isTie = heroAtk === oppAtk;
-      banner.textContent = `${isTie ? 'TIEBREAKER WON!' : 'ROUND WON!'} ${heroAtk} ${isTie ? '=' : '>'} ${oppAtk} (-${dealt} LIFE)`;
+      banner.textContent = `${isTie ? 'TIEBREAKER WON!' : 'ROUND WON!'} ${heroAtk} ${isTie ? '=' : '>'} ${oppAtk} (-${dealt} LIFE • -${shieldsBroken} SHIELD)`;
       banner.className = 'round-banner win';
       AUDIO.playImpact(true);
-      appendDuelLog(`⚡ R${state.round}: ${hero.shortName} [${heroEvo.stage}] (${heroAtk} ATK, ${state.stake} NRG${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK, ${oppStake} NRG) for -${dealt} Life!`);
+      appendDuelLog(`⚡ R${state.round}: ${hero.shortName} [L${heroLvl} ${heroEvo.stage}] (${heroAtk} ATK${state.furyActive ? ' + 🔥FURY' : ''}${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK) for -${dealt} Life & shattered ${shieldsBroken} Shield(s)!`);
     } else {
-      const blocked = usedInstant ? usedInstant.blockDmg : 0;
+      const blocked = (usedInstant ? usedInstant.blockDmg : 0) + kw.dmgReduce;
       const taken = Math.max(1, opp.dmg - blocked);
       state.heroHp = Math.max(0, state.heroHp - taken);
+      state.revengeActive = true;
+      shiftMemory(1); // Revenge momentum bounce
+
+      // Yu-Gi-Oh! Mirror Sack Trap Reflection
+      if (usedInstant && usedInstant.reflectDmg) {
+        state.oppHp = Math.max(0, state.oppHp - usedInstant.reflectDmg);
+        shiftMemory(2);
+        appendDuelLog(`🪞 TRAP ACTIVATED! Mirror Sack reflected ${usedInstant.reflectDmg} DMG back to ${opp.name} & shifted +2 Memory!`);
+      }
+
+      if (state.heroShields > 0) {
+        state.heroShields -= 1;
+        triggerSecurityCheck('hero');
+      }
+
       oppBox.classList.add('round-win'); oppBox.classList.remove('round-loss');
       heroBox.classList.add('round-loss'); heroBox.classList.remove('round-win');
       document.getElementById('opp-atk-readout').classList.add('gold');
       document.getElementById('hero-atk-readout').classList.remove('gold');
-      banner.textContent = `ROUND LOST ${heroAtk} < ${oppAtk} (-${taken} LIFE)`;
+      banner.textContent = `ROUND LOST ${heroAtk} < ${oppAtk} (-${taken} LIFE • REVENGE ARMED)`;
       banner.className = 'round-banner loss';
       AUDIO.playImpact(false);
-      appendDuelLog(`🔥 R${state.round}: ${opp.name} (${oppAtk} ATK, ${oppStake} NRG) out-bluffed ${hero.shortName} (${heroAtk} ATK) for -${taken} Life${blocked ? ` (Trap blocked ${blocked}!)` : ''}!`);
+      appendDuelLog(`🔥 R${state.round}: ${opp.name} (${oppAtk} ATK, ${oppStake} NRG) out-bluffed ${hero.shortName} (${heroAtk} ATK) for -${taken} Life${blocked ? ` (Blocked ${blocked}!)` : ''}! Revenge armed for next round!`);
     }
 
-    if (state.oppHp <= 0 || state.heroHp <= 0 || state.round >= state.maxRounds) {
+    // Mark card as played in Urban Rivals 4-Card Hand
+    state.usedCards.add(hero.id);
+    state.furyActive = false;
+    state.duelBonusAtk = 0;
+    state.evolvedThisRound = false;
+
+    const koVictory = state.oppHp <= 0 || state.oppShields <= 0;
+    const koLoss = state.heroHp <= 0 || state.heroShields <= 0;
+
+    if (koVictory || koLoss || state.round >= state.maxRounds) {
       state.duelOver = true;
-      if (state.oppHp <= 0 || state.heroHp >= state.oppHp) {
-        state.wins += 1;
+      const heroWon = koVictory || (!koLoss && (state.heroHp > state.oppHp || (state.heroHp === state.oppHp && state.heroShields >= state.oppShields)));
+      if (heroWon) {
+        state.profile.wins += 1;
+        state.profile.streak += 1;
+        saveProfile();
+        awardXp(60);
+        unlockTrophy('first-win');
         AUDIO.playMythicFanfare();
-        launchFireworks(5);
-        appendDuelLog(`🏆 MATCH VICTORY! ${hero.name} wins ${state.heroHp}–${state.oppHp}!`);
-        showToast(`🏆 ${hero.shortName} WON THE 4-ROUND DUEL!`);
+        launchFireworks(6);
+        appendDuelLog(`🏆 MATCH VICTORY! ${hero.name} seals the win (${state.heroHp} Life / ${state.heroShields} Shields vs ${state.oppHp} Life / ${state.oppShields} Shields)! +60 XP!`);
+        showToast(`🏆 DUEL VICTORY! +60 XP (Streak: ${state.profile.streak})`);
       } else {
-        appendDuelLog(`😮 ${opp.name} took the match ${state.oppHp}–${state.heroHp}! Tap Play Again for a rematch!`);
+        state.profile.streak = 0;
+        saveProfile();
+        renderProfileBar();
+        appendDuelLog(`😮 ${opp.name} took the match! Tap Play Again to run it back!`);
       }
     } else {
       state.round += 1;
+      // Memory Gauge grants bonus next-round NRG!
+      if (state.memory > 0) {
+        const bonus = state.memory >= 3 ? 2 : 1;
+        state.heroEnergy = Math.min(12, state.heroEnergy + bonus);
+        appendDuelLog(`⚡ MEMORY ADVANTAGE (+${state.memory}): You gained +${bonus} Hype Energy for Round ${state.round}!`);
+      } else if (state.memory < 0) {
+        const bonus = Math.abs(state.memory) >= 3 ? 2 : 1;
+        state.oppEnergy = Math.min(12, state.oppEnergy + bonus);
+        appendDuelLog(`⚠️ OPP MEMORY COUNTER (+${Math.abs(state.memory)}): Opponent gained +${bonus} Hype Energy for Round ${state.round}!`);
+      }
+      // Auto-select next unused card in 4-Card Hand
+      const nextHero = state.hand.find((id) => !state.usedCards.has(id));
+      if (nextHero) state.heroId = nextHero;
       state.stake = Math.min(state.stake, state.heroEnergy);
     }
 
-    document.querySelectorAll('#round-dashes .round-dash').forEach((d, i) => {
-      d.classList.toggle('done', i + 1 < state.round || state.duelOver);
-      d.classList.toggle('active', !state.duelOver && i + 1 === state.round);
-    });
-    document.getElementById('hero-hp-text').textContent = `${state.heroHp} / ${state.heroMaxHp}`;
-    document.getElementById('hero-hp-fill').style.width = `${Math.max(0, (state.heroHp / state.heroMaxHp) * 100)}%`;
-    document.getElementById('opp-hp-text').textContent = `${state.oppHp} / ${state.oppMaxHp}`;
-    document.getElementById('opp-hp-fill').style.width = `${Math.max(0, (state.oppHp / state.oppMaxHp) * 100)}%`;
-    document.getElementById('hero-energy-val').textContent = String(state.heroEnergy);
-    document.getElementById('opp-energy-val').textContent = String(state.oppEnergy);
-    document.getElementById('battle-wins-badge').textContent = `WINS: ${state.wins}`;
-    document.getElementById('duel-round-label').textContent = state.duelOver ? 'MATCH COMPLETE' : `ROUND ${state.round} / ${state.maxRounds}`;
-    document.getElementById('play-round-btn').textContent = state.duelOver ? '🔄 PLAY AGAIN' : `⚡ PLAY ROUND ${state.round}`;
-    renderEnergyControls();
+    renderDuelArena();
   }
 
   /* ---------- REQUEST DESK & CREW WALL ---------- */
@@ -1504,7 +2208,8 @@
       msgEl.value = '';
       renderWall();
       AUDIO.playCardFlip();
-      showToast(`🔥 Posted as ${author}!`);
+      awardXp(10);
+      showToast(`🔥 Posted as ${author}! (+10 XP)`);
     });
   }
 
@@ -1544,6 +2249,8 @@
         showToast(`🔗 Share link: ${url}`);
       }
     });
+
+    document.getElementById('evo-showcase-btn')?.addEventListener('click', runEvolutionShowcase);
 
     document.querySelectorAll('[data-team-filter]').forEach((btn) => {
       btn.addEventListener('click', () => {
@@ -1623,6 +2330,20 @@
       e.currentTarget.textContent = muted ? '🔇 Muted' : '🔊 Sound';
     });
 
+    document.querySelectorAll('[data-duel-format]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        state.duelFormat = btn.dataset.duelFormat;
+        document.querySelectorAll('[data-duel-format]').forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+        resetDuelMatch();
+        showToast(state.duelFormat === 'ascension' ? '🧬 Digimon Ascension Mode: Start L1 & evolve live!' : '⚡ Max Blitz Mode: Using your Vault levels!');
+      });
+    });
+
     document.querySelectorAll('[data-opp-mode]').forEach((btn) => {
       btn.addEventListener('click', () => {
         state.oppMode = btn.dataset.oppMode;
@@ -1636,6 +2357,14 @@
       });
     });
 
+    document.getElementById('fury-toggle-btn')?.addEventListener('click', () => {
+      if (state.heroEnergy < 3 || state.duelOver) return;
+      state.furyActive = !state.furyActive;
+      if (state.furyActive) AUDIO.playFury();
+      else AUDIO.playCardFlip();
+      renderEnergyControls();
+    });
+
     document.getElementById('stake-slider')?.addEventListener('input', (e) => {
       state.stake = Number(e.target.value);
       renderEnergyControls();
@@ -1644,12 +2373,13 @@
     document.getElementById('play-round-btn')?.addEventListener('click', playDuelRound);
     document.getElementById('battle-reset-btn')?.addEventListener('click', () => {
       resetDuelMatch();
-      appendDuelLog('🔄 Fresh 4-Round Match started — 12 Hype Energy & 1 Instant/Trap ready!');
+      appendDuelLog('🔄 Fresh 4-Round TCG Match started — 4-Card Hand, 4 Security Shields, Memory +2, & 1 Trap ready!');
     });
   }
 
   /* ---------- BOOT ---------- */
   saveSquad();
+  renderProfileBar();
   initDialogLightDismissFallback();
   initBgCanvas();
   initFireworks();

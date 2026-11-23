@@ -89,12 +89,17 @@ try {
     expression: `(() => {
       const l3Banner = document.querySelector('.card-column[data-level="3"] .mascot-crest-banner');
       const l3Bg = l3Banner ? getComputedStyle(l3Banner).backgroundImage : 'none';
-      const imgs = [...document.querySelectorAll('.card-art-img, .fighter-avatar')];
+      const imgs = [...document.querySelectorAll('.card-art-img, .fighter-avatar, .hand-card-btn img')];
       return {
         cards: document.querySelectorAll('.holo-card-scene').length,
         seals: document.querySelectorAll('.bad-holo-seal').length,
         brokenImgs: imgs.filter(i => !i.complete || i.naturalWidth === 0).length,
         l3BannerHasGradient: l3Bg !== 'none',
+        memoryNodes: document.querySelectorAll('#memory-track .mem-node').length,
+        handCards: document.querySelectorAll('#duel-hand-grid .hand-card-btn').length,
+        heroShields: document.querySelectorAll('#hero-security-stack .sec-shield').length,
+        oppShields: document.querySelectorAll('#opp-security-stack .sec-shield').length,
+        hasLiveEvoBtn: !!document.getElementById('live-digivolve-btn'),
         synergy: document.getElementById('duel-synergy-pill')?.textContent || '',
         oppMascot: document.getElementById('battle-opp-mascot')?.textContent || '',
         overflowX: document.documentElement.scrollWidth > window.innerWidth
@@ -102,19 +107,32 @@ try {
     })()`
   });
 
-  // Trigger a live duel round, mascot level change, and search XSS check
+  // Trigger live mid-match Digivolution, Fury toggle, duel round, level swaps, comparator, trophies, and XSS test
   await send('Runtime.evaluate', {
     expression: `(() => {
+      document.getElementById('live-digivolve-btn')?.click();
+      document.getElementById('fury-toggle-btn')?.click();
       document.getElementById('play-round-btn').click();
       document.querySelector('[data-all-level="1"]').click();
+      document.querySelector('[data-all-level="2"]').click();
       document.querySelector('[data-all-level="3"]').click();
+      document.getElementById('open-compare-btn')?.click();
+      document.getElementById('compare-dialog')?.close();
+      document.getElementById('open-trophy-btn')?.click();
+      document.getElementById('trophy-dialog')?.close();
       const s = document.getElementById('vault-search');
       s.value = '<img src=x onerror=throw(1)>';
       s.dispatchEvent(new Event('input'));
       document.querySelector('#cards-grid button')?.click();
     })()`
   });
-  await new Promise((r) => setTimeout(r, 300));
+  await new Promise((r) => setTimeout(r, 400));
+
+  // Verify all L2/L3 images load cleanly
+  const imgCheck = await send('Runtime.evaluate', {
+    returnByValue: true,
+    expression: `[...document.querySelectorAll('.card-art-img')].filter(i => !i.complete || i.naturalWidth === 0).length`
+  });
 
   // Mobile viewport audit (390x844)
   await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
@@ -126,6 +144,7 @@ try {
 
   console.log('AUDIT RESULT:', JSON.stringify({
     desktop: desktopStats.result.value,
+    postEvoBrokenImgs: imgCheck.result.value,
     mobileOverflowX: mobileOverflow.result.value,
     jsErrors: errs,
     http404s
@@ -135,7 +154,11 @@ try {
     http404s.length ||
     desktopStats.result.value.cards !== 8 ||
     desktopStats.result.value.brokenImgs > 0 ||
+    imgCheck.result.value > 0 ||
     !desktopStats.result.value.l3BannerHasGradient ||
+    desktopStats.result.value.memoryNodes !== 11 ||
+    desktopStats.result.value.handCards !== 4 ||
+    desktopStats.result.value.heroShields !== 4 ||
     desktopStats.result.value.overflowX ||
     mobileOverflow.result.value
   ) {

@@ -1,9 +1,9 @@
 /* ============================================================
-   B.A.D CARDS 2400 — FLAGSHIP PRO 1ST EDITION REGISTRY
-   Blending Urban Rivals (Clans/Stars/Energy), Yu-Gi-Oh! (ATK/DEF,
-   Foil Tiers, Corner Holo Seal, Traps), & MTG (Keywords, Flavor,
-   Instant Reactions & Synergy Decks) — 100% Original IP
-   + 3-Level Team Mascot Ascension Upgrades
+   B.A.D CARDS 2400 — FLAGSHIP PRO 1ST EDITION REGISTRY (v2.0)
+   Blending Digimon TCG (3-Stage Evolution, Inherited Skills,
+   Memory Gauge & Security Shields), Urban Rivals (4-Card Hand,
+   Clans, Pillz & Fury), Yu-Gi-Oh! (ATK/DEF, Foil Tiers, Corner
+   Holo Seal & Face-Down Traps), & MTG (Active Keywords & Instants)
    ============================================================ */
 
 window.BAD_CARDS_DATA = {
@@ -77,7 +77,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.8,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Walk-on Valhalla pass rusher with fresh black Wayfarers.",
-          "note": "Walk-on Valhalla pass rusher with fresh black Wayfarers."
+          "note": "Walk-on Valhalla pass rusher with fresh black Wayfarers.",
+          "image": "assets/card-karl-danger.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: +1 PWR on Blitz clashes",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -90,7 +95,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.92,
           "mascotBadge": "LVL 2 • ⚡ VIKING HORNS",
           "mascotTrait": "Channels Viktor the Viking’s horned battle aura & roaring SKOL blitz.",
-          "note": "Channels Viktor the Viking’s horned battle aura & roaring SKOL blitz."
+          "note": "Channels Viktor the Viking’s horned battle aura & roaring SKOL blitz.",
+          "image": "assets/card-karl-danger-l2.jpg",
+          "visualFx": "awakened",
+          "evolveCost": 2,
+          "inherited": "Inherited: Drain 1 Opp Energy on Win",
+          "onEvolve": {
+            "label": "⚡ Norse Blitz: -1 Opp Energy",
+            "effect": "drain",
+            "val": 1
+          }
         },
         {
           "level": 3,
@@ -103,7 +117,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.12,
           "mascotBadge": "LVL 3 MAX • 🪓 VIKTOR BERSERKER",
           "mascotTrait": "MAX MASCOT FORM: Viktor’s Horned Helm, Gjallarhorn Roar & Braided War-Gold Armor!",
-          "note": "MAX MASCOT FORM: Viktor’s Horned Helm, Gjallarhorn Roar & Braided War-Gold Armor!"
+          "note": "MAX MASCOT FORM: Viktor’s Horned Helm, Gjallarhorn Roar & Braided War-Gold Armor!",
+          "image": "assets/card-karl-danger-l3.jpg",
+          "visualFx": "max",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "🪓 Viktor Roar: +10 ATK & -2 Opp Energy!",
+            "effect": "burst_drain",
+            "atk": 10,
+            "val": 2
+          }
         }
       ],
       "bio": "Drafted #1 overall out of the Valhalla Tailgate Lot. Karl Danger! never takes the black shades off — not even in a Minnesota blizzard. Known for shattering pocket protection and leading 70,000 fans in deafening SKOL chants.",
@@ -238,7 +262,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.8,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Explosive route runner flashing early Griddy footwork.",
-          "note": "Explosive route runner flashing early Griddy footwork."
+          "note": "Explosive route runner flashing early Griddy footwork.",
+          "image": "assets/card-jroc.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: +4 ATK Haste boost on clash",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -251,7 +280,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.92,
           "mascotBadge": "LVL 2 • ⚡ NORSE WINGS",
           "mascotTrait": "Awakens Viktor’s winged-helm burst speed & purple lightning strides.",
-          "note": "Awakens Viktor’s winged-helm burst speed & purple lightning strides."
+          "note": "Awakens Viktor’s winged-helm burst speed & purple lightning strides.",
+          "image": "assets/card-jroc-l2.jpg",
+          "visualFx": "awakened",
+          "evolveCost": 2,
+          "inherited": "Inherited: +1 Bonus Clash DMG",
+          "onEvolve": {
+            "label": "⚡ Winged Burn: +8 ATK this round!",
+            "effect": "atk",
+            "atk": 8
+          }
         },
         {
           "level": 3,
@@ -264,7 +302,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.12,
           "mascotBadge": "LVL 3 MAX • 🦅 VIKTOR VALKYRIE",
           "mascotTrait": "MAX MASCOT FORM: Viktor’s Winged Norse Helm, Frost-Lightning Stride & Miracle Catch Aura!",
-          "note": "MAX MASCOT FORM: Viktor’s Winged Norse Helm, Frost-Lightning Stride & Miracle Catch Aura!"
+          "note": "MAX MASCOT FORM: Viktor’s Winged Norse Helm, Frost-Lightning Stride & Miracle Catch Aura!",
+          "image": "assets/card-jroc-l3.jpg",
+          "visualFx": "max",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "🦅 Valkyrie Miracle: Shatter 1 Opp Shield!",
+            "effect": "pierce_shield",
+            "val": 1
+          }
         }
       ],
       "bio": "Rocking the #28 purple-and-gold with icy chain swagger and unstoppable 4th-quarter hands. Jared aka Jroc! turns broken plays into 80-yard Minneapolis Miracles while throwing up the peace sign at the 20-yard line.",
@@ -401,7 +448,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.82,
           "mascotBadge": "LVL 1 • FOUNDER ROOKIE",
           "mascotTrait": "Field general drawing up fearless 4th-quarter comebacks.",
-          "note": "Field general drawing up fearless 4th-quarter comebacks."
+          "note": "Field general drawing up fearless 4th-quarter comebacks.",
+          "image": "assets/card-isaiah-little-bill.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: +1 Hype Energy on Evolve",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -414,7 +466,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.93,
           "mascotBadge": "LVL 2 • 📯 GJALLARHORN CALL",
           "mascotTrait": "Sounds Viktor’s golden Gjallarhorn to supercharge the entire Army of 11.",
-          "note": "Sounds Viktor’s golden Gjallarhorn to supercharge the entire Army of 11."
+          "note": "Sounds Viktor’s golden Gjallarhorn to supercharge the entire Army of 11.",
+          "image": "assets/card-isaiah-little-bill-l2.jpg",
+          "visualFx": "awakened",
+          "evolveCost": 2,
+          "inherited": "Inherited: Army of 11 (+1 Squad PWR)",
+          "onEvolve": {
+            "label": "📯 Gjallarhorn Call: +2 Hype Energy!",
+            "effect": "energy",
+            "val": 2
+          }
         },
         {
           "level": 3,
@@ -427,7 +488,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.14,
           "mascotBadge": "LVL 3 MAX • 👑 VIKTOR WARLORD",
           "mascotTrait": "MAX MASCOT FORM: Crowned Viktor War-Helm, Golden Gjallarhorn Shockwave & Supreme Valhalla Aura!",
-          "note": "MAX MASCOT FORM: Crowned Viktor War-Helm, Golden Gjallarhorn Shockwave & Supreme Valhalla Aura!"
+          "note": "MAX MASCOT FORM: Crowned Viktor War-Helm, Golden Gjallarhorn Shockwave & Supreme Valhalla Aura!",
+          "image": "assets/card-isaiah-little-bill-l3.jpg",
+          "visualFx": "max",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "👑 Founder Decree: +2 NRG & +2 Life!",
+            "effect": "founder_decree",
+            "val": 2,
+            "heal": 2
+          }
         }
       ],
       "bio": "The founder of B.A.D Cards and leader of the Army of 11. Isaiah aka Little Bill turns every minor setback into a major comeback — firing 70-yard dimes to Jroc!, unleashing Karl Danger! off the edge, and uniting the whole crew.",
@@ -562,7 +633,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.8,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Hard-hitting middle linebacker forged in freezing Chicago wind.",
-          "note": "Hard-hitting middle linebacker forged in freezing Chicago wind."
+          "note": "Hard-hitting middle linebacker forged in freezing Chicago wind.",
+          "image": "assets/card-tyler-davis.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: Ward (-1 Incoming DMG)",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -575,7 +651,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.92,
           "mascotBadge": "LVL 2 • 🐾 STALEY CLAWS",
           "mascotTrait": "Unlocks Staley Da Bear’s razor grizzly gauntlets & Soldier Field roar.",
-          "note": "Unlocks Staley Da Bear’s razor grizzly gauntlets & Soldier Field roar."
+          "note": "Unlocks Staley Da Bear’s razor grizzly gauntlets & Soldier Field roar.",
+          "image": "assets/card-tyler-davis-l2.jpg",
+          "visualFx": "awakened",
+          "evolveCost": 2,
+          "inherited": "Inherited: Midway Wall (-1 Opp DMG)",
+          "onEvolve": {
+            "label": "🐾 Staley Fortify: +2 Life Points!",
+            "effect": "heal",
+            "val": 2
+          }
         },
         {
           "level": 3,
@@ -588,7 +673,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.13,
           "mascotBadge": "LVL 3 MAX • 🐻 STALEY APEX GRIZZLY",
           "mascotTrait": "MAX MASCOT FORM: Staley Da Bear’s Massive Kodiak Claws, Bear-Fang Armor & Earth-Shaking Midway Roar!",
-          "note": "MAX MASCOT FORM: Staley Da Bear’s Massive Kodiak Claws, Bear-Fang Armor & Earth-Shaking Midway Roar!"
+          "note": "MAX MASCOT FORM: Staley Da Bear’s Massive Kodiak Claws, Bear-Fang Armor & Earth-Shaking Midway Roar!",
+          "image": "assets/card-tyler-davis-l3.jpg",
+          "visualFx": "max",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "🐻 Apex Grizzly Slam: +3 Life & +8 ATK!",
+            "effect": "grizzly",
+            "heal": 3,
+            "atk": 8
+          }
         }
       ],
       "bio": "Forged in the freezing lakefront winds of Soldier Field 2400. Tyler Davis! leads the Monsters of the Midway with relentless grit, bone-rattling hits, and pure Bear Down energy — turning every 4th-quarter blizzard into a Chicago highlight reel.",
@@ -723,7 +818,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.81,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Lightning-quick #22 breaking ankles on opening kickoff.",
-          "note": "Lightning-quick #22 breaking ankles on opening kickoff."
+          "note": "Lightning-quick #22 breaking ankles on opening kickoff.",
+          "image": "assets/card-tavaris-too-too.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: +1 DMG on big clash wins",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -736,7 +836,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.93,
           "mascotBadge": "LVL 2 • 🤠 ROWDY SPURS",
           "mascotTrait": "Ignites Rowdy’s chrome cowboy spurs & blazing blue Lone Star overdrive.",
-          "note": "Ignites Rowdy’s chrome cowboy spurs & blazing blue Lone Star overdrive."
+          "note": "Ignites Rowdy’s chrome cowboy spurs & blazing blue Lone Star overdrive.",
+          "image": "assets/card-tavaris-too-too.jpg",
+          "visualFx": "cowboys-l2",
+          "evolveCost": 2,
+          "inherited": "Inherited: Double Strike (+1 Shield Break)",
+          "onEvolve": {
+            "label": "🤠 Rowdy Spurs: +8 ATK & +1 NRG!",
+            "effect": "atk_energy",
+            "atk": 8,
+            "val": 1
+          }
         },
         {
           "level": 3,
@@ -749,7 +859,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.13,
           "mascotBadge": "LVL 3 MAX • 🤠 ROWDY LONE STAR",
           "mascotTrait": "MAX MASCOT FORM: Rowdy’s Chrome Stetson Crest, Blazing Mustang Spurs & Electric Stampede Lasso!",
-          "note": "MAX MASCOT FORM: Rowdy’s Chrome Stetson Crest, Blazing Mustang Spurs & Electric Stampede Lasso!"
+          "note": "MAX MASCOT FORM: Rowdy’s Chrome Stetson Crest, Blazing Mustang Spurs & Electric Stampede Lasso!",
+          "image": "assets/card-tavaris-too-too.jpg",
+          "visualFx": "cowboys-l3",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "⭐ Lone Star Stampede: Shatter 1 Shield & +10 ATK!",
+            "effect": "pierce_atk",
+            "val": 1,
+            "atk": 10
+          }
         }
       ],
       "bio": "Forged under the neon lights of AT&T Stadium 2400. Tavaris Welch — known across the gridiron as \"Too Too\" — carries the legendary Dallas #22 with explosive speed, ice-cold swag, and relentless 4th-quarter power, turning every primetime drive into a Lone Star highlight reel.",
@@ -884,7 +1004,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.81,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Stealth camo cap locked in — calculating Mach-2 deep routes.",
-          "note": "Stealth camo cap locked in — calculating Mach-2 deep routes."
+          "note": "Stealth camo cap locked in — calculating Mach-2 deep routes.",
+          "image": "assets/card-shawn-elon.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: +1 NRG when staking 2+",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -897,7 +1022,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.93,
           "mascotBadge": "LVL 2 • 🎩 PAT TRICORNE",
           "mascotTrait": "Equips Pat Patriot’s tricorne telemetry crest & scarlet musket-flash plasma.",
-          "note": "Equips Pat Patriot’s tricorne telemetry crest & scarlet musket-flash plasma."
+          "note": "Equips Pat Patriot’s tricorne telemetry crest & scarlet musket-flash plasma.",
+          "image": "assets/card-shawn-elon.jpg",
+          "visualFx": "patriots-l2",
+          "evolveCost": 2,
+          "inherited": "Inherited: +6 ATK Hyperloop Boost",
+          "onEvolve": {
+            "label": "🎩 Tricorne Telemetry: +2 Hype Energy!",
+            "effect": "energy",
+            "val": 2
+          }
         },
         {
           "level": 3,
@@ -910,7 +1044,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.13,
           "mascotBadge": "LVL 3 MAX • 🎩 PAT MINUTEMAN",
           "mascotTrait": "MAX MASCOT FORM: Pat Patriot’s Revolutionary Tricorne Crest, Minuteman Plasma Cannon & Lighthouse Beam!",
-          "note": "MAX MASCOT FORM: Pat Patriot’s Revolutionary Tricorne Crest, Minuteman Plasma Cannon & Lighthouse Beam!"
+          "note": "MAX MASCOT FORM: Pat Patriot’s Revolutionary Tricorne Crest, Minuteman Plasma Cannon & Lighthouse Beam!",
+          "image": "assets/card-shawn-elon.jpg",
+          "visualFx": "patriots-l3",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "🚀 Minuteman Laser: +12 ATK & +2 NRG!",
+            "effect": "atk_energy",
+            "atk": 12,
+            "val": 2
+          }
         }
       ],
       "bio": "Known across Gillette Stadium 2400 simply as \"Elon\". Shawn Clark engineers New England Patriots dynasty plays from the future — firing Mach-2 crimson lasers past the Foxborough Lighthouse with full-sleeve ink, icy calm precision, and 400-IQ gridiron telemetry.",
@@ -1045,7 +1189,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.81,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Ice-cold pocket general commanding sub-zero snaps at Lambeau.",
-          "note": "Ice-cold pocket general commanding sub-zero snaps at Lambeau."
+          "note": "Ice-cold pocket general commanding sub-zero snaps at Lambeau.",
+          "image": "assets/card-jerry-mack.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: +5 ATK Gunslinger Bonus",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -1058,7 +1207,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.93,
           "mascotBadge": "LVL 2 • 🧀 CHEESEHEAD CREST",
           "mascotTrait": "Channels Titletown’s glowing Golden Cheesehead crest & Lambeau frost spirals.",
-          "note": "Channels Titletown’s glowing Golden Cheesehead crest & Lambeau frost spirals."
+          "note": "Channels Titletown’s glowing Golden Cheesehead crest & Lambeau frost spirals.",
+          "image": "assets/card-jerry-mack-l2.jpg",
+          "visualFx": "awakened",
+          "evolveCost": 2,
+          "inherited": "Inherited: +1 Bonus DMG in Tundra Clash",
+          "onEvolve": {
+            "label": "🧀 Lambeau Dime: +9 ATK this round!",
+            "effect": "atk",
+            "atk": 9
+          }
         },
         {
           "level": 3,
@@ -1071,7 +1229,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.14,
           "mascotBadge": "LVL 3 MAX • 🧀 CHEESEHEAD EMPEROR",
           "mascotTrait": "MAX MASCOT FORM: Titletown’s Blazing Golden Cheesehead Crown, Lombardi Lightning & Frozen Tundra Cannon!",
-          "note": "MAX MASCOT FORM: Titletown’s Blazing Golden Cheesehead Crown, Lombardi Lightning & Frozen Tundra Cannon!"
+          "note": "MAX MASCOT FORM: Titletown’s Blazing Golden Cheesehead Crown, Lombardi Lightning & Frozen Tundra Cannon!",
+          "image": "assets/card-jerry-mack-l2.jpg",
+          "visualFx": "packers-l3",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "👑 Cheesehead Emperor: Shatter 1 Shield & +10 ATK!",
+            "effect": "pierce_atk",
+            "val": 1,
+            "atk": 10
+          }
         }
       ],
       "bio": "Born for sub-zero primetime under the lights of Lambeau Field 2400. Jerry Jernigan — known across Titletown as \"MACK\" — commands the Green Bay Packers offense at Quarterback with effortless pocket poise, cannon-arm deep balls, and unstoppable 4th-quarter Ice Veins.",
@@ -1207,7 +1375,12 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.81,
           "mascotBadge": "LVL 1 • ROOKIE",
           "mascotTrait": "Relentless off-the-edge powerhouse built for freezing Green Bay nights.",
-          "note": "Relentless off-the-edge powerhouse built for freezing Green Bay nights."
+          "note": "Relentless off-the-edge powerhouse built for freezing Green Bay nights.",
+          "image": "assets/card-david-da-boss.jpg",
+          "visualFx": "base",
+          "evolveCost": 0,
+          "inherited": "Inherited: Boss Intimidate (-1 Opp PWR)",
+          "onEvolve": null
         },
         {
           "level": 2,
@@ -1220,7 +1393,16 @@ window.BAD_CARDS_DATA = {
           "atkMult": 0.93,
           "mascotBadge": "LVL 2 • ❄️ TUNDRA FROST FISTS",
           "mascotTrait": "Forges Titletown sub-zero ice gauntlets & armored Cheesehead shoulder plates.",
-          "note": "Forges Titletown sub-zero ice gauntlets & armored Cheesehead shoulder plates."
+          "note": "Forges Titletown sub-zero ice gauntlets & armored Cheesehead shoulder plates.",
+          "image": "assets/card-david-da-boss-l2.jpg",
+          "visualFx": "awakened",
+          "evolveCost": 2,
+          "inherited": "Inherited: Shield Break deals +1 Extra DMG",
+          "onEvolve": {
+            "label": "❄️ Frost Fists: -2 Opp Energy!",
+            "effect": "drain",
+            "val": 2
+          }
         },
         {
           "level": 3,
@@ -1233,7 +1415,17 @@ window.BAD_CARDS_DATA = {
           "atkMult": 1.14,
           "mascotBadge": "LVL 3 MAX • 🧀❄️ TUNDRA TITAN",
           "mascotTrait": "MAX MASCOT FORM: Armored Titletown Cheesehead War-Crest, Frozen Tundra Ice-Breaker Claws & Lambeau Shockwave!",
-          "note": "MAX MASCOT FORM: Armored Titletown Cheesehead War-Crest, Frozen Tundra Ice-Breaker Claws & Lambeau Shockwave!"
+          "note": "MAX MASCOT FORM: Armored Titletown Cheesehead War-Crest, Frozen Tundra Ice-Breaker Claws & Lambeau Shockwave!",
+          "image": "assets/card-david-da-boss-l2.jpg",
+          "visualFx": "packers-boss-l3",
+          "evolveCost": 3,
+          "inherited": null,
+          "onEvolve": {
+            "label": "🧀❄️ Tundra Titan Shockwave: -2 Opp NRG & +12 ATK!",
+            "effect": "burst_drain",
+            "atk": 12,
+            "val": 2
+          }
         }
       ],
       "bio": "The undisputed defensive general of Lambeau Field 2400. David Burke — known across Green Bay as \"Da Boss\" — wears the legendary #92 with ice-cold intensity, bulldozing offensive tackles and pairing with QB Jerry aka MACK #4 to form the unstoppable Titletown Tundra duo.",
@@ -1328,6 +1520,16 @@ window.BAD_CARDS_DATA = {
       "bonusAtk": 8,
       "blockDmg": 0,
       "drainEnergy": -2
+    },
+    {
+      "id": "mirror-sack",
+      "name": "🪞 Trap: Mirror Sack",
+      "type": "TRAP",
+      "desc": "If you lose, reflect 3 DMG back & gain +2 Memory!",
+      "bonusAtk": 0,
+      "blockDmg": 2,
+      "reflectDmg": 3,
+      "drainEnergy": 0
     }
   ],
   "rivals": [
@@ -1414,6 +1616,106 @@ window.BAD_CARDS_DATA = {
       "badge": "VIKINGS",
       "time": "VALHALLA LOT",
       "text": "Shades stay on. QBs go down. SKOL!! 🕶️⚡"
+    }
+  ],
+  "securityTriggers": [
+    {
+      "id": "pick-six",
+      "icon": "🛡️",
+      "name": "PICK-SIX TRAP",
+      "desc": "Attacker loses 2 Hype Energy!",
+      "type": "drain_attacker",
+      "val": 2
+    },
+    {
+      "id": "hail-mary",
+      "icon": "⚡",
+      "name": "HAIL MARY SURGE",
+      "desc": "Defender gains +2 NRG & +2 Memory!",
+      "type": "boost_defender",
+      "val": 2
+    },
+    {
+      "id": "blitz-counter",
+      "icon": "🔥",
+      "name": "BLITZ COUNTER",
+      "desc": "Defender deals 2 retaliation damage!",
+      "type": "counter_dmg",
+      "val": 2
+    },
+    {
+      "id": "crowd-roar",
+      "icon": "📯",
+      "name": "CROWD ROAR",
+      "desc": "Defender recovers +2 Life Points!",
+      "type": "heal_defender",
+      "val": 2
+    },
+    {
+      "id": "clean-break",
+      "icon": "💥",
+      "name": "CLEAN BREAK",
+      "desc": "Security Shield shattered cleanly!",
+      "type": "none",
+      "val": 0
+    }
+  ],
+  "achievements": [
+    {
+      "id": "first-evo",
+      "icon": "⚡",
+      "name": "Digivolution Spark",
+      "desc": "Evolve any card in the Vault or Duel Arena",
+      "xp": 50
+    },
+    {
+      "id": "max-vault",
+      "icon": "👑",
+      "name": "Apex Mascot Collector",
+      "desc": "Ascend all 8 cards to Level 3 MAX",
+      "xp": 100
+    },
+    {
+      "id": "mid-match-evo",
+      "icon": "🧬",
+      "name": "Live Ascension",
+      "desc": "Digivolve a fighter mid-duel on the Arena stage",
+      "xp": 120
+    },
+    {
+      "id": "fury-clash",
+      "icon": "🔥",
+      "name": "Urban Rivals Fury",
+      "desc": "Win a clash with Fury Mode activated",
+      "xp": 100
+    },
+    {
+      "id": "shield-breaker",
+      "icon": "🛡️",
+      "name": "Security Crusher",
+      "desc": "Shatter an opponent Security Shield",
+      "xp": 80
+    },
+    {
+      "id": "trap-master",
+      "icon": "🪤",
+      "name": "Chain Reaction",
+      "desc": "Trigger a Face-Down Trap or Instant spell",
+      "xp": 80
+    },
+    {
+      "id": "first-win",
+      "icon": "🏆",
+      "name": "2400 Champion",
+      "desc": "Win a 4-Round Tactical Squad Duel",
+      "xp": 150
+    },
+    {
+      "id": "pack-ripper",
+      "icon": "🎁",
+      "name": "Mythic Pack Hunter",
+      "desc": "Rip open an 8-Card 1st-Edition God Pack",
+      "xp": 75
     }
   ]
 };

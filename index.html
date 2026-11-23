@@ -80,7 +80,7 @@
           MYTHIC CREW VAULT
         </h1>
         <p class="hero-sub">
-          Collect, evolve, build your 4-card squad, and out-bluff your friends with Hype Energy &amp; Instant Traps — featuring pure team-native 3D holographic cards stamped with the subtle <strong>B.A.D</strong> corner authentication seal.
+          Collect &amp; visually evolve every card across <strong>3 Team Mascot Forms (L1 Rookie → L2 Awakened → L3 MAX Apex Mascot)</strong>, build your <strong>4-Card Urban Rivals Squad</strong>, push the <strong>Digimon Memory Gauge</strong>, break <strong>Security Shields</strong>, and spring <strong>Face-Down Traps</strong>.
         </p>
 
         <ul class="clan-strip" role="list" aria-label="Active team clans">
@@ -93,31 +93,50 @@
 
         <div class="hero-cta-row">
           <button id="hero-pack-btn" class="btn btn-gold" type="button">🎁 Rip 8-Card Mythic Pack</button>
-          <a href="#vault" class="btn btn-cyan">🃏 Open Card Binder</a>
-          <a href="#battle" class="btn btn-ghost">⚔️ Play 4-Round Duel</a>
-          <a href="#request-desk" class="btn btn-ghost">🎨 Request Your Card</a>
+          <a href="#vault" class="btn btn-cyan">⚡ Evolve &amp; Open Binder</a>
+          <a href="#battle" class="btn btn-emerald">⚔️ Play Tactical TCG Duel</a>
+          <button id="open-compare-hero-btn" class="btn btn-ghost" type="button">⚖️ Compare Cards</button>
         </div>
 
         <div class="hero-stats">
           <div class="stat-pill-box">
-            <div class="stat-pill-val">8 / 8</div>
-            <div class="stat-pill-lbl">1st-Ed Mythic 1/1</div>
+            <div class="stat-pill-val">8 × 3</div>
+            <div class="stat-pill-lbl">3-Level Mascot Evolutions</div>
           </div>
           <div class="stat-pill-box">
-            <div class="stat-pill-val">5 FOILS</div>
-            <div class="stat-pill-lbl">Prism • Gold • Ghost • Ice</div>
+            <div class="stat-pill-val">MEMORY</div>
+            <div class="stat-pill-lbl">Digimon Gauge &amp; Shields</div>
           </div>
           <div class="stat-pill-box">
-            <div class="stat-pill-val">12 NRG</div>
-            <div class="stat-pill-lbl">Tactical Bluff Duels</div>
+            <div class="stat-pill-val">4-CARD</div>
+            <div class="stat-pill-lbl">Urban Rivals Hand + Fury</div>
           </div>
           <div class="stat-pill-box">
-            <div class="stat-pill-val">B.A.D 10</div>
-            <div class="stat-pill-lbl">Corner Holo Sealed</div>
+            <div class="stat-pill-val">TRAPS</div>
+            <div class="stat-pill-lbl">Yu-Gi-Oh! Chains &amp; MTG</div>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- DUELIST PROFILE, XP RANK & TROPHY BAR -->
+    <div class="profile-bar">
+      <div class="profile-bar-inner">
+        <div class="profile-rank-group">
+          <span id="profile-rank-pill" class="rank-crest-pill">★ ROOKIE COLLECTOR</span>
+          <div class="xp-meter-wrap">
+            <span id="profile-xp-label">0 / 200 XP</span>
+            <div class="xp-track" aria-hidden="true"><div id="profile-xp-fill" class="xp-fill" style="width:0%;"></div></div>
+          </div>
+          <span id="profile-streak-label" style="font-family:var(--font-mono);font-size:0.72rem;color:#86efac;">STREAK: 0</span>
+        </div>
+        <div class="toolbar-group">
+          <button id="evo-showcase-btn" class="btn btn-gold btn-sm" type="button">🎬 Evolve All L1 → L2 → L3</button>
+          <button id="open-compare-btn" class="btn btn-ghost btn-sm" type="button">⚖️ Compare</button>
+          <button id="open-trophy-btn" class="btn btn-cyan btn-sm" type="button">🏆 Trophies (<span id="trophy-count">0</span>/8)</button>
+        </div>
+      </div>
+    </div>
 
     <!-- SECTION 1: DIGITAL BINDER & LIVE 3D CARD VAULT -->
     <section id="vault" class="section">
@@ -175,20 +194,20 @@
       <div id="cards-grid" class="cards-grid"></div>
     </section>
 
-    <!-- SECTION 2: TACTICAL 4-ROUND DUEL ARENA -->
+    <!-- SECTION 2: TACTICAL 4-ROUND TCG DUEL ARENA (DIGIMON × URBAN RIVALS × YU-GI-OH! × MTG) -->
     <section id="battle" class="section">
       <div class="section-header">
         <div>
-          <div class="section-kicker">TACTICAL BLUFF &amp; INSTANT COUNTERPLAY</div>
-          <h2 class="section-title">B.A.D 4-Round Duel Arena</h2>
+          <div class="section-kicker">DIGIMON MEMORY &amp; ASCENSION &bull; URBAN RIVALS HAND &amp; FURY &bull; YU-GI-OH! TRAPS</div>
+          <h2 class="section-title">B.A.D 2400 Tactical Duel Arena</h2>
         </div>
         <p class="section-desc">
-          Pick your card, stake <strong>Hype Energy (0–12)</strong> secretly to multiply <strong>Power × (1 + Energy)</strong>, arm a 1-per-match <strong>Instant or Trap</strong>, and drop your opponent’s Life to 0!
+          Deploy your <strong>4-Card Squad Hand</strong>, evolve fighters live from <strong>LVL 1 → LVL 2 → LVL 3 MAX</strong> to stack <strong>Inherited Skills</strong>, push the <strong>Shared Memory Gauge</strong>, toggle <strong>Fury (+2 DMG)</strong>, shatter <strong>Security Shields</strong>, and spring <strong>Face-Down Traps</strong>!
         </p>
       </div>
 
       <div class="panel-surface">
-        <!-- Urban Rivals-style Top Duel HUD -->
+        <!-- Top Duel HUD -->
         <div class="duel-hud">
           <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
             <span style="font-family:var(--font-display);font-size:0.72rem;color:var(--bad-gold-hot);" id="duel-round-label">ROUND 1 / 4</span>
@@ -208,18 +227,38 @@
           </div>
         </div>
 
+        <!-- Digimon Shared Memory / Momentum Gauge -->
+        <div class="memory-gauge-wrap">
+          <div class="memory-gauge-head">
+            <span style="color:#7dd3fc;">◀ YOUR MEMORY ADVANTAGE (+NRG)</span>
+            <span id="memory-readout-label" style="color:#ffe28a;">SHARED MEMORY GAUGE: +2 YOU</span>
+            <span style="color:#fca5a5;">OPP COUNTER MEMORY (+NRG) ▶</span>
+          </div>
+          <div id="memory-track" class="memory-track" role="img" aria-label="Shared Memory Gauge"></div>
+        </div>
+
         <div class="battle-setup">
           <div class="battle-row">
-            <span class="toolbar-label">YOUR CARD:</span>
-            <div id="fighter-picker" class="toolbar-group"></div>
-          </div>
-          <div class="battle-row">
-            <span class="toolbar-label">MODE:</span>
+            <span class="toolbar-label">DUEL FORMAT:</span>
+            <button class="chip active" data-duel-format="ascension" type="button" aria-pressed="true">🧬 Digimon Ascension (L1 → L3 Live)</button>
+            <button class="chip" data-duel-format="max" type="button" aria-pressed="false">⚡ Max Blitz (Vault Levels)</button>
+            <span class="toolbar-label" style="margin-left:0.4rem;">MODE:</span>
             <button class="chip active" data-opp-mode="crew" type="button" aria-pressed="true">⚔️ Friend vs. Friend</button>
             <button class="chip" data-opp-mode="rivals" type="button" aria-pressed="false">🏟️ NFL Rivals</button>
-            <span class="toolbar-label" style="margin-left:0.4rem;">OPPONENT:</span>
+          </div>
+          <div class="battle-row">
+            <span class="toolbar-label">OPPONENT:</span>
             <div id="opponent-picker" class="toolbar-group"></div>
           </div>
+        </div>
+
+        <!-- Urban Rivals 4-Card Squad Hand -->
+        <div class="duel-hand-panel">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+            <span class="toolbar-label">🃏 YOUR 4-CARD SQUAD HAND (PICK 1 UNUSED FIGHTER EACH ROUND)</span>
+            <span id="hand-revenge-tag" style="font-family:var(--font-mono);font-size:0.68rem;color:#94a3b8;">1 card per round • Clan bonuses active</span>
+          </div>
+          <div id="duel-hand-grid" class="duel-hand-grid"></div>
         </div>
 
         <div class="battle-stage">
@@ -227,7 +266,9 @@
           <div class="fighter-card" id="hero-fighter-box">
             <img id="battle-hero-img" class="fighter-avatar" src="assets/card-david-da-boss.jpg" alt="Your fighter" decoding="async" />
             <div id="battle-hero-name" class="fighter-name">DAVID aka DA BOSS #92</div>
-            <div id="battle-hero-mascot" class="duel-mascot-tag">LVL 3 MAX • 🧀❄️ TUNDRA TITAN</div>
+            <div id="battle-hero-mascot" class="duel-mascot-tag">LVL 1 • ROOKIE</div>
+            <div id="battle-evo-bar" class="battle-evo-bar"></div>
+            <div id="hero-inherited-stack" class="inherited-stack"></div>
             <div class="fighter-stat-badges">
               <span class="badge-pwr">👊 PWR <strong id="hero-pwr-val">13</strong></span>
               <span class="badge-dmg">🔥 DMG <strong id="hero-dmg-val">9</strong></span>
@@ -238,19 +279,25 @@
               <div class="hp-label"><span>LIFE POINTS</span><span id="hero-hp-text">14 / 14</span></div>
               <div class="hp-track"><div id="hero-hp-fill" class="hp-fill" style="width:100%;"></div></div>
             </div>
+            <div class="security-row">
+              <div class="security-label"><span>🛡️ END-ZONE SECURITY SHIELDS</span><span id="hero-sec-count">4 / 4</span></div>
+              <div id="hero-security-stack" class="security-stack"></div>
+            </div>
           </div>
 
           <!-- CENTER VS + RESULT BANNER -->
           <div class="vs-core">
             <div class="vs-slanted">VS</div>
             <div id="round-result-banner" class="round-banner">STAKE ENERGY &amp; CLASH</div>
+            <div id="trap-zone-badge" class="trap-slot-badge">🪤 TRAP ZONE: EMPTY</div>
           </div>
 
           <!-- OPPONENT SIDE -->
           <div class="fighter-card" id="opp-fighter-box">
             <div id="battle-opp-visual"></div>
             <div id="battle-opp-name" class="fighter-name">KARL DANGER! #99</div>
-            <div id="battle-opp-mascot" class="duel-mascot-tag opp-tag">LVL 3 MAX • 🪓 VIKTOR BERSERKER</div>
+            <div id="battle-opp-mascot" class="duel-mascot-tag opp-tag">LVL 1 • ROOKIE</div>
+            <div id="opp-inherited-stack" class="inherited-stack"></div>
             <div class="fighter-stat-badges">
               <span class="badge-pwr">👊 PWR <strong id="opp-pwr-val">10</strong></span>
               <span class="badge-dmg">🔥 DMG <strong id="opp-dmg-val">8</strong></span>
@@ -261,36 +308,44 @@
               <div class="hp-label"><span>LIFE POINTS</span><span id="opp-hp-text">14 / 14</span></div>
               <div class="hp-track"><div id="opp-hp-fill" class="hp-fill" style="width:100%;"></div></div>
             </div>
+            <div class="security-row">
+              <div class="security-label" style="color:#fca5a5;"><span>🛡️ OPP SECURITY SHIELDS</span><span id="opp-sec-count">4 / 4</span></div>
+              <div id="opp-security-stack" class="security-stack"></div>
+            </div>
           </div>
         </div>
 
-        <!-- HYPE ENERGY STAKE + INSTANT/TRAP CONTROLS -->
+        <!-- HYPE ENERGY STAKE + URBAN RIVALS FURY + YU-GI-OH! TRAP / MTG INSTANT CONTROLS -->
         <div class="stake-controls">
           <div>
             <div style="display:flex;justify-content:space-between;align-items:center;font-family:var(--font-display);font-size:0.72rem;">
-              <span style="color:var(--bad-gold-hot);">⚡ STAKE HYPE ENERGY: <strong id="stake-val-label">2</strong></span>
+              <span style="color:var(--bad-gold-hot);">⚡ STAKE HYPE ENERGY (PILLZ): <strong id="stake-val-label">2</strong></span>
               <span style="color:var(--text-muted);" id="stake-formula-hint">Power × 3</span>
             </div>
             <div class="energy-pips" id="energy-pips"></div>
             <input id="stake-slider" class="stake-slider" type="range" min="0" max="12" value="2" aria-label="Hype Energy to stake" />
+            <div class="fury-trap-row">
+              <button id="fury-toggle-btn" class="fury-btn" type="button" aria-pressed="false">🔥 FURY: OFF (+3 NRG → +2 DMG)</button>
+              <span id="keyword-active-hint" style="font-size:0.74rem;color:#7dd3fc;"></span>
+            </div>
           </div>
 
           <div class="instant-bar">
             <div style="font-family:var(--font-display);font-size:0.68rem;color:#7dd3fc;">
-              🛡️ INSTANT / TRAP SLOT <span id="instant-status-tag" style="color:var(--bad-gold);">(1 READY)</span>
+              🪤 FACE-DOWN TRAP / INSTANT SLOT <span id="instant-status-tag" style="color:var(--bad-gold);">(1 READY)</span>
             </div>
             <div id="instant-picker" class="instant-grid"></div>
-            <div id="instant-desc" style="font-size:0.78rem;color:var(--text-muted);">Optional: Arm a 1-per-match Instant or Trap before playing the round.</div>
+            <div id="instant-desc" style="font-size:0.78rem;color:var(--text-muted);">Optional: Set 1 Face-Down Trap or Instant spell before playing the round.</div>
           </div>
         </div>
 
         <div class="battle-cta-row">
-          <button id="play-round-btn" class="btn btn-gold" style="min-width:240px;padding:0.72rem 1.6rem;" type="button">⚡ PLAY THE ROUND</button>
+          <button id="play-round-btn" class="btn btn-gold" style="min-width:240px;padding:0.72rem 1.6rem;" type="button">⚡ PLAY ROUND 1</button>
           <button id="battle-reset-btn" class="btn btn-ghost" type="button">🔄 New 4-Round Match</button>
         </div>
 
         <div id="battle-log" class="battle-log" aria-live="polite">
-          <div>🏟️ B.A.D 2400 Tactical Duel Arena is live! Stake your Hype Energy, arm an Instant or Trap, and hit PLAY THE ROUND!</div>
+          <div>🏟️ B.A.D 2400 Tactical Duel Arena v2.0 is live! Pick a card from your 4-Card Hand, evolve live for Inherited Skills, toggle Fury, set a Trap, and shatter all Security Shields!</div>
         </div>
       </div>
     </section>
@@ -436,8 +491,10 @@
             <div id="inspect-atkdef" style="font-family:var(--font-mono);font-size:0.78rem;color:#ffe28a;font-weight:700;"></div>
           </div>
 
+          <div id="inspect-evo-trio" class="evo-trio-grid" role="group" aria-label="3-Stage Evolution Artwork Preview"></div>
           <div id="inspect-evo-bar" class="evo-bar"></div>
-          <div id="inspect-evo-note" style="font-size:0.86rem;color:#c9dcf7;background:rgba(255,255,255,0.045);border-radius:8px;padding:0.45rem 0.65rem;margin-bottom:0.7rem;"></div>
+          <div id="inspect-evo-note" style="font-size:0.86rem;color:#c9dcf7;background:rgba(255,255,255,0.045);border-radius:8px;padding:0.45rem 0.65rem;margin-bottom:0.55rem;"></div>
+          <div id="inspect-evo-skills" class="inherited-stack" style="margin-bottom:0.7rem;"></div>
 
           <div id="inspect-keywords" class="keyword-row"></div>
           <blockquote id="inspect-quote" style="border-left:3px solid #f5b942;padding-left:0.75rem;font-style:italic;color:#e6f0ff;margin-bottom:0.7rem;"></blockquote>
@@ -477,6 +534,43 @@
         <button id="squad-launch-duel" class="btn btn-gold" style="flex:1;" type="button">⚔️ Battle With Squad</button>
         <button id="squad-clear-btn" class="btn btn-ghost btn-sm" type="button">Clear</button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- NATIVE MODAL DIALOG: ACHIEVEMENT TROPHY CASE -->
+  <dialog id="trophy-dialog" closedby="any" aria-labelledby="trophy-dialog-title">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <h2 id="trophy-dialog-title" class="modal-title">🏆 B.A.D 2400 DUELIST RANK &amp; TROPHY CASE</h2>
+        <form method="dialog">
+          <button class="btn btn-ghost btn-sm" type="submit" autofocus aria-label="Close trophy case">✕ Close</button>
+        </form>
+      </div>
+      <div id="trophy-summary" style="font-size:0.88rem;color:#cbd5e1;margin-bottom:1rem;"></div>
+      <div id="trophy-grid" class="trophy-grid"></div>
+    </div>
+  </dialog>
+
+  <!-- NATIVE MODAL DIALOG: HEAD-TO-HEAD CARD COMPARATOR -->
+  <dialog id="compare-dialog" closedby="any" aria-labelledby="compare-dialog-title">
+    <div class="modal-inner">
+      <div class="modal-head">
+        <h2 id="compare-dialog-title" class="modal-title">⚖️ HEAD-TO-HEAD CARD &amp; EVOLUTION COMPARATOR</h2>
+        <form method="dialog">
+          <button class="btn btn-ghost btn-sm" type="submit" autofocus aria-label="Close comparator">✕ Close</button>
+        </form>
+      </div>
+      <div class="form-row-2">
+        <div>
+          <label class="field-label" for="compare-select-a">CARD A</label>
+          <select id="compare-select-a" class="select-input"></select>
+        </div>
+        <div>
+          <label class="field-label" for="compare-select-b">CARD B</label>
+          <select id="compare-select-b" class="select-input"></select>
+        </div>
+      </div>
+      <div id="compare-grid" class="compare-grid"></div>
     </div>
   </dialog>
 

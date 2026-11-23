@@ -15,10 +15,8 @@ Official **Build a Dream (B.A.D) Studio** Flagship Pro trading card vault & tact
 - [https://iksterbo-design.github.io/bad-cards-2400/](https://iksterbo-design.github.io/bad-cards-2400/)
 
 ## Highlights
-- **Pure Team-Native 3D Holographic Cards + Corner `B.A.D` Foil Seal** — subtle Yu-Gi-Oh!/Pokémon-inspired gold holographic corner authentication seal & set code on every card without touching the player art or team look.
-- **5 Collector Foil Finishes** — Team Native, Secret Prism, Quarter-Century Gold, Ghost Silver, and Star Ice + B.A.D 10 Graded Slab mode.
-- **3-Level Team Mascot Ascension Upgrades (`L1 → L2 → L3 MAX`)** — power up every card through Rookie, Awakened, and MAX Mascot forms (Viktor the Viking, Titletown Cheesehead & Tundra Titan, Staley Da Bear, Rowdy, and Pat Patriot) with live OVR, ATK/DEF, Duel Power/Damage scaling, and level-aware PNG exports.
-- **Card Evolution Inspector (`1★ → 3★ → 5★`)** — inspect lore quotes, MTG-inspired keywords, Yu-Gi-Oh!-inspired ATK/DEF ratings, career milestones, and download high-res Front & Back PNGs with the corner seal baked in.
-- **4-Card Squad Builder Drawer** — build a 4-card team deck with live Star Cap & Clan Synergy bonuses (Valhalla Squad, Titletown Tundra, and Multi-Team Alliance).
-- **Tactical Hype-Energy Duel Arena** — bluff with 12 Hype Energy (`Power × (1 + Energy)`), fire Instant/Trap counterplays, and run Friend vs. Friend or NFL Rival matches.
-- **Rip 8-Card Mythic Pack + Custom Card Request Desk** — friends can rip a sealed holographic pack and request their own custom B.A.D Card directly.
+- **3-Stage Visual Team Mascot Evolutions (`LVL 1 Rookie → LVL 2 Awakened → LVL 3 MAX Apex Mascot`)** — distinct progressive card artwork, escalating holographic frame tiers, Digivolution flash shockwaves, level-aware PNG exports, and a one-click **Evolve All L1 → L2 → L3** Showcase.
+- **Digimon TCG Mechanics** — Shared **Memory / Momentum Gauge**, **Live Mid-Match Digivolution** with **When-Evolving** bursts & stacked **Inherited Skills**, and **4 Face-Down End-Zone Security Shields** with surprise Security Trigger checks.
+- **Urban Rivals Mechanics** — True **4-Card Squad Hand** (play 1 unused fighter per round), **Hype Energy (Pillz)** bluffing (`Power × (1 + Energy)`), **Fury Mode (`+3 NRG → +2 DMG`)**, **Clan Resonance**, and **Revenge** comeback bonuses.
+- **Yu-Gi-Oh! & MTG Counterplay** — **Face-Down Trap & Instant Slot** (including *Mirror Sack* reflection), **5 Collector Foil Finishes**, **B.A.D 10 Graded Slab** mode, subtle corner `B.A.D` holo seal, and live **MTG Combat Keywords** (*Haste/Blitz, Double Strike, Ward, Commander, Intimidate, Gunslinger/Launch*).
+- **Collector Meta Progression** — Persistent **Duelist XP & Ranks**, **8 Unlockable Achievement Trophies**, **3-Stage Evolution Inspector**, **Head-to-Head Card Comparator**, **8-Card Mythic Pack Ripper**, and **Custom Card Request Desk**.

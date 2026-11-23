@@ -110,6 +110,68 @@ class BadCardsAudio {
     osc.start(now);
     osc.stop(now + 0.4);
   }
+
+  playEvolve(level = 2) {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const notes = level === 3
+      ? [293.66, 369.99, 440.0, 587.33, 739.99, 880.0]
+      : [261.63, 329.63, 392.0, 523.25];
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = level === 3 ? 'sawtooth' : 'triangle';
+      osc.frequency.setValueAtTime(freq, now + i * 0.055);
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(level === 3 ? 2800 : 1800, now + i * 0.055);
+      g.gain.setValueAtTime(0.001, now + i * 0.055);
+      g.gain.linearRampToValueAtTime(level === 3 ? 0.14 : 0.10, now + i * 0.055 + 0.03);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.055 + 0.52);
+      osc.connect(filter);
+      filter.connect(g);
+      g.connect(ctx.destination);
+      osc.start(now + i * 0.055);
+      osc.stop(now + i * 0.055 + 0.55);
+    });
+  }
+
+  playFury() {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(110, now);
+    osc.frequency.exponentialRampToValueAtTime(320, now + 0.18);
+    g.gain.setValueAtTime(0.18, now);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.36);
+  }
+
+  playShieldBreak() {
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    [680, 420, 210].forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const g = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, now + i * 0.04);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.45, now + i * 0.04 + 0.16);
+      g.gain.setValueAtTime(0.12, now + i * 0.04);
+      g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.18);
+      osc.connect(g);
+      g.connect(ctx.destination);
+      osc.start(now + i * 0.04);
+      osc.stop(now + i * 0.04 + 0.2);
+    });
+  }
 }
 
 window.badAudio = new BadCardsAudio();
