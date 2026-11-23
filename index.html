@@ -22,7 +22,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Orbitron:wght@600;700;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=2.3" />
+  <link rel="stylesheet" href="styles.css?v=2.4" />
 </head>
 <body data-foil="native">
   <canvas id="bg-canvas" aria-hidden="true"></canvas>
@@ -63,7 +63,7 @@
         </nav>
 
         <div class="nav-actions">
-          <button id="open-squad-btn" class="btn btn-cyan btn-sm" type="button">🃏 <span>My Squad (<span id="squad-count">3</span>/4)</span></button>
+          <button id="open-squad-btn" class="btn btn-cyan btn-sm" type="button">🃏 <span>My Squad (<span id="squad-count">4</span>/4)</span></button>
           <button id="mute-btn" class="btn btn-ghost btn-sm" type="button">🔊 Sound</button>
           <button id="nav-pack-btn" class="btn btn-gold btn-sm" type="button">🎁 Rip Pack</button>
         </div>
@@ -297,6 +297,7 @@
             <div id="battle-opp-visual"></div>
             <div id="battle-opp-name" class="fighter-name">KARL DANGER! #99</div>
             <div id="battle-opp-mascot" class="duel-mascot-tag opp-tag">LVL 1 • ROOKIE</div>
+            <div id="opp-taunt-pill" class="opp-taunt-pill"></div>
             <div id="opp-inherited-stack" class="inherited-stack"></div>
             <div class="fighter-stat-badges">
               <span class="badge-pwr">👊 PWR <strong id="opp-pwr-val">10</strong></span>
@@ -324,6 +325,12 @@
             </div>
             <div class="energy-pips" id="energy-pips"></div>
             <input id="stake-slider" class="stake-slider" type="range" min="0" max="12" value="2" aria-label="Hype Energy to stake" />
+            <div class="stake-presets" role="group" aria-label="Quick Hype Energy stake presets">
+              <button class="chip stake-preset-btn" data-stake-preset="0" type="button">0 Bluff</button>
+              <button class="chip stake-preset-btn" data-stake-preset="2" type="button">2 NRG</button>
+              <button class="chip stake-preset-btn" data-stake-preset="4" type="button">4 Push</button>
+              <button class="chip stake-preset-btn" data-stake-preset="max" type="button">⚡ ALL-IN</button>
+            </div>
             <div class="fury-trap-row">
               <button id="fury-toggle-btn" class="fury-btn" type="button" aria-pressed="false">🔥 FURY: OFF (+3 NRG → +2 DMG)</button>
               <span id="keyword-active-hint" style="font-size:0.74rem;color:#7dd3fc;"></span>
@@ -577,8 +584,8 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=2.3"></script>
-  <script src="audio.js?v=2.3"></script>
-  <script src="app.js?v=2.3"></script>
+  <script src="data.js?v=2.4"></script>
+  <script src="audio.js?v=2.4"></script>
+  <script src="app.js?v=2.4"></script>
 </body>
 </html>

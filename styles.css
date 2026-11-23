@@ -276,6 +276,10 @@ body {
 }
 
 .btn:active { transform: scale(0.96); }
+:where(.btn, .chip, .lvl-pill, .card-mini-btn, .hand-card-btn, .fury-btn, .battle-evo-btn, .energy-pip, .evo-trio-card, .strip-link-btn, .stake-slider):focus-visible {
+  outline: 2.5px solid #ffe28a;
+  outline-offset: 2px;
+}
 .btn-sm { padding: 0.42rem 0.84rem; font-size: 0.65rem; }
 
 .btn-gold {
@@ -1732,6 +1736,35 @@ body[data-foil="ice"] .holo-rainbow {
   min-height: 28px;
   accent-color: #f5b942;
   cursor: pointer;
+}
+
+.stake-presets {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: 0.35rem;
+}
+
+.stake-preset-btn {
+  padding: 0.28rem 0.65rem;
+  font-size: 0.6rem;
+}
+
+.opp-taunt-pill {
+  font-size: 0.74rem;
+  font-style: italic;
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.11);
+  border: 1px solid rgba(239, 68, 68, 0.32);
+  border-radius: 10px;
+  padding: 0.34rem 0.6rem;
+  margin: 0.35rem 0 0.45rem;
+  line-height: 1.3;
+}
+.opp-taunt-pill:empty { display: none; }
+
+@media (pointer: coarse) {
+  .stake-preset-btn { min-block-size: 36px; padding: 0.38rem 0.78rem; }
 }
 
 .instant-bar { display: flex; flex-direction: column; gap: 0.45rem; }

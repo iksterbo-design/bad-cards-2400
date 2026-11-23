@@ -1533,11 +1533,14 @@
 
   function getActiveKeywordBonuses(card, duelLvl) {
     const kw = card.keywords || [];
+    let bonusPwr = 0;
     let bonusAtk = 0;
     let bonusDmg = 0;
     let dmgReduce = 0;
+    let oppPwrReduce = 0;
     let drainOnWin = 0;
     let extraShieldBreak = 0;
+    let shieldBreakBonusDmg = 0;
     const notes = [];
 
     if ((kw.includes('Haste') || kw.includes('Blitz')) && state.round === 1) {
@@ -1563,21 +1566,26 @@
 
     // Inherited Digimon passives stacked when evolved above L1
     if (duelLvl >= 2) {
-      if (card.id === 'karl-danger') notes.push('Inherited L1 (+1 Blitz PWR)');
+      if (card.id === 'karl-danger') { bonusPwr += 1; notes.push('Inherited L1 (+1 Blitz PWR)'); }
       if (card.id === 'jared-jroc') { bonusAtk += 4; notes.push('Inherited L1 (+4 Haste ATK)'); }
+      if (card.id === 'isaiah-little-bill') { notes.push('Inherited L1 (+1 NRG on Evolve)'); }
       if (card.id === 'tyler-davis') { dmgReduce += 1; notes.push('Inherited L1 (Ward -1 DMG)'); }
-      if (card.id === 'jerry-mack') { bonusAtk += 5; notes.push('Inherited L1 (+5 Gunslinger ATK)'); }
       if (card.id === 'tavaris-too-too') { bonusDmg += 1; notes.push('Inherited L1 (+1 Clash DMG)'); }
-      if (card.id === 'david-da-boss') { bonusAtk += 3; notes.push('Inherited L1 (Boss Pressure)'); }
+      if (card.id === 'shawn-elon' && state.stake >= 2) { notes.push('Inherited L1 (+1 NRG Refund)'); }
+      if (card.id === 'jerry-mack') { bonusAtk += 5; notes.push('Inherited L1 (+5 Gunslinger ATK)'); }
+      if (card.id === 'david-da-boss') { oppPwrReduce += 1; notes.push('Inherited L1 (-1 Opp PWR)'); }
       if (card.id === 'justin-porky') { bonusAtk += 4; notes.push('Inherited L1 (+4 Lambeau Haste)'); }
     }
     if (duelLvl >= 3) {
-      if (card.id === 'jared-jroc' || card.id === 'jerry-mack' || card.id === 'justin-porky') { bonusDmg += 1; notes.push('Inherited L2 (+1 DMG)'); }
       if (card.id === 'karl-danger') { drainOnWin += 1; notes.push('Inherited L2 (-1 Opp NRG)'); }
-      if (card.id === 'shawn-elon') { bonusAtk += 6; notes.push('Inherited L2 (+6 Hyperloop ATK)'); }
+      if (card.id === 'jared-jroc' || card.id === 'jerry-mack' || card.id === 'justin-porky') { bonusDmg += 1; notes.push('Inherited L2 (+1 DMG)'); }
+      if (card.id === 'isaiah-little-bill') { bonusPwr += 1; notes.push('Inherited L2 (+1 Army of 11 PWR)'); }
+      if (card.id === 'tyler-davis') { dmgReduce += 1; notes.push('Inherited L2 (Midway Wall -1 DMG)'); }
       if (card.id === 'tavaris-too-too') { extraShieldBreak += 1; notes.push('Inherited L2 (Double Strike)'); }
+      if (card.id === 'shawn-elon') { bonusAtk += 6; notes.push('Inherited L2 (+6 Hyperloop ATK)'); }
+      if (card.id === 'david-da-boss') { shieldBreakBonusDmg += 1; notes.push('Inherited L2 (+1 DMG on Shield Break)'); }
     }
-    return { bonusAtk, bonusDmg, dmgReduce, drainOnWin, extraShieldBreak, notes };
+    return { bonusPwr, bonusAtk, bonusDmg, dmgReduce, oppPwrReduce, drainOnWin, extraShieldBreak, shieldBreakBonusDmg, notes };
   }
 
   /* ---------- TACTICAL 4-ROUND DIGIMON × URBAN RIVALS DUEL ENGINE ---------- */
@@ -1630,6 +1638,7 @@
         dmg: oppEvo.dmg,
         maxHp: 14,
         mascotBadge: oppEvo.mascotBadge,
+        taunt: opp.quote || opp.subtitle,
         evo: oppEvo
       };
     }
@@ -1645,8 +1654,23 @@
       pwr: r.duelPower,
       dmg: r.duelDamage,
       maxHp: r.hp,
+      taunt: `“${r.taunt}”`,
       mascotBadge: `${r.badge} NFL RIVAL • ${r.ovr} OVR`
     };
+  }
+
+  function computeSmartOppStake(opp, effOppPwr) {
+    const roundsLeft = state.maxRounds - state.round + 1;
+    if (roundsLeft <= 1) return state.oppEnergy;
+    const avgBudget = Math.floor(state.oppEnergy / roundsLeft);
+    const trailing = state.oppHp < state.heroHp || state.oppShields < state.heroShields;
+    const closeKill = state.heroHp <= opp.dmg || state.heroShields <= 1;
+    const target = closeKill ? Math.min(state.oppEnergy, avgBudget + 3) : (trailing ? avgBudget + 2 : avgBudget + 1);
+    const jitter = Math.floor(Math.random() * 3) - 1; // -1, 0, or +1 unpredictability
+    const maxSafe = Math.min(state.oppEnergy, roundsLeft === 2 ? state.oppEnergy : 6);
+    // Avoid wasting excess if base PWR is already huge
+    const cap = effOppPwr >= 11 ? Math.min(maxSafe, 5) : maxSafe;
+    return Math.max(0, Math.min(cap, target + jitter));
   }
 
   function appendDuelLog(line) {
@@ -1839,10 +1863,12 @@
     const hero = getHeroCard();
     const heroLvl = getDuelLevel(hero.id);
     const heroEvo = getCardEvoAt(hero, heroLvl);
+    const opp = getOpponent();
     const syn = getSquadSynergy();
     const kw = getActiveKeywordBonuses(hero, heroLvl);
     const revengePwr = state.revengeActive ? 2 : 0;
-    const effPwr = heroEvo.power + syn.bonusPwr + revengePwr;
+    const effPwr = heroEvo.power + syn.bonusPwr + kw.bonusPwr + revengePwr;
+    const effOppPwr = Math.max(1, opp.pwr - kw.oppPwrReduce);
 
     const furyCost = state.furyActive ? 3 : 0;
     const maxStakeAllowed = Math.max(0, state.heroEnergy - furyCost);
@@ -1851,6 +1877,19 @@
     const slider = document.getElementById('stake-slider');
     slider.max = String(maxStakeAllowed);
     slider.value = String(state.stake);
+
+    const oppPwrEl = document.getElementById('opp-pwr-val');
+    if (oppPwrEl) oppPwrEl.textContent = kw.oppPwrReduce > 0 ? `${effOppPwr} (-${kw.oppPwrReduce})` : String(effOppPwr);
+
+    document.querySelectorAll('.stake-preset-btn').forEach((btn) => {
+      const raw = btn.dataset.stakePreset;
+      const val = raw === 'max' ? maxStakeAllowed : Number(raw);
+      const isValid = val <= maxStakeAllowed && !state.duelOver;
+      const isSelected = isValid && state.stake === val;
+      btn.disabled = !isValid;
+      btn.classList.toggle('active', isSelected);
+      btn.setAttribute('aria-pressed', String(isSelected));
+    });
 
     const instant = DATA.instants.find((ins) => ins.id === state.armedInstantId);
     const bonusAtk = (instant ? instant.bonusAtk : 0) + state.duelBonusAtk + kw.bonusAtk;
@@ -2057,6 +2096,8 @@
       : `<div class="rival-emblem">${opp.badge}</div>`;
     document.getElementById('battle-opp-name').textContent = opp.name;
     document.getElementById('battle-opp-mascot').textContent = opp.mascotBadge || '';
+    const oppTauntEl = document.getElementById('opp-taunt-pill');
+    if (oppTauntEl) oppTauntEl.textContent = opp.taunt || '';
     document.getElementById('opp-pwr-val').textContent = String(opp.pwr);
     document.getElementById('opp-dmg-val').textContent = String(opp.dmg);
 
@@ -2093,11 +2134,8 @@
     const syn = getSquadSynergy();
     const kw = getActiveKeywordBonuses(hero, heroLvl);
 
-    const roundsLeft = state.maxRounds - state.round + 1;
-    const maxOppStake = Math.min(state.oppEnergy, roundsLeft === 1 ? state.oppEnergy : Math.min(6, state.oppEnergy));
-    const oppStake = roundsLeft === 1
-      ? state.oppEnergy
-      : Math.min(maxOppStake, Math.max(0, Math.floor(Math.random() * Math.min(6, state.oppEnergy + 1))));
+    const effOppPwr = Math.max(1, opp.pwr - kw.oppPwrReduce);
+    const oppStake = computeSmartOppStake(opp, effOppPwr);
 
     const usedInstant = (!state.instantUsed && state.armedInstantId)
       ? DATA.instants.find((x) => x.id === state.armedInstantId)
@@ -2113,9 +2151,9 @@
     state.oppEnergy = Math.max(0, state.oppEnergy - oppStake);
 
     const revengePwr = state.revengeActive ? 2 : 0;
-    const effPwr = heroEvo.power + syn.bonusPwr + revengePwr;
+    const effPwr = heroEvo.power + syn.bonusPwr + kw.bonusPwr + revengePwr;
     const heroAtk = effPwr * (1 + state.stake) + (usedInstant ? usedInstant.bonusAtk : 0) + state.duelBonusAtk + kw.bonusAtk;
-    const oppAtk = opp.pwr * (1 + oppStake);
+    const oppAtk = effOppPwr * (1 + oppStake);
 
     if (usedInstant) {
       state.instantUsed = true;
@@ -2129,11 +2167,10 @@
 
     document.getElementById('hero-atk-readout').textContent = String(heroAtk);
     document.getElementById('opp-atk-readout').textContent = String(oppAtk);
-    document.getElementById('opp-atk-sub').textContent = `Staked ${oppStake} NRG (${opp.pwr} × ${1 + oppStake})`;
+    document.getElementById('opp-atk-sub').textContent = `Staked ${oppStake} NRG (${effOppPwr} × ${1 + oppStake})`;
 
     if (heroAtk >= oppAtk) {
-      const dealt = heroEvo.dmg + syn.bonusDmg + kw.bonusDmg + (state.furyActive ? 2 : 0);
-      state.oppHp = Math.max(0, state.oppHp - dealt);
+      let dealt = heroEvo.dmg + syn.bonusDmg + kw.bonusDmg + (state.furyActive ? 2 : 0);
       state.revengeActive = false;
       if (kw.drainOnWin > 0) state.oppEnergy = Math.max(0, state.oppEnergy - kw.drainOnWin);
       shiftMemory(1);
@@ -2143,13 +2180,19 @@
       if ((heroAtk - oppAtk >= 15 && kw.extraShieldBreak > 0) || state.furyActive) {
         shieldsBroken = Math.min(2, state.oppShields);
       }
+      let actualBroken = 0;
       for (let s = 0; s < shieldsBroken; s++) {
         if (state.oppShields > 0) {
           state.oppShields -= 1;
+          actualBroken += 1;
           unlockTrophy('shield-breaker');
           triggerSecurityCheck('opp');
         }
       }
+      if (actualBroken > 0 && kw.shieldBreakBonusDmg > 0) {
+        dealt += kw.shieldBreakBonusDmg;
+      }
+      state.oppHp = Math.max(0, state.oppHp - dealt);
 
       if (state.furyActive) unlockTrophy('fury-clash');
 
@@ -2158,10 +2201,10 @@
       document.getElementById('hero-atk-readout').classList.add('gold');
       document.getElementById('opp-atk-readout').classList.remove('gold');
       const isTie = heroAtk === oppAtk;
-      banner.textContent = `${isTie ? 'TIEBREAKER WON!' : 'ROUND WON!'} ${heroAtk} ${isTie ? '=' : '>'} ${oppAtk} (-${dealt} LIFE • -${shieldsBroken} SHIELD)`;
+      banner.textContent = `${isTie ? 'TIEBREAKER WON!' : 'ROUND WON!'} ${heroAtk} ${isTie ? '=' : '>'} ${oppAtk} (-${dealt} LIFE • -${actualBroken} SHIELD)`;
       banner.className = 'round-banner win';
       AUDIO.playImpact(true);
-      appendDuelLog(`⚡ R${state.round}: ${hero.shortName} [L${heroLvl} ${heroEvo.stage}] (${heroAtk} ATK${state.furyActive ? ' + 🔥FURY' : ''}${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK) for -${dealt} Life & shattered ${shieldsBroken} Shield(s)!`);
+      appendDuelLog(`⚡ R${state.round}: ${hero.shortName} [L${heroLvl} ${heroEvo.stage}] (${heroAtk} ATK${state.furyActive ? ' + 🔥FURY' : ''}${usedInstant ? ` + ${usedInstant.name}` : ''}) crushed ${opp.name} (${oppAtk} ATK) for -${dealt} Life & shattered ${actualBroken} Shield(s)!`);
     } else {
       const blocked = (usedInstant ? usedInstant.blockDmg : 0) + kw.dmgReduce;
       const taken = Math.max(1, opp.dmg - blocked);
@@ -2451,6 +2494,18 @@
     document.getElementById('stake-slider')?.addEventListener('input', (e) => {
       state.stake = Number(e.target.value);
       renderEnergyControls();
+    });
+
+    document.querySelectorAll('.stake-preset-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (state.duelOver) return;
+        const furyCost = state.furyActive ? 3 : 0;
+        const maxAllowed = Math.max(0, state.heroEnergy - furyCost);
+        const raw = btn.dataset.stakePreset;
+        state.stake = raw === 'max' ? maxAllowed : Math.min(maxAllowed, Number(raw));
+        AUDIO.playCardFlip();
+        renderEnergyControls();
+      });
     });
 
     document.getElementById('play-round-btn')?.addEventListener('click', playDuelRound);
