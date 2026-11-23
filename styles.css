@@ -1037,29 +1037,12 @@ body.slab-mode .card-column[data-level="3"] .holo-card-scene {
   box-shadow: 0 0 26px var(--card-glow-1), 0 0 16px rgba(255, 226, 138, 0.65), 0 6px 18px rgba(0, 0, 0, 0.78);
 }
 
-/* Visual FX Ascension Variants for Cards Awaiting Final Painted Swaps */
-.card-art-img[data-visual-fx="cowboys-l2"] {
-  filter: contrast(1.10) saturate(1.22) drop-shadow(0 0 16px rgba(56, 189, 248, 0.45));
+/* Bespoke Painted Evolution Artwork — subtle clarity polish for Awakened & MAX tiers */
+.card-art-img[data-visual-fx="awakened"] {
+  filter: contrast(1.03) saturate(1.06);
 }
-.card-art-img[data-visual-fx="cowboys-l3"] {
-  filter: contrast(1.18) saturate(1.36) brightness(1.06);
-  transform: scale(1.06);
-}
-.card-art-img[data-visual-fx="patriots-l2"] {
-  filter: contrast(1.12) saturate(1.24) brightness(1.03);
-}
-.card-art-img[data-visual-fx="patriots-l3"] {
-  filter: contrast(1.20) saturate(1.38) brightness(1.07);
-  transform: scale(1.06);
-}
-.card-art-img[data-visual-fx="packers-l3"],
-.card-art-img[data-visual-fx="packers-boss-l3"],
-.card-art-img[data-visual-fx="packers-leap-l3"] {
-  filter: contrast(1.16) saturate(1.34) brightness(1.07);
-  transform: scale(1.05);
-}
-.card-art-img[data-visual-fx="packers-leap-l2"] {
-  filter: contrast(1.10) saturate(1.22) brightness(1.03);
+.card-art-img[data-visual-fx="max"] {
+  filter: contrast(1.05) saturate(1.09);
 }
 
 /* Evolution Level-Up Shockwave Burst */
